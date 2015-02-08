@@ -1,0 +1,82 @@
+@ This is the initial trivial implementation of the
+\IDLInterface{PRNGIntegerState} defined in the IDL file
+\file{CorbaPRNGUtil.idl}.  This has a methods that returns an integer
+vector corresponding to the state .  In addition, it provides a method
+that returns the class-defined hash value for the state.  This allows
+the method that sets the state using an integer vector to verify that
+the state has been transmitted correctly and has not been modified.
+
+As per usual, we can use the tie mechanism to delegate the CORBA
+services (i.e. the skeletons to a secondary class) and have
+this class extend the existing \Java{} class, e.g.
+\OmegaClass{PRNGIntegerState}.  This may or may not be
+more convenient.
+
+All of this will be run from a small  application
+that instantiates an object of this class
+and puts it on the CORBA bus. It must initialize the ORB and BOA.
+See
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Docs}
+or
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Test}
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+public class CorbaPRNGIntegerState 
+               extends CorbaPRNGUtil._PRNGIntegerStateImplBase
+{
+ <<Fields>>
+
+ <<Constructors>>
+
+ <<Methods>>
+}
+
+
+@ Here we will probably have a \OmegaClass{PRNGIntegerState}.
+<<Fields>>=
+      PRNGIntegerState state;
+@ 
+<<Constructors>>=
+
+public CorbaPRNGIntegerState(PRNGIntegerState in_state) 
+{
+  state = in_state;
+}
+
+@ 
+Again,
+<<Methods>>=
+
+public String getPRNGName()
+{
+  return(state.getPRNGName());
+}
+
+
+public String getPRNGStateName()
+{
+  return ((Object) state).getClass().getName();
+}
+
+
+public int[] getIntegerState()
+{
+  return state.getIntegerState();
+}
+
+public int[] getIntegerStateHash()
+{
+  return state.getIntegerStateHash();
+}
+
+public void setIntegerState( int[] intState, int[] hash )
+{
+  state.setIntegerState( intState, hash );
+}
+
+
+@
+
+

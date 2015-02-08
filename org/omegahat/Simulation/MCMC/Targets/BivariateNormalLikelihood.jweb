@@ -1,0 +1,170 @@
+
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Targets/BivariateNormalLikelihood.jweb,v 1.1.1.1 2001/04/04 17:16:27 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+This file provides a simple unnormalized bivariate normal likelihood as a target distribution.
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/**
+ * A Bivariate normal density 
+ */
+public class BivariateNormalLikelihood implements UnnormalizedDensity
+{
+    <<Fields>>
+    <<Methods>>
+    <<Constructors>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+protected double[][] X ;
+protected BivariateNormalDensity norm;
+@
+
+<<Accessors>>=
+
+public double getData() { return X; }
+
+@
+
+<<Methods>>=
+
+public double logUnnormalizedPDF( Object state )
+{
+
+    // state should be a vector of doubles of length four containing:
+    // [0] mu_1
+    // [1] mu_2
+    // [2] sigma
+    // [3] rho
+
+    Double[] Dstate = (Double[]) state;
+    double mu1   = Dstate[0].doubleValue();
+    double mu2   = Dstate[1].doubleValue();
+    double sigma = Dstate[2].doubleValue();
+    double rho   = Dstate[3].doubleValue();
+
+    // check ranges 
+    if ( sigma <= 0.0 ) return 0.0;
+    if ( rho < 0.0 || rho > 1.0 ) return 0.0;
+
+    return computeLog( X, mu1, mu2, sigma, rho);
+}
+
+public double unnormalizedPDF( Object state )
+{
+    return Math.exp( logUnnormalizedPDF( state ) );
+}
+
+
+protected double computeLog( double[][] X, double mu1, double mu2, double sigma, double rho )
+{
+    double retval = 0.0;
+
+    for(int i=0; i < X.length ; i++)
+	{
+	    double x = (X[i][0] - mu1) / sigma;
+	    double y = (X[i][1] - mu2) / sigma;
+
+	    retval +=  // 1/Math.sqrt(2 * Math.PI ) * square( 1 / (1 - square( rho ) ) )  
+                       //  * 
+                       Math.exp( -1./2. * ( square(x) - 2. * rho * x * y + square(y) ) / ( 1. - square(rho) ) );
+	}
+
+    return retval;
+}
+
+
+protected double square(double x) { return x*x; }
+
+protected void readData( String dataFile ) throws java.io.IOException
+{
+    /* Temporary vector because we don't know how much data we have */
+    Vector tmp = new Vector();
+    
+    /* Open the input file */
+    BufferedReader B = new BufferedReader (new FileReader (dataFile));
+    StreamTokenizer T = new StreamTokenizer (B);
+    T.parseNumbers();           /* please parse doubles */
+    T.slashStarComments(true);  /* Ignore comments */
+    T.slashSlashComments(true); /* Ignore comments */
+    
+    /* Read file looking for numbers */
+    int token;
+    while( (token=T.nextToken()) != T.TT_EOF )
+	{
+	    switch( token ) {
+	    case T.TT_NUMBER:
+		tmp.addElement(new Double(T.nval));
+	    }
+	}
+    
+    System.out.println( T.lineno() + " lines read, " + tmp.size() + " values found. ");
+
+    if( (tmp.size() % 2) != 0 )
+	throw new RuntimeException(" Data length is not a multiple of two ! ");
+    
+    /* Copy the data out of the temporary vector and into an array */
+    this.X = new double[tmp.size()/2][2];
+    for(int i=0; i < tmp.size(); i+=2)
+	{
+	    this.X[i][i+0] = ((Double) tmp.elementAt(i)).doubleValue();
+	    this.X[i][i+1] = ((Double) tmp.elementAt(i)).doubleValue();
+	}
+    
+}
+
+@
+
+<<Constructors>>=
+
+public BivariateNormalLikelihood(String filename)
+{
+    try
+    {
+	readData( filename );
+    }
+    catch (Throwable e )
+    {
+	throw new RuntimeException("Error loading data.");
+    }
+}
+
+@
+
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Targets;
+
+@ %def 
+
+<<Imports>>=
+
+import org.omegahat.Probability.Distributions.*;
+import org.omegahat.Simulation.RandomGenerators.*;
+import java.util.Vector;
+import java.io.*;
+
+@ %def 
+
+

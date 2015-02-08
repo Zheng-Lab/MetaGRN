@@ -1,0 +1,197 @@
+This class implements a multi-dimensional generator that
+creates the next state from a multivariate normal distribution
+centered at the specified mean and variance.  
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+
+public class NormalProposal extends MVNormal implements GeneralProposal
+{
+
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods from interface ConditionalGenerator>>
+    <<Methods from interface ConditionalDensity>>
+    <<Methods from interface GeneralProposal>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+//public boolean DEBUG = true;
+public boolean DEBUG = false;
+
+@ %Def 
+
+<<Accessors>>=
+    
+/* inherited */
+
+@ %def 
+
+
+<<Constructors>>=
+
+/** Constructor for normal with specified mean and covariance matrix.
+ * @param mean  mean vector
+ * @param var   variance matrix
+**/
+public NormalProposal( double[] mean, double[][] var, PRNG prng )
+{
+    super(mean, var, prng );
+}
+
+/** Constructor for a spherical normal with the same mean and variances for each dimension.  
+ * Each element mean will be set the specified value.
+ * The diagonal elements of the covariance matrix will be set to the specified value, with off diagonals set to 0
+ * @param length number of dimensions
+ * @param mean   mean of each dimension
+ * @param var    diagnonal values for covariance matrix (off diagonals are set to 0, PRNG prng )
+**/
+public NormalProposal( int length, double mean, double var, PRNG prng )
+{
+  super(length, prng );
+  double[] mu = new double[length];
+  double[][] sigma  = new double[length][length];
+  
+  for(int i=0; i < length; i++)
+    {
+      mu[i] = mean;
+      sigma[i][i] = var;
+      // off diagionals reman 0.0 //
+    }
+  
+  setMean(mu);
+  setCovariance(sigma);
+  checkConformity();
+
+}
+
+/** Constructor for a (standard) spherical normal with mean 0 and identity covariance matrix 
+ * @param length number of dimensions
+**/
+public NormalProposal( int length , PRNG prng )
+{
+  super( length , prng );
+  double[] mu = new double[length];
+  double[][] sigma  = new double[length][length];
+  
+  for(int i=0; i < length; i++)
+    {
+      mu[i] = 0.0;
+      for(int j=0; j<length; j++)
+          sigma[i][j] = (i==j)?1.0:0.0;
+    }
+  
+  setMean(mu);
+  setCovariance(sigma);
+  checkConformity();
+
+}
+
+
+@ %def 
+
+
+<<Methods from interface ConditionalGenerator>>=
+
+public Object generate( Object ignored ) 
+{
+      return super.generate();
+}
+
+@
+
+<<Methods from interface GeneralProposal>>=
+
+public double transitionProbability( Object from, Object to )
+{
+    return conditionalPDF( to, from );
+}
+
+public double logTransitionProbability( Object from, Object to )
+{ 
+    return logConditionalPDF( to, from );
+}
+@
+
+
+<<Methods from interface ConditionalDensity>>=
+
+public double conditionalPDF( Object state, Object ignored )
+{
+    return PDF( state );
+}
+
+public double logConditionalPDF( Object state, Object conditionals )
+{
+    return logPDF( state );
+}
+
+@
+
+
+
+<<Main>>=
+
+static public void main( String[] argv )
+{
+    if(argv.length < 3) 
+    {
+        System.err.println("Usage: NormalProposal [numSamples] [offDiagonalCovariance] [debug]");
+        return;
+    }
+
+    double rho = Double.parseDouble( argv[1] );
+
+    double[][] var = {{1.0,rho,rho},{rho,1.0,rho},{rho,rho,1.0}}; 
+    double[]   mean = {0.0,0.0,0.0};
+    Double[]   start = new Double[]{ new Double(0.),
+                                     new Double(0.),
+                                     new Double(0.)};
+    
+    PRNG prng = new CollingsPRNG( (new CollingsPRNGAdministrator()).registerPRNGState() );
+    
+    NormalProposal example = new NormalProposal( mean, var, prng );
+
+    example.DEBUG = Boolean.valueOf(argv[2]).booleanValue();
+
+
+     for(int outer=0; outer< Integer.parseInt(argv[0]); outer++)
+     {
+         Double[] retval = (Double[]) example.generate( start );
+         double[] tmp = new double[3];
+
+         for(int i=0; i<retval.length; i++)
+             {
+                 System.out.print( retval[i] + " " );
+                 tmp[i] = retval[i].doubleValue();
+             }
+
+         System.out.println( example.PDF( retval ) );
+     }
+
+}
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Proposals;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+  import org.omegahat.Probability.Distributions.*;
+  import org.omegahat.Simulation.RandomGenerators.*;
+//   import Jama.*;
+
+@ %def 

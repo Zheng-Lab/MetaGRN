@@ -1,0 +1,92 @@
+/*****************************************************/
+/* First specify the Target (Posterior) Distribution */
+/*****************************************************/
+m = ModelFormula.multiLineParse(" X ~ N( mu, sigma) ; mu ~ N( 10.0, rho) ; rho ~ N( 1.0, 0.2 )");
+
+/*************************************************************/
+/* Now specify the Metropolis-Hastings Proposal Distribution */
+/*************************************************************/
+p = ModelFormula.multiLineParse(" mu ~ N( mu, sm ); rho ~ N( rho, sr) ");   
+
+/************************************/
+/* create a random number generator */
+/************************************/
+a = new CollingsPRNGAdministrator();               /* This server generates unique random number generators when asked */
+prng = new CollingsPRNG( a.registerPRNGState() );  /* instantiat the generator */
+
+/***********************************************************/
+/* define all of the terms and objects that will be needed */
+/***********************************************************/
+d = new ObjectDatabase("Definitions");             /* Somewhere to store everything. */
+d.assign("sigma",1.0);
+d.assign("N", new Normal( new CollingsPRNG( a.registerPRNGState() ) ) );  /* Create a normal distribution object */
+
+/* X _ rnorm(n=100,mean=3,sd=1) */
+d.assign("X", new double[] {4.480608, 4.472416, 3.738617, 5.093094, 2.209083, 1.478951, 1.382535, 4.103335, 2.244269, 3.070244, 4.590988, 1.901725, 2.892511, 4.490848, 3.652389, 3.172301, 4.247049, 2.271669, 3.193590, 2.28028, 1.407532, 3.810055, 2.538954, 3.774791, 2.673972, 1.650474, 3.537650, 2.19295, 2.417387, 2.671459, 3.076402, 3.645867, 3.123181, 5.172414, 2.719802, 3.218641, 2.381867, 4.362955, 2.135889, 4.54022, 2.496254, 3.393177, 3.623449, 0.1563431, -0.4630982, 3.170979, 1.698627, 2.489101, 3.179863, 1.381480, 2.968871, 2.553213, 2.81571, 1.384136, 1.344707, 2.306096, 1.150164, 3.539327, 1.424764, 3.104447, 2.456724, 4.646438, 1.775502, 3.680398, 2.629114, 3.398694, 2.075375, 3.123948, 1.714057, 3.298205, 4.901637, 2.543036, 1.811994, 2.874148, 3.631943, 3.475023, 2.98129, 2.696148, 3.637603, 3.476499, 1.814034, 4.302414, 3.576143, 3.411982, 2.970440, 2.367898, 3.112148, 3.380583, 2.042252, 2.322567, 2.787768, 0.5702486, 2.529506, 4.034501, 2.985719, 3.122801, 2.837401, 3.619862, 1.145621, 3.622189});
+
+
+
+d.assign("sm", 0.125 );
+d.assign("sr", 0.25 );
+
+
+
+/*************************/
+/* Pick an initial state */
+/*************************/
+
+i = new MCMCStateDatabase("Initial State"); 
+i.assign("mu",0.0);      /* intentionally bad */
+i.assign("rho", 0.50 );
+
+/*************************************************************************/
+/* Create the proposal distribution using the model and the definitions. */
+/*************************************************************************/
+pm = new ExpressionGeneralProposal( p , d );
+
+/**********************************************************************/
+/* Create the target distribution using the model and the definitions */
+/**********************************************************************/
+tm = new ExpressionTarget( m, d );  
+
+/*************************************/
+/* now create the actual MCMC object */
+/*************************************/
+mcmc = new CustomMetropolisHastingsSampler(i, tm, pm, prng  ); 
+
+/***************************************************************/
+/* add a listener so we get information about what happens ... */
+/***************************************************************/
+
+l = new StepListenerPrinter();  // displays on stdout
+w = new ListenerWriter("test.out");  // saves to "test.out"
+
+lh = mcmc.registerListener(l);
+lw = mcmc.registerListener(w);
+
+
+
+/******************************************************/
+/* Add a couple plots so we can see what is happening */
+/******************************************************/
+
+vars = new String[]{"mu","rho"};
+
+//lb = new PlottingListener(vars,1000);
+//lbh = mcmc.registerListener(lb);
+
+lbe = new ExpandingPlottingListener(vars,10, 10000);
+lbeh = mcmc.registerListener(lbe);
+
+//lb.refreshInterval(50);
+lbe.refreshInterval(50);
+
+/*******************************/
+/* Now run for 1000 iterations */
+/*******************************/
+mcmc.iterate(1000);
+
+mcmc.iterate(10);
+
+//mcmc.run();
+

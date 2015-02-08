@@ -1,0 +1,129 @@
+This class implements a very basic listener.  It counts occurences of [[ChainStepEvent]]s and displays the current count when one is recieved.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+/**
+ * Displays contents and counter of <code>ChainStepEvent<code>s when one is recieved.
+ */
+public class StepListenerPrinter extends ListenerPrinter
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+    public int step=0;
+    public boolean counter=true;
+
+@ %def 
+
+<<Accessors>>=
+    
+    /* none */
+
+@ %def 
+
+
+<<Constructors>>=
+
+    /* none */
+
+@ %def 
+
+<<Methods>>=
+
+
+protected String arrayToString( Object contents )
+{
+    Object[] array = (Object[]) contents;
+
+    String retval = "[ ";
+    for(int i = 0; i < array.length; i++)
+        retval += array[i].toString() + " ";
+    retval += "]";
+
+    return retval;
+}
+
+
+public String doString( Object current )
+{
+	if( current instanceof ContainerState )
+	{
+	    Object contents = ((ContainerState) current).getContents();
+
+	    if(contents instanceof Object[] )
+		return ( arrayToString(contents) );
+	    else
+		return ( contents.toString() );
+	}
+	else return current.toString();
+}
+
+public void notify( MCMCEvent e )
+{
+  if( e instanceof DetailChainStepEvent )
+    {
+      System.out.println( e.toString() );
+    }
+  else
+    if( e instanceof GenericChainStepEvent )
+    {
+	if (counter) ++step ;
+
+	MCMCState current =  ((GenericChainStepEvent ) e).getCurrent();
+
+	if( current instanceof ContainerState )
+	{
+	    System.out.println( doString(current) );
+
+	}
+	else if (current  instanceof MultiState )
+	{
+	    MultiState me = (MultiState) current;
+	    
+	    for(int i=0; i < me.size() ; i++)
+		{
+		    System.out.println( step + " " + i + " " + doString(me.get(i)) );
+		}
+	}
+	else
+	    System.out.println( current );
+    }
+    else
+      System.out.println("Unrecognized Event: " + e );
+}
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+    /* none */
+
+@ %def 
+
+
+
+

@@ -1,0 +1,89 @@
+
+Hi Duncan,
+
+As I worked to get the ModelEvaluator to compile and run properly, I
+discovered a number of misfeatures, bugs, and questions.  This (rather
+long) email describes them.
+
+-------------------------------------------------------------------------------------
+---------  SearchPath.toString() displays elements in the wrong  order --------------
+-------------------------------------------------------------------------------------
+
+When the searchpath of my ModelEvaluator is displayed, the elements
+are shown in the wrong order.  When I access the search path element
+by element, or test by doing get("foo") it appears to be correct.
+
+
+Code:
+
+  // attach these in the order we want the search to occur
+  // Scratch in position 0
+  attach( proposed, 1 ) ; 
+  attach( current, 2 );
+  attach( definitions, 3 ) ;
+
+Results:
+
+ Get numbered elements:
+
+[16] ev.searchPath().elementAt(0).getName();
+Scratch
+[17] ev.searchPath().elementAt(1).getName();
+proposed
+[18] ev.searchPath().elementAt(2).getName();
+current
+[19] ev.searchPath().elementAt(3).getName();
+Definitions
+
+  Ask for the keys explicitly:
+
+[25] s.orderedKeys()
+[Scratch, proposed, current, Definitions]
+
+  However, ask for the list of elements:
+
+[20] ev.searchPath()
+{Definitions={sigma=1.0, X=[Ljava.lang.Double;@e0533426, N=org.omegahat.Probability.Distributions.Normal@d8f33426}, proposed={rho=null database entry, mu=null database entry}, Scratch={}, current={rho=0.95, mu=10.0}}
+
+I think that the problem may be that OrderedTable does not declare its
+own toString method, rather it relies on the method supplied by
+Hashtable, which is not aware of the ordering information.
+
+Adding the method:
+
+<<toString>>=
+
+public String toString()
+{
+  Vector n = orderedKeys();
+  Vector d = ordered();
+  
+  String retval = "[";
+  
+  for(int i = 0; i < n.size() && i < d.size() ; i++)
+  {
+    if ( i!=0 ) 
+    { 
+      retval += ","; 
+    }
+    
+    retval += n.elementAt(i) + "=" + d.elementAt(i) ;
+  }
+  
+  retval += "]";
+
+  return retval;
+}
+  
+@ %def 
+
+to $OMEGA_HOME/Environment/Utils/OrderedTable.jweb
+
+seems to correct the problem:
+
+[3] ev.searchPath()
+[Scratch={},proposed={rho=null database entry, mu=null database entry},current={rho=0.95, mu=10.0},Definitions={sigma=1.0, X=[Ljava.lang.Double;@cb8b3231, N=org.omegahat.Probability.Distributions.Normal@f5c73231}]
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------

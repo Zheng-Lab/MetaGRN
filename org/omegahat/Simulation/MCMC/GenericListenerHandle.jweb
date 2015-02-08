@@ -1,0 +1,23 @@
+<<*>>=
+
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/GenericListenerHandle.jweb,v 1.1.1.1 2001/04/04 17:16:15 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+
+
+package org.omegahat.Simulation.MCMC;                 
+
+
+import java.util.*;                                      
+import org.omegahat.Simulation.RandomGenerators.PRNG;    
+import org.omegahat.Probability.Distributions.*;
+
+
+
+public class GenericListenerHandle implements MCMCListenerHandle
+{
+    
+};
+
+@

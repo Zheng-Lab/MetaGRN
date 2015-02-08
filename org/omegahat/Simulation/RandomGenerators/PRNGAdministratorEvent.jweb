@@ -1,0 +1,40 @@
+@
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+
+public class PRNGAdministratorEvent // extends java.awt.AWTEvent {
+{ 
+
+<<Fields>>
+<<Constructors>>
+
+<<Field Accessors>>
+}
+
+@ 
+<<Fields>>=
+protected  PRNGState state;
+protected  PRNGAdministrator source;
+
+@ 
+<<Constructors>>=
+public PRNGAdministratorEvent(PRNGState state, PRNGAdministrator admin) {
+  source = admin;;
+  state(state);
+}
+
+public PRNGAdministratorEvent() {
+}
+
+@ 
+<<Field Accessors>>=
+public PRNGState state() {
+ return(state);
+}
+
+public PRNGState state(PRNGState s) { 
+  state = s;
+ return(state());
+}

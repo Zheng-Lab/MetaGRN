@@ -1,0 +1,88 @@
+@ This is the initial base class for trivial implementations of the
+\IDLInterface{PRNGFactory} defined in the IDL file
+\file{CorbaPRNGUtil.idl}.  This base class has  methods for instantiating a 
+\IDLInterface{PRNGState} and returning the either resulting
+\OmegaInterface{PRNG} or a CORBA IDLInterface{PRNG} holding a \OmegaInterface{PRNG} .
+
+This methods of this base class don't actually know how to instantiate anything, it
+merely throws an exception if called.
+
+As per usual, we can use the tie mechanism to delegate the CORBA
+services (i.e. the skeletons to a secondary class) and have
+this class extend the existing \Java{} class, e.g.
+\OmegaClass{CollingsPRNGFactory}).  This may or may not be
+more convenient.
+
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+public class CorbaPRNGFactory 
+               extends CorbaPRNGUtil._PRNGFactoryImplBase
+{
+ <<Fields>>
+ <<Constructors>>
+ <<Methods>>
+}
+
+
+@ Here we will probably have a \OmegaClass{CollingsPRNGFactory}.
+<<Fields>>=
+      PRNGFactory factory;
+@ 
+<<Constructors>>=
+public CorbaPRNGFactory() 
+{
+}
+
+@ 
+
+<<Methods>>=
+/** 
+ * Create and return new <code>PRNG</code> using the supplied <code>CorbaPRNGState</code>.  
+ *
+ * <p> Note that this method returns a "pure" <code>PRNG</code>.  To
+ * get a <code>CorbaPRNG</code>, use <code>instantiate</code> instead.  
+ *
+ * <p> This "default" implementation merely throws a <code>Runtime
+ * Exception<code> and returns.
+ *
+ * <p> Inheriting classes should override this method.  Yhe overriding
+ * method should call <code>parent.instantiate</code> for any
+ * CorbaPRNG class that it does not handle, thus inheriting the
+ * functionality (if any) provided by the parent.  If the calls fall
+ * through to this base implemenation, it will throw a
+ * <code>RuntimeException</code>.  
+ */
+public PRNG localInstantiate(CorbaPRNGUtil.PRNGState corbaState)
+{
+  /* This method doesn't actually know how to instantiate anything.  Throw an exception. */
+  throw new RuntimeException("Unknown CorbaPRNG Class.  Failed in instantiate");  
+}
+@
+
+<<Methods>>=
+/** 
+ * Create and return new <code>CorbaPRNG</code> using the provided
+ * <code>CorbaPRNGState</code>.  
+ *
+ * <p> Note that this method returns a <code>CorbaPRNG</code> object.  To get a "pure"
+ * <code>PRNG</code>, use "localInstantiate" instead.  
+ *
+ * <p> This "default" implementation merely throws a <code>Runtime
+ * Exception<code> and returns.
+ *
+ * <p> Inheriting classes should override this method.  Yhe overriding
+ * method should call <code>parent.instantiate</code> for any
+ * CorbaPRNG class that it does not handle, thus inheriting the
+ * functionality (if any) provided by the parent.  If the calls fall
+ * through to this base implemenation, it will throw a
+ * <code>RuntimeException</code>.  
+ */
+
+public CorbaPRNGUtil.PRNG instantiate(CorbaPRNGUtil.PRNGState corbaState)
+{
+  /* This method doesn't actually know how to instantiate anything.  Throw an exception. */
+  throw new RuntimeException("Unknown CorbaPRNG Class.  Failed in instantiate");  
+}
+@

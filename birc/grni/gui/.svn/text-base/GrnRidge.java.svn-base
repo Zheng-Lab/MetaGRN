@@ -1,0 +1,115 @@
+package birc.grni.gui;
+
+import birc.grni.gui.visulization.GrnVisulizeNetwork;
+import birc.grni.ridge.RidgeRegression;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+
+
+public class GrnRidge extends GrnRidgeDisplay {
+
+	public GrnRidge(JFrame frameR) {
+		
+		super(frameR);
+		header_ridge.setTitle("Set parameters for Ridge Regression");
+		header_ridge.setInfo("Enter parameters and click start button ");
+		header_ridge.setTopColor(Color.RED);
+		header_ridge.setBottomColor(Color.PINK);
+		
+		startButtonRidge.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int numGenes = Integer.parseInt(geneText.getText());
+				int samples = Integer.parseInt(sampleTextField.getText());
+				String filePath = inputFilePath.getText();
+				
+				RidgeRegression ridge = new RidgeRegression (numGenes,samples,filePath);
+				ridge.execute();
+						
+			}
+		});
+			
+	}
+	
+	public static void ridgeResult (int [][] network, int genes) {
+		
+		Object [] options = {"Save Result" , "Visualize Result"};
+		int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		
+		if(optionValue == JOptionPane.OK_OPTION){
+			// save result
+			JFileChooser chooser = new JFileChooser();
+		    int returnVal = chooser.showSaveDialog(null);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		    	String resultSavePath = chooser.getSelectedFile().getAbsolutePath();
+		    	try {
+					FileWriter resultFileWriter = new FileWriter(resultSavePath , true);
+					// write results as a matrix //
+					for(int i=0; i<genes; i++){
+			    		   for(int j=0; j<genes; j++){
+			    			   
+			    			   if(network[i][j] == 1){
+			    				   resultFileWriter.write("1" + "\t");
+			                       
+			    			   }
+			    			   else{
+			    				   resultFileWriter.write("0" + "\t");
+			    			   }
+			    		   }
+			    		 
+			    		   resultFileWriter.write("\n");
+			    	   }
+			    	  
+					   resultFileWriter.write("\n");
+					   resultFileWriter.write("\n");
+			    	      
+			    	   // write results according to standard format 
+					   for(int m=0; m<genes; m++){
+			    		   for(int n=0; n<genes; n++){
+			    			   
+			    			   if(network[m][n] == 1){
+			    				   resultFileWriter.write("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+			                       
+			    			   }
+			    			   else{
+			    				   resultFileWriter.write("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+			    			   }
+			    			   resultFileWriter.write("\n");
+			    		   }
+			    	   }
+					   resultFileWriter.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			
+		    }  	
+		}
+		
+		if(optionValue == JOptionPane.NO_OPTION){
+			// create a visualization class object and pass the network
+			try {
+				GrnVisulizeNetwork visualization = new GrnVisulizeNetwork(network, genes);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+						
+	}
+	
+	private void printReslt(){
+		
+	}
+}

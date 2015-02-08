@@ -1,0 +1,39 @@
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/MCMCListener.jweb,v 1.1.1.1 2001/04/04 17:16:16 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+public interface MCMCListener 
+{
+
+    /** Function to be called for notification */
+    public void notify( MCMCEvent event );
+}
+
+@ %def 
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+    /* none */
+
+@ %def 
+

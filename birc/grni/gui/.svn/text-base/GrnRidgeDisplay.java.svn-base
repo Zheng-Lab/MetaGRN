@@ -1,0 +1,183 @@
+package birc.grni.gui;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
+
+public class GrnRidgeDisplay {
+
+	protected JFrame frame_ridge;
+	protected GrnGuiHeader header_ridge = new GrnGuiHeader();
+	
+	protected JPanel headerPanelRidge;
+	protected JPanel textFieldPanelRidge;
+	protected JPanel bottomPanel;
+	
+	protected JLabel numGenesRidge;
+	protected JLabel numSamples;
+	protected JLabel inputFilePathLable;
+	
+	protected TextField geneText;
+	protected TextField sampleTextField;
+	protected TextField inputFilePath;
+	
+	protected JButton fileBrowse;
+	protected JButton startButtonRidge;
+	
+	public static JProgressBar ridgeProgressBar;
+	
+	
+	public GrnRidgeDisplay(JFrame frameR){
+		frame_ridge= frameR;
+		
+		frame_ridge.setBackground(Color.WHITE);
+		frame_ridge.getContentPane().setFocusCycleRoot(true);
+		frame_ridge.getContentPane().setBackground(Color.WHITE);
+		frame_ridge.setSize(new Dimension(0,0));
+		frame_ridge.setBounds(200,200,600,400);
+		
+		frame_ridge.setTitle("Ridge regression");
+		
+		// adding header panel 
+		headerPanelRidge = new JPanel();
+		headerPanelRidge.setBackground(Color.WHITE);
+		final CardLayout cards_ = new CardLayout();
+		headerPanelRidge.setLayout(cards_);
+		frame_ridge.getContentPane().add(headerPanelRidge, BorderLayout.NORTH);
+		headerPanelRidge.add(header_ridge, "header");
+		
+		// create text field panel and add component into it
+		textFieldPanelRidge = new JPanel();
+		textFieldPanelRidge.setBackground(Color.WHITE);
+		GridBagLayout gridBagLayout1 = new GridBagLayout();
+		textFieldPanelRidge.setLayout(gridBagLayout1);
+		frame_ridge.getContentPane().add(textFieldPanelRidge,BorderLayout.CENTER);
+		
+		inputFilePathLable = new JLabel();
+		inputFilePathLable.setText("Input File path");
+		GridBagConstraints ridgeConstraints = new GridBagConstraints();
+		ridgeConstraints.fill = GridBagConstraints.HORIZONTAL;
+		ridgeConstraints.weightx = 0.5;
+		ridgeConstraints.weighty = 1;
+		ridgeConstraints.gridx= 0;
+		ridgeConstraints.gridy= 0;
+		ridgeConstraints.insets = new Insets(0,5,0,10);
+		textFieldPanelRidge.add(inputFilePathLable, ridgeConstraints);
+		
+		inputFilePath = new TextField();
+		ridgeConstraints.weightx = 2.5;
+		ridgeConstraints.gridx = 1;
+		ridgeConstraints.gridy = 0;
+		ridgeConstraints.weightx = 0.5;
+		ridgeConstraints.insets = new Insets(0,10,0,10);
+		textFieldPanelRidge.add(inputFilePath, ridgeConstraints);
+		inputFilePath.setColumns(20);
+		
+		fileBrowse = new JButton();
+		fileBrowse.setText("Browse");
+		ridgeConstraints.weightx = 0.1;
+		ridgeConstraints.gridx = 3;
+		ridgeConstraints.gridy = 0;
+		
+		ridgeConstraints.insets = new Insets(0,10,0,10);
+		textFieldPanelRidge.add(fileBrowse, ridgeConstraints);
+		
+		fileBrowse.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JFileChooser ch = new JFileChooser();
+				int value = ch.showOpenDialog(null);
+				if(value == JFileChooser.APPROVE_OPTION){
+					inputFilePath.setText(ch.getSelectedFile().getAbsolutePath());
+				}
+				
+			}
+		});
+		
+		numGenesRidge = new JLabel();
+		numGenesRidge.setText("Number of genes");
+		ridgeConstraints.weightx = 0.5;
+		ridgeConstraints.gridx = 0;
+		ridgeConstraints.gridy = 1;
+		ridgeConstraints.insets = new Insets(0, 5, 0, 10);
+		textFieldPanelRidge.add(numGenesRidge, ridgeConstraints);
+		
+		geneText = new TextField();
+		ridgeConstraints.gridx = 1;
+		ridgeConstraints.gridy = 1;
+		ridgeConstraints.insets = new Insets(0,10,0,150);
+		textFieldPanelRidge.add(geneText, ridgeConstraints);
+		
+		numSamples = new JLabel();
+		numSamples.setText("Number of samples");
+		ridgeConstraints.gridx = 0;
+		ridgeConstraints.gridy = 2;
+		ridgeConstraints.insets = new Insets(0,5,0,10);
+		textFieldPanelRidge.add(numSamples, ridgeConstraints);
+		
+		sampleTextField = new TextField();
+		ridgeConstraints.gridx = 1;
+		ridgeConstraints.gridy = 2;
+		ridgeConstraints.insets = new Insets(0,10,0,150);
+		textFieldPanelRidge.add(sampleTextField , ridgeConstraints);
+		
+		//bottom panel
+		bottomPanel = new JPanel();
+		GridBagLayout gridBagLayoutbottom = new GridBagLayout();
+		bottomPanel.setLayout(gridBagLayoutbottom);
+		frame_ridge.getContentPane().add(bottomPanel,BorderLayout.SOUTH);
+		
+		Component componentStruct = Box.createVerticalStrut(10);
+		final GridBagConstraints gridBagConstraintsStruct = new GridBagConstraints();
+		gridBagConstraintsStruct.gridy = 0;
+		gridBagConstraintsStruct.gridx = 1;
+		bottomPanel.add(componentStruct, gridBagConstraintsStruct);
+		
+		
+		startButtonRidge = new JButton();
+		startButtonRidge.setText("Start");
+		GridBagConstraints bagConstraintsbottom = new GridBagConstraints();
+		bagConstraintsbottom .fill = GridBagConstraints.HORIZONTAL;
+		bagConstraintsbottom .weightx = 0.5;
+		bagConstraintsbottom .gridy = 1;
+		bagConstraintsbottom .gridx = 0;
+		bagConstraintsbottom .insets = new Insets(10,30,10,50);
+		bottomPanel.add(startButtonRidge, bagConstraintsbottom );
+		
+		ridgeProgressBar = new JProgressBar();
+		ridgeProgressBar.setStringPainted(true);
+		//bagConstraintsbottom.ipady =15;
+		bagConstraintsbottom .gridx = 1;
+		bagConstraintsbottom .gridy = 1;
+		bagConstraintsbottom .insets = new Insets(0,10,0,100);
+		bottomPanel.add( ridgeProgressBar, bagConstraintsbottom );
+		
+		Component componentStruct2 = Box.createVerticalStrut(10);
+		final GridBagConstraints gridBagConstraintsStruct2 = new GridBagConstraints();
+		gridBagConstraintsStruct2.gridy = 2;
+		gridBagConstraintsStruct2.gridx = 2;
+		bottomPanel.add(componentStruct2, gridBagConstraintsStruct2);
+		
+		
+	}
+}

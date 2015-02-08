@@ -1,0 +1,143 @@
+
+This object implements both [[MCMCListener]] and [[NotifyingObject]].
+It serves as a proxy [[MCMCListener]] that only forwards 1 out of
+every [[thinningFactor]] events to its subscribers.
+
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Listeners/ThinningProxyListener.jweb,v 1.1.1.1 2001/04/04 17:16:30 warneg Exp $ */
+/* (c) 1999 by the Omegahat Project */
+/* (c) 2000 by the Gregory R. Warnes */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/** 
+ * This object serves as a proxy <code>MCMCListener</code> that only
+ * forwards 1 out of every <code>thinningFactor</code> events to its
+ * subscribers 
+ **/
+public class ThinningProxyListener implements NotifyingObject, MCMCListener
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Methods implementing NotifyingObject>>
+    <<Methods implementing MCMCListener>>
+    <<Constructor>>
+}
+
+@
+<<Fields>>=
+    
+protected Hashtable listeners = new Hashtable();  
+
+protected int thinningFactor = 1;
+protected int totalEvents = 0;
+@
+
+
+<<Accessors>>=
+
+public int getTotalEvents() { return totalEvents; }
+public void resetTotalEvents() { totalEvents=0; }
+
+public int getThinningFactor() { return thinningFactor; }
+public int setThinningFactor( int factor ) 
+{ 
+    if(factor<1) 
+        throw new RuntimeException("Attempt to set thinning factor to value less that 1");
+
+    return thinningFactor = factor; 
+}
+
+@ %def 
+
+
+
+<<Methods implementing NotifyingObject>>=
+
+    public class MyHandle implements MCMCListenerHandle
+    {
+        public MyHandle() {};
+    }
+
+    // we can always register and unregister listeners
+    public MCMCListenerHandle registerListener  ( MCMCListener  listener ) 
+    { 
+
+        MCMCListenerHandle handle = new MyHandle();
+
+        listeners.put( handle,  listener); 
+        return handle;
+    }
+    public void    unregisterListener( MCMCListenerHandle handle   )
+    { 
+        listeners.remove( handle );
+    }
+    
+    protected void   notifyAll( MCMCEvent e )
+     {
+       MCMCListener l = null;
+    
+       Enumeration iterator = listeners.elements();
+       while( iterator.hasMoreElements() )
+       {   
+          l = (MCMCListener) iterator.nextElement();
+          if( l != null) l.notify( e );
+       }
+     }
+
+
+
+
+@ %def 
+
+<<Methods implementing MCMCListener>>=
+/** Function to be called for notification */
+public void notify( MCMCEvent event )
+{
+    totalEvents++;
+
+    // only forward 1 of every thinningFactor events
+    if( ((totalEvents) % thinningFactor) == 0 )
+       notifyAll(event);
+}
+
+
+@ %def 
+
+<<Constructor>>=
+
+public ThinningProxyListener()
+{
+}
+
+public ThinningProxyListener(int factor)
+{
+    thinningFactor = factor;
+}
+
+@ %def 
+
+
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+    import java.util.*;
+
+@ %def 
+

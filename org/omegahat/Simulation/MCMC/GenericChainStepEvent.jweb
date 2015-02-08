@@ -1,0 +1,83 @@
+This class defines a minimal event that is generated when a chain has
+completed one step.  It provides appropriate information about the
+step.  It can be extended to provide arbitrarily rich information
+about the step.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class GenericChainStepEvent extends GenericChainEvent
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+}
+@
+
+<<Fields>>=
+
+public MCMCState current;
+
+@ %def 
+
+<<Accessors>>=
+    
+public MCMCState getCurrent() { return this.current; }
+public void      setCurrent( MCMCState current ) { this.current = current; }
+
+@ %def 
+
+
+<<Constructors>>=
+
+    protected GenericChainStepEvent()
+    {
+    }
+
+
+    public GenericChainStepEvent( Object source, MCMCState current )
+    {
+	this.description = "Generic Chain Step Event";
+	this.source = source;
+	this.current = current;
+    }
+
+@ %def 
+
+<<Methods>>=
+
+public String toString()
+{
+    return this.description + "\n" + 
+           "Source: " + source + "\n" + 
+           "Current: " + current + "\n" ;
+
+}
+@ %def 
+
+<<Constructors>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+  import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+@ %def 

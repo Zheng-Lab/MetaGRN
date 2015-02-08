@@ -1,0 +1,50 @@
+//      System.err.println("Usage: CustomHastingsCoupledSampler /nIter/ /pCouple/ /proposalVar/ ");
+
+int nDim = 5;
+String modeFile = "example.data";
+
+int numChains = 10;
+int numIter = 10000;
+double pCouple = 0.0;
+double proposalVar = 1.0;
+
+
+
+// create a random number generator //
+PRNG prng = new CollingsPRNG( (new CollingsPRNGAdministrator()).registerPRNGState() );
+
+// Create an array to hold the component chains //
+SlaveMetropolisHastingsSampler[] chains = new SlaveMetropolisHastingsSampler[numChains];
+
+// This prints out the states as they are created //
+ListenerPrinter l = new StepListenerPrinter();
+
+// Same proposal for all three chains //
+NormalIncrementGenerator ni =   new NormalIncrementGenerator(prng);
+ni.setVariance( proposalVar );
+
+ManyModesLikelihood  mmlik = new ManyModesLikelihood( modeFile , nDim);
+
+for ( int i=0; i < chains.length; i++)
+{
+    Double[] state = new Double[nDim];
+    for(int j=0; j<nDim; j++)
+	state[j] = new Double(0.0);
+    
+    chains[i] = new org.omegahat.Simulation.MCMC.SlaveMetropolisHastingsSampler( state, 
+						    mmlik,
+						    ni,
+						    prng );
+    //            chains[i].registerListener(l);
+    
+}
+
+CustomHastingsCoupledSampler test = new CustomHastingsCoupledSampler( chains, pCouple , prng  );
+
+test.debug=false;
+
+// test.registerListener(l);
+
+test.iterate( numIter );
+
+mmlik.numVisited()

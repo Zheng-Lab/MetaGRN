@@ -1,0 +1,49 @@
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/MetropolisSampler.jweb,v 1.1.1.1 2001/04/04 17:16:17 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/** 
+ *  A Metropolis Markov Chain sampler.
+ * 
+ *  <p> Metropolis samplers are Markov Chains that generate the next
+ *  state by making generating a prospective next state from a known
+ *  distribution, and then deciding whether to use prospective state
+ *  by computing the Metropolis acceptance function.  This function
+ *  depends only on the ratio of the target distribution's probability
+ *  density at the current and proposed points.  Hence
+ *  normalization constants are not required. 
+ *
+ *  <p> the Metropolis sampler is only valid for proposal
+ * distributions are symmetric in that P(X|Y) = P(Y|X).
+ */
+public interface MetropolisSampler extends MarkovChain
+{
+}
+@ %def 
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+    /* none */
+
+@ %def 
+

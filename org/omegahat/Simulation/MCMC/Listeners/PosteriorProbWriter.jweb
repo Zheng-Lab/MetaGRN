@@ -1,0 +1,114 @@
+This class extends [[ListenerWriter]] by extracting the current MCMC posterior probability from [[DetailChainStepEvent]]s.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class PosteriorProbWriter extends ListenerWriter 
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+/*inherited*/
+
+@ %def 
+
+
+<<Accessors>>=
+
+/*inherited*/
+
+@ %def 
+
+
+<<Constructors>>=
+
+protected PosteriorProbWriter() throws java.io.IOException
+{
+}
+
+public PosteriorProbWriter( String filename, boolean append, boolean storeTime) throws java.io.IOException
+{
+  super( filename, append, storeTime);
+}
+
+public PosteriorProbWriter( String filename, boolean append ) throws java.io.IOException
+{
+  this( filename, append, false );
+}
+
+public PosteriorProbWriter( String filename ) throws java.io.IOException
+{
+  this( filename, false, false);
+}
+
+
+@ %def 
+
+<<Methods>>=
+
+public void notify( MCMCEvent e )
+{
+    if( e instanceof DetailChainStepEvent )
+    {
+	DetailChainStepEvent de = (DetailChainStepEvent) e;
+	
+	double currentLogProb;
+
+	if( de.accepted )
+	    currentLogProb = de.proposedProb;
+	else
+	    currentLogProb = de.lastProb;
+
+	out.println( Math.exp(currentLogProb) + " " + currentLogProb );
+    }
+    else
+      out.println("Unrecognized Event: " + e );
+}
+
+public void println( String ignored )
+{
+  return;
+}
+
+public void print( String ignored )
+{
+  return;
+}
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.io.*;
+import java.util.Date;
+import java.util.zip.GZIPOutputStream;
+import org.omegahat.GUtilities.ArrayTools;
+
+@ %def 
+
+
+
+

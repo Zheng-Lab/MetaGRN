@@ -1,0 +1,148 @@
+
+This file implements [[CustomGibbsSampler]].  The constructor accepts
+an [[ConditionalGenerator]] which is then used to create a Gibbs Sampler.
+Objects of this class is immutable once created.
+
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/CustomGibbsSampler.jweb,v 1.1.1.1 2001/04/04 17:16:12 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/** 
+ *  A Gibbs Sampler that uses an internal <code>FullConditionalProposal</code> to generate the next Markov state.
+ */
+public class CustomGibbsSampler extends CustomMarkovChain
+{
+
+    <<Fields>>
+    <<Constructors>>
+    <<New Methods>>
+    <<Main>>
+}
+
+@
+<<Fields>>=
+
+    /* none */
+
+@
+
+<<Accessors>>=
+
+    /* none */
+
+@ %def 
+
+
+<<New Methods>>=
+
+    /* none */
+
+@ %def 
+
+
+<<Constructors>>=
+
+public CustomGibbsSampler( ContainerState state, FullConditionalProposal generator )
+{
+    super( state, generator );
+}
+
+
+public CustomGibbsSampler( Object state, FullConditionalProposal generator )
+{
+    super( state, generator );
+}
+
+@ %def 
+
+
+This section contains code that I've used to test and debug this class.
+
+<<Main>>=
+
+static public class NormalGenerator extends Normal implements FullConditionalProposal
+{
+    public Object generate( Object ignored )
+    {
+	return super.generate();
+    }
+
+
+    public Object[] generateSeveral( int howmany, Object[] ignored )
+    {
+	return super.generateSeveral( howmany );
+    }
+
+    public NormalGenerator( PRNG prng )
+    {
+	super( prng );
+    }
+}
+
+
+
+
+public static class listenerPrinter implements MCMCListener
+{
+    public int step=0;
+    public void notify( MCMCEvent e ){
+	if( e instanceof GenericChainStepEvent )
+	    {
+		step++;
+		System.out.println("** Notify : Chain Step Event #" + step + " ** ");
+	    }
+	else
+	    System.out.println("** Notify: Unrecognized Event ** ");
+	System.out.println("** Details:");
+	System.out.println( e );
+    }
+}
+
+
+
+public static void main( String[] argv )
+{
+    PRNG prng = new CollingsPRNG( (new CollingsPRNGAdministrator()).registerPRNGState() );
+
+    Double[] state = new Double[1];
+    state[0] = new Double( 0.0 );
+    CustomGibbsSampler test = new CustomGibbsSampler( state, new NormalGenerator(prng) );
+    listenerPrinter l = new listenerPrinter();
+
+    test.registerListener(l);
+    test.iterate(10);
+}
+
+    
+
+@ %def 
+
+
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+import org.omegahat.Probability.Distributions.*;
+import org.omegahat.Simulation.RandomGenerators.*;
+
+@ %def 
+

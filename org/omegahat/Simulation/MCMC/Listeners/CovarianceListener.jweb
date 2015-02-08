@@ -1,0 +1,111 @@
+This listener computes the covariance of the points it recieves.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class CovarianceListener implements MCMCListener, ResettableListener
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+protected MultiDoubleState$CovAccumulator  cumData = null;
+
+@ %def 
+
+<<Accessors>>=
+
+
+public double[][] getCovariance()
+{
+    return MultiDoubleState.accumToVar( cumData );
+}
+
+public void reset()
+{
+    cumData = null;
+}
+
+@ %def 
+
+
+<<Constructors>>=
+
+public CovarianceListener()
+{
+}
+
+@ %def 
+
+<<Methods>>=
+
+public void notify( MCMCEvent e )
+{
+  MultiDoubleState state = null;
+
+
+  if( e instanceof GenericChainStepEvent )
+  {
+    GenericChainStepEvent ev = ((GenericChainStepEvent) e);
+    MultiState current = null;
+    
+    if (ev.current instanceof ContainerState)
+      current = (MultiState) ((ContainerState) ev.current).getContents();      
+    else if (ev.current instanceof MultiState)
+      current = (MultiState) ev.current;
+
+    state = new MultiDoubleState( current );
+
+    if(false)
+    {
+      throw new RuntimeException( "CovarianceListener only works on MultiDoubleState or MultiState objects "+
+                              "containing only Double[] components.");
+    }
+    
+    if(cumData==null)
+    {
+        cumData = state.cumSumSqr();
+    }
+    else
+        cumData = state.cumSumSqr(cumData);
+
+  }
+
+  // else ignore the event
+
+}
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.io.*;
+import java.util.Date;
+
+@ %def 
+
+
+
+

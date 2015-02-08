@@ -1,0 +1,29 @@
+@ This is an application that makes a SPRNGTester CORBA object
+available to other applications.  This can then be used to run some of
+the PRNG tests for a given PRNG adminsitrator and random number
+generator system.
+
+The definition for the IDL interface is in \file{SPRNGTester.idl}.
+
+Duncan Temple Lang.
+<<*>>=
+
+<<Includes>>
+<<Globals>>
+
+<<Main>>
+
+
+@ 
+<<Main>>=
+int
+main(int argc, char **argv)
+{
+
+ InitializeLocalOrb(argc, argv, &CORBAGlobals, true);
+
+  new SPRNGTestServer();
+
+    /* Enter the event loop and process requests. */
+ CORBAGlobals.boa->impl_is_ready(NULL);
+}

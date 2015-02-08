@@ -1,0 +1,97 @@
+This class computes a beta-binomial likelihood for data read from the specified file.
+
+<<*>>=
+
+
+package org.omegahat.Simulation.MCMC.Dissertation.Paper1;
+
+import java.lang.Math;
+import com.imsl.math.Sfun;
+import org.omegahat.GUtilities.ArrayTools;
+import org.omegahat.Probability.Distributions.UnnormalizedDensity;
+
+public class Binomial implements UnnormalizedDensity
+{
+
+    static public boolean ignoreRangeErrors = true;
+    
+    protected int   dataLength = 40;
+    
+    protected int[] dataX = new int[]{ 7, 3, 4, 3, 5, 4, 5, 3, 6, 12, 5, 3,
+				       1, 3, 5, 3, 11, 2, 2, 2, 3, 5, 3, 4,
+				       6, 3, 1, 4, 5, 19, 5, 5, 6, 5, 6, 2,
+				       0, 0, 6, 4 } ;
+
+    protected int[] dataN = new int[]{ 17, 15, 17, 18, 15, 15, 15, 19,
+				       16, 15, 18, 19, 18, 19, 19, 21,
+				       17, 16, 12, 17, 18, 18, 19, 19,
+				       14, 12, 16, 19, 16, 19, 21, 15,
+				       13, 20, 16, 17, 8, 7, 18, 15 };
+
+    // Constructor 
+    public Binomial() {}
+
+    
+    static public double lgamma( int x )
+    {
+	return Sfun.logGamma( (double) x );
+    }
+    
+    static public double lgamma( double x )
+    {
+	return Sfun.logGamma( x );
+    }
+
+    static public double unnorm_log_binom( int    x,
+					   int    n,
+					   double pi)
+					   
+    {
+	if( (x<0) || (n<0) || (pi<0.) || (pi>1.) )
+	    if( ignoreRangeErrors )
+		return Double.NEGATIVE_INFINITY;
+	    else
+		throw new RuntimeException("Argument out of range.");
+	
+	double retval = Math.log(pi)  * x +  Math.log( 1-pi ) * ( n - x ); 
+	
+	return retval;
+    }
+
+    static public double unnorm_log_binom( int    x[],
+					   int    n[],
+					   double pi)
+    {                                       
+	if(x.length != n.length) throw new RuntimeException("Length of x and n vectors must match.");
+	double retval = 0.0;
+	
+	for(int i=0; i < x.length; i++)
+	    retval += unnorm_log_binom(x[i],n[i],pi);
+	
+	return retval;
+    }
+
+    public double logUnnormalizedPDF( Object paramOb )
+    {
+	double[] params = ArrayTools.Otod( paramOb );
+	if(params.length != 1 ) throw new RuntimeException("Wrong number of parameters!");
+	
+	double pi0    = params[0];
+	
+	return unnorm_log_binom( dataX, dataN, pi0 );
+    }
+    
+    
+    public double unnormalizedPDF( Object paramObj )
+    {
+	double[] params = ArrayTools.Otod( paramObj );
+	if(params.length != 1 ) throw new RuntimeException("Wrong number of parameters!");
+	
+	double pi0    = params[0];
+	
+	return Math.exp(unnorm_log_binom( dataX, dataN, pi0 ));
+    }
+
+
+@     
+

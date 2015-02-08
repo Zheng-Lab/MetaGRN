@@ -1,0 +1,97 @@
+@ This is an implementation of the \IDLInterface{PRNGFactory} to
+instantiate \IDLInterface{PRNG} objects from \IDLInterface{PRNGIntegerState} objects 
+without requiring further details about the class.
+
+The IDL is defined in the file
+\file{CorbaPRNGUtil.idl}.  
+
+This class has a single method that instantiates a 
+\IDLInterface{PRNGState} and returns the resulting \IDLInterface{PRNG} .
+
+All of this will be run from a small  application
+that instantiates an object of this class
+and puts it on the CORBA bus. It must initialize the ORB and BOA.
+See
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Docs}
+or
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Test}
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+public class IntegerStateCorbaPRNGFactory 
+               extends CorbaPRNGFactory
+{
+ <<Fields>>
+
+ <<Constructors>>
+ <<Get PRNG>>
+}
+
+
+@ 
+<<Constructors>>=
+public IntegerStatePRNGFactory() 
+{
+}
+
+@ 
+Again,
+<<Get PRNG>>=
+  /**
+   * Instantiate a PRNG of the correct class
+   *
+   * @param state State information used to create the PRNG
+   *
+   */
+public CorbaPRNGUtil.PRNG instantiate(CorbaPRNGUtil.PRNGState corbaState)
+{
+  PRNG prng;
+  String prngName;
+
+  /********* If we this corbaState implements a PRNGItegerState *******/
+
+  if( !!!!!!!!! test here !!!!!!!!!!!!!  ) 
+    {
+
+
+      /* Get the class names */
+      prngName = corbaState.getPRNGName();
+      prngStateName = corbaState.getPRNGStateName()
+	
+	/* Get the PRNGIntegerState class */
+	Class stateClass        = Class.forName(prngStateName);
+      
+      /* Now instantiate a blank PRNGIntegerState class */
+      PRNGIntegerState prngState = (PRNGState) stateClass.newInstance();
+      
+      /* Stuff in the integer state information */
+      prngState.setIntegerState( corbaState.getIntegerState(), corbaState.getIntegerStateHash() );
+      
+      /* Now we should have a valid PRNGIntegerState .. */
+      
+      /* Instantiate it */
+      
+      !!!!!!!! more here ... look at DefaultPRNGFactory !!!!!!!!
+
+      /* return a CorbaPRNG */
+      return corbaPRNG;
+    }
+
+  /********** Otherwise pass the buck. ****************/
+  else super.instantate(corbaState);
+
+}
+
+@
+<<Fields>>=
+@
+
+
+
+
+
+
+
+
+

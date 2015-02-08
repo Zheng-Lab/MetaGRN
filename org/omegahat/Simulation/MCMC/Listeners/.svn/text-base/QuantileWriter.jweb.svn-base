@@ -1,0 +1,154 @@
+This class implements a very basic listener.  It simply stores the
+events it recieves to a specified text file.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class QuantileWriter extends HistogramWriter 
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+// Inherited //
+// protected PrintWriter out;
+// protected boolean storeTime = false;
+// protected Histogram[] hists;
+// protected double min;
+// protected double max;
+// protected int    bins;
+
+protected double[]    quantiles;
+
+@ %def 
+
+<<Accessors>>=
+
+/*none*/
+
+@ %def 
+
+
+<<Constructors>>=
+
+public QuantileWriter( String filename, 
+			boolean append, 
+			boolean storeTime, 
+			double min, 
+			double max, 
+			int bins,
+			double[] quantiles) 
+     throws java.io.IOException
+{
+
+    super(filename, append, storeTime, min, max, bins );
+
+    this.quantiles = quantiles;
+
+}
+
+public QuantileWriter( String filename, boolean append, double min, 
+			double max, int bins, double[]quantiles ) throws java.io.IOException
+{
+  this( filename, false, false, min, max, bins, quantiles);
+}
+
+
+public QuantileWriter( String filename, double min, double max, int bins, double[]quantiles ) throws java.io.IOException
+{
+  this( filename, false, min, max, bins, quantiles );
+}
+
+protected QuantileWriter()  /* for use in sub-classes only */
+{
+};
+
+
+@ %def 
+
+<<Methods>>=
+
+    // inherited //
+    // public void notify( MCMCEvent e )
+
+public void flush()
+{
+    if (hists != null && quantiles != null )
+    {
+
+	double[][] temp = new double[hists.length][quantiles.length];
+	
+	out.print( "Quantile ");
+	for(int i=0; i<hists.length; i++)
+	{
+	    out.print(" Dimension." + (i+1) );
+	    temp[i] = hists[i].quantiles( quantiles );
+	}
+	out.println();
+	
+	for(int j=0; j<quantiles.length; j++)
+	{
+	    out.print( quantiles[j] + " " );
+	    for(int i=0; i<hists.length; i++)
+		out.print( temp[i][j] + " " );
+	    out.println();
+	}
+	
+    }
+
+    out.println();
+    out.flush();
+}
+
+
+public void close()
+{
+  if(storeTime) out.println( "Finished at: " + new Date() );
+  
+  out.close();
+}
+
+public void println(String data)
+{
+    out.println(data);
+}
+
+public void print(String data)
+{
+    out.println(data);
+}
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.io.*;
+import java.util.Date;
+
+@ %def 
+
+
+
+

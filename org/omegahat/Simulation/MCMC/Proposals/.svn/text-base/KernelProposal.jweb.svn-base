@@ -1,0 +1,167 @@
+This class implements a [[HastingsCoupledProposal]] that generates
+states using a kernel smooth of the set of current states.
+
+
+<<Copyright>>=
+
+    /* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Proposals/KernelProposal.jweb,v 1.1.1.1 2001/04/04 17:16:24 warneg Exp $ */
+    /* (c) 2000 Gregory R. Warnes */
+    /* May include code (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+public class KernelProposal implements HastingsCoupledProposal 
+{
+  <<Fields>>
+  <<Accessors>>
+
+  // implementing Hastings Coupled Proposal //
+  <<Methods extending ConditionalDensity>>
+  <<Methods extending ConditionalGenerator>>
+  <<Methods extending GeneralProposal>>
+ 
+  <<Constructors>>
+}
+
+@ %def 
+
+<<Fields>>=
+
+GeneralProposal kernel;
+PRNG            prng;
+
+@ %def 
+
+<<Accessors>>=
+
+public GeneralProposal getKernel()                         { return this.kernel; }
+public GeneralProposal setKernel( GeneralProposal kernel ) { return this.kernel = kernel; }
+
+public PRNG getPRNG()            { return this.prng; }
+public PRNG setPRNG( PRNG prng ) { return this.prng = prng; }
+
+
+@ %def 
+
+
+
+
+<<Methods extending ConditionalDensity>>=
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param state        Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double conditionalPDF   ( Object state, Object conditions, int which, MultiState stateVector)
+{
+     double retval = 0.0;
+     for(int i=0; i < stateVector.size(); i++)
+        retval += kernel.conditionalPDF( state, stateVector.get(i) );
+     retval = retval / (double) stateVector.size();
+     return retval;
+}
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param state        Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double logConditionalPDF( Object state, Object conditions, int which, MultiState stateVector )
+{
+    return Math.log(conditionalPDF(state,conditions,which,stateVector) );
+}
+
+@ %def 
+
+<<Methods extending ConditionalGenerator>>=
+
+/** Generate a new component state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public Object   generate( Object conditionals, int which, MultiState stateVector  )
+{
+    int from = (int) ( ((double) stateVector.size()) * prng.nextDouble() );  // uniform on [0, size-1]
+
+    return kernel.generate( stateVector.get(from) );
+}
+
+
+@ %def 
+
+
+<<Methods extending GeneralProposal>>=
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param from         Current value of the component state being updated
+ *  @param to           Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double transitionProbability( Object from, Object to, int which, MultiState stateVector )
+{
+    return conditionalPDF( to, from, which, stateVector );
+}
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param from         Current value of the component state being updated
+ *  @param to           Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double logTransitionProbability( Object from, Object to, int which, MultiState stateVector )
+{
+    return logConditionalPDF( to, from, which, stateVector );
+}
+
+
+
+@ %def 
+
+
+
+<<Constructors>>=
+
+public KernelProposal()
+{
+}
+
+
+public KernelProposal(PRNG prng)
+{
+  this.prng   = prng;
+}
+
+public KernelProposal( GeneralProposal kernel, PRNG prng )
+{
+  this.kernel = kernel;
+  this.prng   = prng;
+}
+
+@
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Proposals;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+    import org.omegahat.Probability.Distributions.*;
+    import org.omegahat.Simulation.RandomGenerators.PRNG;
+
+@ %def 
+

@@ -1,0 +1,6 @@
+OK, I think it may not be the best idea to create a overly-structured
+Distribution hirearchy.  Its probably best simply to provide an
+interface "Distribution" which specifies methods that give information
+about the distribution but nothing more.  Individual distributions can
+be given interfaces, for instance the normal distribution, but I
+suspect thats as far as we want to go.

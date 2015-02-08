@@ -1,0 +1,63 @@
+package org.omegahat.Simulation.RandomGenerators;
+
+/**
+ * Enapsulates all of the state information of a PRNG.
+ *
+ * <body> 
+ *
+ * Given a copy of the PRNGState corresponding to a specific 
+ * PRNG, it should be possible to exactly
+ * duplicate the random number stream produced.  
+ * </body>
+ */
+public interface PRNGState // extends java.io.Serializable //?
+{
+
+  /** 
+   * Return the name of the class that can be enstantiated from this state.
+   *
+   * @return fully qualified class name
+   *
+   * The fully qualified class name can be used to instantiate the PRNG
+   * without knowing any of its details.  For example:
+   * <body>
+ * <p>
+ * <code>
+ *      CollingsPRNGAdministrator admin = new CollingsPRNGAdministrator();
+ * <p>
+ *      PRNGState state = admin.registerPRNGState();
+ * <p>
+ *      String name     = state.getPRNGName();
+ * <p>
+ *      Class cl        = Class.forName(name);
+ * <p>
+ *      Class classes[] = new Class[1]; 
+ * <p>
+ *      classes[0]      = Class.forName("org.omegahat.Simulation.RandomGenerators.PRNGState");
+ * <p>
+ *      java.lang.reflect.Constructor   c = cl.getConstructor(classes);
+ * <p>
+ *      Object[] args = new Object[1]; <p>
+ *      args[0] = state;
+ * <p>
+ *      PRNG prng = (PRNG) <p>
+ *        c.newInstance(args);
+ * <p>
+ *      for(int a=1; a<10; a++) <p>
+ *          System.out.println(prng.nextInt());
+ * <p>  
+ * </code>
+ * </body>
+   */
+  public String getPRNGName();
+
+}
+
+/*
+  We probably want to be able to serialize
+  PRNGs.  Do we want to do this directly, or
+  via the State? via the State seems most reasonable.
+*/
+
+
+

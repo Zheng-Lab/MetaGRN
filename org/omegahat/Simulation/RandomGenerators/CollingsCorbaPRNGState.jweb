@@ -1,0 +1,88 @@
+@ This is the initial trivial implementation of the
+\IDLInterface{CollingsPRNGState} defined in the IDL file \file{CorbaPRNGUtil.idl}.
+This has a single method that returns the class name corresponding to
+this state .
+
+As per usual, we can use the tie mechanism to delegate the CORBA
+services (i.e. the skeletons to a secondary class) and have
+this class extend the existing \Java{} class, e.g.
+\OmegaClass{CollingsCorbaPRNGState}.  This may or may not be
+more convenient.
+
+All of this will be run from a small  application
+that instantiates an object of this class
+and puts it on the CORBA bus. It must initialize the ORB and BOA.
+See
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Docs}
+or
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Test}
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+public class CollingsCorbaPRNGState 
+               extends CorbaPRNGUtil._CollingsPRNGStateImplBase
+{
+ <<Fields>>
+
+ <<Constructors>>
+ <<Get PRNG Name>>
+ <<Get State Details>>
+}
+
+
+@ Here we will probably have a \OmegaClass{PRNGState}.
+<<Fields>>=
+      CollingsPRNGState state;
+@ 
+<<Constructors>>=
+public CollingsCorbaPRNGState() 
+{
+  state = new CollingsPRNGState();
+}
+
+public CollingsCorbaPRNGState(PRNGState in_state) 
+{
+  state = (CollingsPRNGState) in_state;
+}
+
+@ 
+Again,
+<<Get PRNG Name>>=
+public String getPRNGName()
+{
+  return(state.getPRNGName());
+}
+@
+
+<<Get State Details>>=
+  public int getNumGen()
+    {
+      return state.getNumGen();
+    }
+
+  public int getMixerMult()
+    {
+      return state.getMixerMult();
+    }
+  
+ public  int getMixerSeed()
+    {
+      return state.getMixerSeed();
+    }
+
+  public int[] getComponentMult()
+    {
+      return state.getComponentMult();
+    }
+			
+
+  public int[] getComponentSeed()
+    {
+      return state.getComponentSeed();
+    }
+
+
+@
+
+

@@ -1,0 +1,154 @@
+This class implements a very basic listener.  It simply stores the
+events it recieves to a specified text file.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class SquaredDistanceWriter implements MCMCListenerWriter
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+protected PrintWriter out;
+protected boolean storeTime = false;
+protected double cumsum = 0.0;
+protected int    niter = 0;
+protected int    numChain = 0;
+
+@ %def 
+
+<<Accessors>>=
+
+/*none*/
+
+@ %def 
+
+
+<<Constructors>>=
+
+public SquaredDistanceWriter( String filename, 
+		   boolean append, 
+		   boolean storeTime )
+     throws java.io.IOException
+{
+  out = new PrintWriter( 
+            new BufferedWriter ( 
+                new FileWriter( filename, append) ));
+
+  this.storeTime = storeTime;
+
+  if(storeTime) out.println( "Started at: " + new Date() );
+}
+
+public SquaredDistanceWriter( String filename, boolean append  ) throws java.io.IOException
+{
+  this( filename, false, false);
+}
+
+
+public SquaredDistanceWriter( String filename ) throws java.io.IOException
+{
+  this( filename, false );
+}
+
+protected SquaredDistanceWriter()  /* for use in sub-classes only */
+{
+};
+
+
+@ %def 
+
+<<Methods>>=
+
+public void notify( MCMCEvent e )
+{
+  MultiDoubleState state = null;
+
+
+  if( e instanceof DetailHastingsCoupledStepEvent )
+  {
+    DetailHastingsCoupledStepEvent ev = ((DetailHastingsCoupledStepEvent) e);
+    MultiState current = null;
+ 
+    double distance = Distance.euclidean( ArrayTools.Otod(ev.currentComponent), 
+				          ArrayTools.Otod(ev.lastComponent ));
+
+
+    cumsum += distance * distance;
+    niter++;
+  }
+
+  // else ignore the event
+
+}
+
+public void flush( double pCouple )
+{
+    flush();
+}
+
+public void flush()
+{
+    out.print( cumsum / (double) niter );
+
+    out.println();
+    out.flush();
+}
+
+
+
+public void close()
+{
+  if(storeTime) out.println( "Finished at: " + new Date() );
+  
+  out.close();
+}
+
+public void println(String data)
+{
+    out.println(data);
+}
+
+public void print(String data)
+{
+    out.println(data);
+}
+
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*; 
+
+import java.io.*;
+import java.util.Date;
+import org.omegahat.GUtilities.Distance;
+import org.omegahat.GUtilities.ArrayTools;
+
+@ %def 
+
+
+
+

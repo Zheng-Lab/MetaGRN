@@ -1,0 +1,167 @@
+This class implements an Hastings-Coupled proposal that generates
+states independently using a common [[GeneralProposal]].  It simply refers
+appropriate method calls to the encapsulated [[GeneralProposal]].
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+/**
+ * This class implements an Hastings-Coupled proposal that generates
+ * states independently using a common <code>GeneralProposal</code>.  It simply
+ * refers appropriate method calls to the encapsulated
+ * <code>GeneralProposal</code>.
+ **/
+public class IndependentHastingsCoupledProposal implements HastingsCoupledProposal, TimeDependentProposal
+{
+
+    <<Fields>>
+    <<Accessors>>
+    <<Methods implementing TimeDependentProposal>>
+    <<Methods from interface HastingsCoupledProposal>>
+    <<Constructors>>
+}
+@
+
+<<Fields>>=
+
+protected GeneralProposal proposal;
+
+protected int time       = 0;
+protected int timeCalls  = 0;
+protected int dim        = 1;
+
+@ %Def 
+
+
+<<Methods implementing TimeDependentProposal>>=
+
+public void timeInc()
+{
+  time++;
+
+  if( proposal instanceof TimeDependentProposal )
+     {
+	// time for the encapsulated proposal should only increment
+	// once it has iterated through all of the $C$ components.
+	// this is implemented here by eating $C-1$ of every $C$
+        //  timeInc() calls.
+
+	timeCalls++;
+	if( timeCalls >= dim )
+        {
+	   ((TimeDependentProposal) proposal).timeInc();
+	   timeCalls = 0;
+        }
+     }
+}
+
+public void resetTime()
+{
+    time = -1;
+    timeInc();
+}
+
+public int getTime()
+{
+   return time;
+}
+
+@
+
+
+<<Accessors>>=
+
+/* read-only */
+public GeneralProposal getProposal() { return this.proposal;}
+
+@ %def 
+
+
+<<Constructors>>=
+
+public IndependentHastingsCoupledProposal( GeneralProposal proposal )
+{
+    this.proposal = proposal;
+}
+
+@ %def 
+
+
+<<Methods from interface HastingsCoupledProposal>>=
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param state        Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double conditionalPDF   ( Object state, Object conditions, int which, MultiState stateVector)
+{
+    return proposal.conditionalPDF(state,conditions);
+}
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param state        Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double logConditionalPDF( Object state, Object conditions, int which, MultiState stateVector )
+{
+    return proposal.logConditionalPDF(state,conditions);
+}
+
+
+/** Generate a new component state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public Object generate( Object conditions, int which, MultiState stateVector  )
+{
+    dim = stateVector.size();
+    return proposal.generate(conditions);
+}
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param from         Current value of the component state being updated
+ *  @param to           Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double transitionProbability( Object from, Object to, int which, MultiState stateVector )
+{
+    return proposal.transitionProbability( from, to);
+}
+
+/** Computes the HastingsCoupled transition probability for one sub-state given the entire state vector 
+ *  @param from         Current value of the component state being updated
+ *  @param to           Proposed state of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public double logTransitionProbability( Object from, Object to, int which, MultiState stateVector )
+{
+    return proposal.logTransitionProbability( from, to);
+}
+
+
+@
+
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Proposals;
+
+@ %def 
+
+<<Imports>>=
+
+  import org.omegahat.Simulation.MCMC.*;
+  import org.omegahat.Probability.Distributions.*;
+
+@ %def 

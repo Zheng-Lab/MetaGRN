@@ -1,0 +1,76 @@
+@ This is an abstract class providing an initial trivial implementation of the
+\IDLInterface{PRNGAdministrator} defined in the IDL file
+\file{CorbaPRNGUtil.idl}.  This has a single method that returns the next
+\IDLInterface{PRNG}.
+
+As per usual, we can use the tie mechanism to delegate the CORBA
+services (i.e. the skeletons to a secondary class) and have this class
+extend the existing \Java{} class, e.g.
+\OmegaClass{CollingsPRNGAdministrator}).  This may or may not be more
+convenient.
+
+For the immediate future, I suggest that inheriting classes have a
+that contains a \OmegaInterface{PRNGAdministrator} and use it to
+construct a \OmegaInterface{PRNG}.  We then turn this into a
+\OmegaClass{CorbaPRNG} using the same mechanism.
+
+
+All of this will be run from a small  application
+that instantiates an object of this class
+and puts it on the CORBA bus. It must initialize the ORB and BOA.
+See
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Docs}
+or
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Test}
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+public abstract class CorbaPRNGAdministrator 
+               extends CorbaPRNGUtil._PRNGAdministratorImplBase
+{
+ <<Fields>>
+
+ <<Constructors>>
+ <<Get PRNG>>
+}
+
+
+@ Here we will probably have a \OmegaClass{CollingsPRNGAdministrator}.
+<<Fields>>=
+      PRNGAdministrator admin;
+@ 
+<<Constructors>>=
+// For example
+// public CorbaCollingsPRNGAdministrator();
+//{
+//  admin = new CollingsPRNGAdministrator();
+//}
+
+@ 
+
+Now, created a PRNGState when requested.
+
+<<Get PRNG>>=
+abstract public CorbaPRNGUtil.PRNGState registerPRNGState();
+
+// For Example
+// abstract public CorbaPRNGUtil.PRNGState registerPRNGState() 
+// {
+//  PRNGState state;
+//
+//   System.out.println("Creating and Registering a  PRNGState");
+//
+//   /* Create the PRNG */
+//   try {
+//     state = admin.registerPRNGState();
+//   } catch(Exception ex) {
+//     ex.printStackTrace();
+//     throw new RuntimeException("Failed in getPRNG");
+//   }
+//  
+//   return(new CorbaCollingsPRNGState(state));
+// }
+//
+
+

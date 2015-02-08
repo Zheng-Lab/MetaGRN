@@ -1,0 +1,145 @@
+package birc.grni.gui;
+
+import org.omegahat.Simulation.MCMC.Examples.*;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.Window;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.*;
+
+import javax.swing.JFrame;
+
+
+public class GrnDbn extends GrnDbnDisplay {
+	
+	//protected JFrame grn_frame;
+	private  static String resultPath;
+	private static Logger logger = Logger.getLogger(GrnDbn.class.getName());
+	protected Binomial_HDBNf hdb ;
+
+	public GrnDbn(JFrame frame_1) {
+		super(frame_1);
+		
+		header_dbn.setTitle("Set parameters for DBN");
+		header_dbn.setInfo("Enter parameters and click start button ");
+		header_dbn.setTopColor(Color.RED);
+		header_dbn.setBottomColor(Color.PINK);
+		// TODO Auto-generated constructor stub
+		
+		// add spinner model to beta
+		SpinnerNumberModel spinModel = new SpinnerNumberModel(1, 1, 5, 1);
+		betaSpinner.setModel(spinModel);
+		
+		// add spinner model to iterations
+		SpinnerNumberModel iterModel = new SpinnerNumberModel(50000,30000,200000,10000);
+		iterationSpinner.setModel(iterModel);
+		
+		priorDataBox.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				enablePrior();
+			}
+		});
+		
+		startButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				String inputFile = dataFilePathDbn.getText();
+				String s = numGenesDbn.getText();
+				int genes = Integer.parseInt(numGenesDbn.getText());
+				//int samples = Integer.parseInt(numTimePoints.getText());
+				//String resultPath = resultSavePath.getText();
+				resultPath = resultSavePath.getText();
+				logger.log(Level.INFO, "dbn start buttion click");
+				startButton.setEnabled(false);
+				int iterations =(Integer)iterationSpinner.getModel().getValue();
+				boolean select =priorDataBox.isSelected();
+				if(select){
+					int beta =(Integer)betaSpinner.getModel().getValue();
+					String priorFile =priorDataText.getText();
+					hdb = new Binomial_HDBNf(genes, inputFile, iterations, beta, priorFile);
+					
+				}else{
+					hdb = new Binomial_HDBNf(genes, inputFile, iterations);
+				}
+							
+				//hdb.dbnRun();
+				hdb.execute();       // start swingWorker as a worker thread
+				logger.log(Level.INFO, "End of Dbn ");
+				//frame_dbn.dispose();
+				//logger.log(Level.INFO, "dbn frame closed ");
+			}
+		});
+		
+		
+	}
+	
+	private void enablePrior(){
+		boolean select =priorDataBox.isSelected();
+		priorDataText.setEnabled(select);
+		priorSelect.setEnabled(select);
+		betaSpinner.setEnabled(select);
+	}
+	
+	public static void dbnResultPrinter(int network [], int genes){
+		
+		try {
+			//PrintStream resultFilePrinter = new PrintStream(new File(resultPath));
+			 FileWriter resultFileWriter = new FileWriter(resultPath , true);
+			// write results as a matrix //
+			   for(int i=0; i<genes; i++){
+	    		   for(int j=0; j<genes; j++){
+	    			   
+	    			   if(network[i*genes +j] == 1){
+	    				   resultFileWriter.write("1" + "\t");
+	                       
+	    			   }
+	    			   else{
+	    				   resultFileWriter.write("0" + "\t");
+	    			   }
+	    		   }
+	    		 
+	    		   resultFileWriter.write("\n");
+	    	   }
+	    	  
+			   resultFileWriter.write("\n");
+			   resultFileWriter.write("\n");
+	    	      
+	    	   // write results according to standard format 
+			   for(int m=0; m<genes; m++){
+	    		   for(int n=0; n<genes; n++){
+	    			   
+	    			   if(network[m*genes +n] == 1){
+	    				   resultFileWriter.write("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+	                       
+	    			   }
+	    			   else{
+	    				   resultFileWriter.write("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+	    			   }
+	    			   resultFileWriter.write("\n");
+	    		   }
+	    	   }
+			   resultFileWriter.close();
+	    	     
+			   startButton.setEnabled(true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+}

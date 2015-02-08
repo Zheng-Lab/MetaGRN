@@ -1,0 +1,116 @@
+
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Examples/SimpleMarkovChain.jweb,v 1.1.1.1 2001/04/04 17:16:18 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+This file illustrates a very simple Markov Chain.  It generates its
+next state from N(0,1) regardless of the current state, resulting in a
+gaussian random walk.
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/**
+ * A simple Markov Chain example. It simply generates
+ * its next state from N(0,1) regardless of the current state.
+ */
+public class SimpleMarkovChain extends BaseMarkovChain
+{
+    <<Fields>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+    protected PRNG                prng;
+    protected Normal              norm;
+
+    protected class doubleState implements MCMCState
+    {
+        double state;
+        public double getState() { return state; }
+        public doubleState( double d ) { state = d; }
+        public String toString() { return ""+state; }
+    }
+
+@ %def 
+
+<<Methods>>=
+
+    public MCMCState generate( MCMCState ignored )
+    {
+        return new doubleState(norm.generateDouble());
+    }
+
+    public SimpleMarkovChain( PRNG prng )
+    {
+        this.prng = prng;
+        this.norm = new Normal ( prng );
+    }
+
+
+@
+
+<<Main>>=
+
+
+
+    public static class listenerPrinter implements MCMCListener
+    {
+	public int step=0;
+	public void notify( MCMCEvent e ){
+	    if( e instanceof GenericChainStepEvent )
+		{
+		    step++;
+		    System.out.println("** Notify : Chain Step Event #" + step + " ** ");
+		}
+	    else
+		System.out.println("** Notify: Unrecognized Event ** ");
+	    System.out.println("** Details:");
+	    System.out.println( e );
+	}
+    }
+
+
+    public static void main( String[] argv )
+    {
+        PRNG prng = new CollingsPRNG( (new CollingsPRNGAdministrator()).registerPRNGState() );
+
+        BaseMarkovChain chain = new SimpleMarkovChain(prng);
+	chain.registerListener( new listenerPrinter() );
+
+        chain.iterate(10);
+        System.err.println( chain.getState() );
+    }
+
+@ %def 
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Examples;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Expressions.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+    import org.omegahat.Probability.Distributions.*;
+    import org.omegahat.Simulation.RandomGenerators.*;
+
+
+@ %def 
+
+

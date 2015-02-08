@@ -1,0 +1,63 @@
+This class serves as the base class for all objects in the MCMC package.  At the moment it doesn't contain any functionality.  Later it may implement things found to be useful for all objects in the MCMCPackage.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+abstract public class GenericChainEvent extends GenericMCMCEvent
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Constructors>>
+}
+@
+
+<<Fields>>=
+
+    /* none */
+
+@ %def 
+
+<<Accessors>>=
+    
+    /* none */
+
+@ %def 
+
+
+<<Constructors>>=
+
+    /* none */
+
+@ %def 
+
+<<Methods>>=
+
+    /* none */
+
+@ %def 
+
+<<Constructors>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+    /* none */
+
+@ %def 

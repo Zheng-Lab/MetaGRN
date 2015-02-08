@@ -1,0 +1,126 @@
+This class implements a very basic listener.  It counts occurences of
+[[MCMCChainIndexEvent]]]]s and displays the current count when one is
+recieved.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+/**
+ * Displays contents and counter of <code>RecordingIndexEvent<code>s when one is recieved.
+ */
+public class PlottingListener extends ArrayListener
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+SwingDeviceWindow[] plotWindows;
+Scatterplot[] plots;
+
+int refreshInterval = 100;
+
+@ %def 
+
+<<Accessors>>=
+
+public int refreshInterval() { return refreshInterval; }
+public int refreshInterval( int delay ) { return refreshInterval = delay; }
+
+public SwingDeviceWindow[] plotWindows() { return  plotWindows; }
+public Scatterplot[] plots() { return plots; };
+
+
+
+@ %def 
+
+
+<<Constructors>>=
+
+public PlottingListener( String[] varNames)
+{
+  this(varNames, 1000);
+}
+
+public PlottingListener ( String[] varNames, int size )
+{
+  super(varNames, size);
+
+  plotWindows = new SwingDeviceWindow[this.varNames.length];
+  plots = new Scatterplot[this.varNames.length];
+
+  for(int i=0; i < this.varNames.length; i++ )
+    {
+      plotWindows[i] = new SwingDeviceWindow( this.varNames[i] + " vs time",true);
+    }
+
+}
+
+@ %def 
+
+<<Methods>>=
+
+public void notify( MCMCEvent e )
+{
+  super.notify( e );
+
+  //  int index = (( index + 40 ) % mu().length );
+  //  mu()[index] = Double.NaN;
+  //  rho()[index] = Double.NaN;
+
+  if ( ( index % refreshInterval() ) == 0 ) 
+  {
+    for(int i=0; i<varNames.length; i++)
+      {
+	if(plots[i]==null)
+	  {
+	    plots[i]  = new Scatterplot( time , 
+					 data[i], 
+					 Scatterplot.LINES ); 
+	    // | Scatterplot.WITH_BREAKS );
+	    //	    plots[i].setXLabel( varNames[i] );
+	    plotWindows[i].plot(plots[i]);
+	  }
+	//	plotWindows[i].getComponents()[0].hide();
+		plotWindows[i].getComponents()[0].show(false);
+		plotWindows[i].getComponents()[0].show(true);
+		//		plotWindows[i].getComponents()[0].repaint();
+      }
+  }
+}
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.util.Vector;
+import org.omegahat.Graphics.Plots.*;
+import org.omegahat.Graphics.Devices.*;
+
+@ %def 
+
+
+
+

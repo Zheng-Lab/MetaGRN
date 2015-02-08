@@ -1,0 +1,134 @@
+This class implements a [[HastingsCoupledProposal]] that generates
+states using a kernel smooth of the set of current states.
+
+
+<<Copyright>>=
+
+    /* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Proposals/AdaptiveKernelProposal.jweb,v 1.1.1.1 2001/04/04 17:16:23 warneg Exp $ */
+    /* (c) 2000 Gregory R. Warnes */
+    /* May include code (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+abstract public class AdaptiveKernelProposal extends KernelProposal
+{
+    <<Fields>>
+    <<Accessors>>
+
+    // implementing Hastings Coupled Proposal //
+    <<Methods extending ConditionalDensity>>
+    <<Methods extending ConditionalGenerator>>
+    <<Methods extending GeneralProposal>>
+
+    <<Abstract Methods>>
+}
+
+@ %def 
+
+<<Fields>>=
+
+    /* inherited */
+    // protected GeneralProposal kernel;
+    // protected PRNG            prng;
+
+    public    boolean DEBUG = false;
+
+@ %def 
+
+<<Accessors>>=
+
+    /* inherited */
+    //public GeneralProposal getKernel()                         { return this.kernel; }
+    //public GeneralProposal setKernel( GeneralProposal kernel ) { return this.kernel = kernel; }
+
+    //public PRNG getPRNG()            { return this.prng; }
+    //public PRNG setPRNG( PRNG prng ) { return this.prng = prng; }
+
+
+@ %def 
+
+
+
+
+<<Methods extending ConditionalDensity>>=
+
+public double conditionalPDF   ( Object state, Object conditions, int which, MultiState stateVector)
+
+{
+    adapt(stateVector, which);
+    return(super.conditionalPDF(state,conditions,which,stateVector));
+}
+
+public double logConditionalPDF( Object state, Object conditions, int which, MultiState stateVector )
+{
+    adapt(stateVector, which);
+    return(super.logConditionalPDF(state,conditions,which,stateVector));
+}
+
+@ %def 
+
+<<Methods extending ConditionalGenerator>>=
+
+/** Generate a new component state given the entire state vector 
+ *  @param conditions   Current value of the component state being updated
+ *  @param which        index of the component state being updated
+ *  @param stateVector  entire set of states, including the state being updated
+ **/
+public Object   generate( Object conditionals, int which, MultiState stateVector  )
+{
+    adapt(stateVector, which);
+    return super.generate( conditionals, which, stateVector );
+}
+
+
+@ %def 
+
+
+<<Methods extending GeneralProposal>>=
+
+public double transitionProbability( Object from, Object to, int which, MultiState stateVector )
+{
+    adapt(stateVector,which);
+    return super.transitionProbability( from, to, which, stateVector );
+}
+
+public double logTransitionProbability( Object from, Object to, int which, MultiState stateVector )
+{
+    adapt(stateVector,which);
+    return super.logTransitionProbability( from, to, which, stateVector );
+    
+}
+
+
+
+@ %def 
+
+<<Abstract Methods>>=
+
+/** modify the state of the enclosed proposal distribution using information from the provided state vector **/
+abstract public void adapt( MultiState mstate, int which );
+
+@ %def 
+
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Proposals;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+    import org.omegahat.Probability.Distributions.*;
+
+    import org.omegahat.Simulation.RandomGenerators.PRNG;
+
+@ %def 
+

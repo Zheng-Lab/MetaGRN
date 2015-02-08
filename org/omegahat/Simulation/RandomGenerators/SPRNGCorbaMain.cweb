@@ -1,0 +1,73 @@
+@ 
+
+We define a \CRoutine{main} routine that does the necessary initializtion before
+calling the \CRoutine{test_main} that is the entry point for each of the test functions.
+
+<<*>>=
+
+<<Includes>>
+<<Body>>
+
+@
+
+Make sure and include the definition of the structure that will hold
+the command line arguments for \Cfunction{initCORBA} defined in
+\file{SPRNGCorbaClient}.
+
+<<Includes>>=
+#include "SPRNGCorbaClient.h"
+@
+
+<<Body>>=
+
+#include "SPRNGCorbaMain.h"
+
+#ifdef __STDC__
+int main(int argc, char *argv[])
+#else
+int main(argc, argv)
+     int argc;
+     char *argv[];
+#endif
+{
+  /* Store a copy of the command line */
+  CmdArgs.args = argv;
+  CmdArgs.length = argc;
+  
+  /* do intialization */
+  printf("Initializing CORBA...\n");
+  initCORBA();
+  
+  /* call the test functions main() */
+  return test_main(argc, argv);
+}
+@
+
+<<Header>>=
+
+/*** get printf() ***/
+#include <stdio.h>
+
+/*** get CmdArgs variable ***/
+extern CommandLineArgs CmdArgs; /* provided by SPRNGCorbaClient.cc */
+
+
+/*** provide a prototype for test_main() ***/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+<<C Prototypes>>
+
+#ifdef __cplusplus
+}
+#endif
+@
+
+
+<<C Prototypes>>=
+
+int test_main(int argc, char *argv[]);
+
+@

@@ -1,0 +1,16 @@
+<<*>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/MCMCEvent.jweb,v 1.1.1.1 2001/04/04 17:16:16 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+package org.omegahat.Simulation.MCMC;
+
+
+public interface MCMCEvent 
+{
+    String getDescription ();
+    Object getSource();
+
+}
+
+@

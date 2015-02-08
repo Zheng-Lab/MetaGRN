@@ -1,0 +1,71 @@
+package birc.grni.ridge;
+
+import birc.grni.ridge.FalseDiscoveryRate;
+import birc.grni.gui.GrnRidge;
+import birc.grni.gui.GrnRidgeDisplay;
+import birc.grni.ridge.RidgeSparseVar;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.SwingWorker;
+
+public class RidgeRegression extends SwingWorker<Void, Void> {
+
+	protected RidgeSparseVar ridgeVar;
+	protected int numGenes;
+	protected int gene;
+	protected int [][] dofValues;
+	protected double [][] ridgeTvalues;
+	protected int [][] network;
+	
+	public RidgeRegression(int genes, int samples, String filePath){
+		InputPreProcessRidge in = new InputPreProcessRidge();
+		try {
+			in.processInput(filePath);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*compare number of genes and samples in the file with the GUI inputs */
+		if(genes != in.numGeneInFile){
+			// add a log in the logging file
+			System.exit(0);	
+		}
+		if(samples != in.numSamplesInFile){
+			// add a log in the logging file
+			System.exit(0);	
+		}
+		numGenes = in.numGeneInFile;
+		ridgeVar = new RidgeSparseVar(in.zeroMeanXdata, in.zeroMeanYdata);
+		gene=0;
+		GrnRidgeDisplay.ridgeProgressBar.setMaximum(numGenes-1);
+	}
+	
+	
+	@Override
+	protected Void doInBackground() throws Exception {
+		// TODO Auto-generated method stub
+		
+		while(gene <= numGenes){
+			ridgeVar.runRidge(gene);
+			GrnRidgeDisplay.ridgeProgressBar.setValue(gene);
+			gene++;
+		}
+		return null;
+	}
+	
+	protected void done(){
+		dofValues =ridgeVar.getDofMatrix();
+		ridgeTvalues =ridgeVar.getTvalueMatrix();
+		FalseDiscoveryRate fd = new FalseDiscoveryRate(ridgeTvalues, dofValues);
+		network = fd.networkConstructor();
+		GrnRidge.ridgeResult(network,numGenes);
+	}
+		
+	
+
+}

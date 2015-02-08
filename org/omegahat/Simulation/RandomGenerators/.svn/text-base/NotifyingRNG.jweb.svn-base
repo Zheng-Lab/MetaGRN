@@ -1,0 +1,96 @@
+@ This is used to notify listeners of the event that one or more
+random numbers have been generated from this RNG.  Additionally, this
+can be run in its own thread or directly via the run method and it
+will continue to generate random numbers and notify listeners.  This
+is a simple mechanism to avoid the need for an explicit loop in a
+callers code.
+
+<<*>>=
+package org.omegahat.Simulation.RandomGenerators;
+
+
+abstract public class NotifyingRNG 
+ // implements RNG/Distribution Generator
+       implements Runnable
+{
+<<Fields>>
+<<Listener Management>>
+
+<<Run>>
+<<Next Value>>
+
+<<Field Accessors>>
+}
+
+
+ 
+@ 
+Here we provide methods to register and remove 
+listeners which are notified of \OmegaInterface{PRNGState} allocations.
+<<Listener Management>>=
+public int addListener(PRNGAdministratorListener l) {
+ if(listeners() == null) {
+    listeners( new java.util.Vector(1));
+ }
+
+  listeners().addElement(l);
+
+ return(listeners().size());
+}
+
+public boolean removeListener(PRNGAdministratorListener l) {
+
+ if(listeners() == null || listeners().contains(l))
+  return(false);
+
+ listeners().remove(l);
+
+return(true);
+}
+
+
+@ 
+This stores the different listeners that are registered
+to be notified of events in the form of state
+allocation.
+<<Fields>>=
+    protected java.util.Vector listeners;
+
+
+@ 
+This provides access to the listeners vector.
+<<Field Accessors>>=
+public java.util.Vector listeners() {
+  return(listeners);
+}
+
+public java.util.Vector listeners(Vector v) {
+   listeners = v;
+  return(listeners());
+}
+
+
+@
+Here we notify the listeners that a \OmegaInterface{PRNGState} has been allocated.
+<<Notify Listeners>>=
+public void notifyListeners(PRNGState state)
+{
+  PRNGAdministratorEvent event = new PRNGAdministratorEvent(state, this);
+  for(java.util.Enumeration e = listeners().elements() ; e.hasMoreElements() ; ) {
+    ((PRNGAdministratorListener) e.nextElement()).PRNGStateRegistered(event);
+  }
+}
+
+
+@ 
+<<Next Value>>=
+public double getNextDouble();
+
+@ 
+<<Run>>=
+public void run() {
+  while(true) {
+    getNextValue();
+  }
+}
+

@@ -1,0 +1,64 @@
+This file provides a generic interface for objects that hold
+information useful for a proposal distribution.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public interface ProposalDetails
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+    /* none */
+
+@ %def 
+
+<<Accessors>>=
+    
+    /* none */
+
+@ %def 
+
+
+<<Constructors>>=
+
+    /* none */
+
+@ %def 
+
+<<Methods>>=
+
+    /* none */
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+    /* none */
+
+@ %def 

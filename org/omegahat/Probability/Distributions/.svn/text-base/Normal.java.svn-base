@@ -1,0 +1,468 @@
+
+    
+
+    /*
+    * @(#)$Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Probability/Distributions/Normal.java,v 1.2 2002/11/02 23:00:51 warnes Exp $
+    *
+    * Copyright (C) 1996, B. Narasimhan (naras@stat.stanford.edu)
+    * Copyright (C) 1999, G. Warnes (greg@warnes.net)
+    *
+    * This program is free software; you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation; either version 2 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    *
+    */
+
+
+    
+    package org.omegahat.Probability.Distributions;
+
+    
+    import org.omegahat.Simulation.RandomGenerators.*;
+
+
+public class Normal //implements NormalDistribution
+{
+
+    /** Mean */
+    double mu;
+
+    /** Standard Deviation */
+    double sigma;
+
+    /** Pseudo-Random Number Generator to Use */
+    PRNG prng;
+
+    /** Pull all the probability functions out of ' package */
+    PRNGDistributionFunctions prob;
+      
+    
+    public Normal (PRNG prng_in)
+    {
+        prng = prng_in;
+        prob = new PRNGDistributionFunctions(prng);
+        
+        mu    = 0.0;
+        sigma = 1.0;
+    }
+
+    public Normal (PRNG prng_in,
+                   Object[] parameters)
+    {
+        prng = prng_in;
+        prob = new PRNGDistributionFunctions(prng);
+        
+        mu    = 0.0;
+        sigma = 1.0;
+        
+        if (parameters==null)
+            return;
+        
+        switch (parameters.length)
+            {       
+            default:
+            case  2:
+                try 
+                    {
+                        sigma = ((Number) parameters[1]).doubleValue();
+                    }
+                catch (Throwable t)
+                    {}
+            case  1:
+                try 
+                    {
+                        mu = ((Number) parameters[0]).doubleValue();
+                    }
+                catch (Throwable t)
+                    {}
+            case  0:
+            }
+    }     
+
+    // public Normal (double[] parameters)
+    // {
+    //     prob = new PRNGDistributionFunctions();
+        
+    //     mu    = 0.0;
+    //     sigma = 1.0;
+        
+    //     if (parameters==null)
+    //      return;
+        
+    //     switch (parameters.length)
+    //      {       
+    //      default:
+    //      case  2:
+    //          sigma = parameters[1];
+    //      case  1:
+    //          mu = parameters[0];
+    //      case  0:
+    //      }
+    // }     
+
+    // public Normal (double mean, double stddev)
+    // {
+    //     prob = new PRNGDistributionFunctions();
+    //     mu = mean;
+    //     sigma = stddev;
+    // }
+
+    // public Normal ()
+    // {
+    //     prob = new PRNGDistributionFunctions();
+    //     mu = 0.0;
+    //     sigma = 1.0;
+    // }
+
+      
+    public double getMean()
+    { 
+        return mu;
+    }
+
+    public double getStandardDeviation()
+    {
+        return sigma;
+    }
+
+    public double getVariance()
+    {
+        return sigma * sigma;
+    }
+
+    public void setMean(double mean_in)
+    {
+        mu = mean_in;
+    }
+
+    public void setStandardDeviation(double stddev_in)
+    {
+        sigma = stddev_in;
+    }
+
+    public void setVariance(double var_in)
+    {
+        sigma = Math.sqrt(var_in);
+    }
+
+
+    public double CDF( Object x )
+    {
+        return cdf( ((Double) x).doubleValue() );
+    }
+
+
+
+    public double logCDF( Object x )
+    {
+        return Math.log(CDF(x));
+    }
+
+
+    public double cdf(double x) 
+    {
+        return(prob.normalCDF((x-mu)/sigma));
+    }
+
+    public double[] cdf(double[] x)
+    {
+        double[] retval = new double[x.length];
+        for(int i=0; i<x.length; i++)
+        retval[i] = cdf(x[i]);
+        return retval;
+    }
+
+    public double cdf(Object x)
+    {
+        try
+            {
+                return cdf( ((Number) x).doubleValue() );
+            }
+        catch (Throwable t)
+            {
+                return 0.0;
+            }
+    }
+
+    public double[] cdf(Object[] x)
+    {
+        double[] retval = new double[x.length];
+        for(int i=0; i<x.length; i++)
+        retval[i] = cdf( ((Number) (x[i])).doubleValue());
+        return retval;
+    }
+
+
+    public double quantileDouble(double x) 
+    {
+        return(prob.normalQuantile(x) * sigma + mu);
+    }
+
+    public double[] quantileDouble(double[] x)
+    {
+        double[] retval = new double[x.length];
+          for(int i=0; i<x.length; i++)
+        retval[i] = quantileDouble(x[i]);
+        return retval;
+    }
+
+
+    public Object quantileObject(double x)
+    {
+        return new Double(quantileDouble(x));
+    }
+
+    public Object[] quantileObject(double[] x)
+    {
+        Object[] retval = new Object[x.length];
+        for(int i=0; i<x.length; i++)
+        retval[i] = new Double(quantileDouble(x[i]));
+        return retval;
+    }
+
+
+    public double PDF( Object x )
+    {
+        return density( ((Double) x).doubleValue() );
+    } 
+
+
+    public double PDF( double x, double mu, double sigma )
+    {
+      this.mu = mu;
+      this.sigma = sigma;
+      return density( x );
+    }
+
+    public double logPDF( double x, double mu, double sigma )
+    {
+      return Math.log( PDF( x, mu, sigma ) );
+    }
+
+
+
+    public double logPDF( Object x )
+    {
+        return Math.log(PDF(x));
+    }
+
+    public double unnormalizedPDF( Object x )
+    {
+        return PDF(x);
+    }
+
+    public double logUnnormalizedPDF( Object x )
+    {
+        return logPDF(x);
+    }
+
+    public double unnormalizedPDF( double x, double mu, double sigma )
+    {
+     return (prob.normalPDF( (x - mu) / sigma ) );
+    }
+
+    public double unnormalizedPDF( double[] x, double mu, double sigma )
+    {
+      double retval = 1.0;
+      for(int i = 0; i < x.length ; i++)
+        {
+          retval *= unnormalizedPDF( x[i], mu, sigma );
+        }
+      return retval;
+    }
+
+    public double logUnnormalizedPDF( double[] x, double mu, double sigma )
+    {
+      double retval = 0.0;
+      for(int i = 0; i < x.length ; i++)
+        {
+          retval += Math.log(unnormalizedPDF( x[i], mu, sigma ));
+        }
+      return retval;
+    }
+
+    public double logUnnormalizedPDF( double x, double mu, double sigma )
+    {
+      return Math.log(unnormalizedPDF( x, mu, sigma ));
+    }
+
+    public double density(double x) {
+        return (prob.normalPDF( (x - mu) / sigma ) );
+    } 
+
+
+    public double[] density(double[] x)
+    {
+        double[] retval = new double[x.length];
+        for(int i=0; i<x.length; i++)
+        retval[i] = density(x[i]);
+        return retval;
+    }
+
+    public Object generate()
+    {
+        return new Double( generateDouble() );
+    }
+
+    public Object generate( double mean, double stddev )
+    {
+      mu = mean;
+      sigma = stddev;
+      return generate();
+    }
+
+    public Object generate( double[] means, double[] stddevs )
+    {
+      if( means.length != stddevs.length ) throw new RuntimeException("Length of mean and stddev vectors must match!");
+      Object[] retval = new Object[ means.length ];
+      for(int i =0; i < means.length ; i ++ )
+        retval[i] = generate( means[i], stddevs[i] );
+      return retval;
+    }
+
+
+    public Object[] generateSeveral( int number )
+    {
+        Double[] retval = new Double[number];
+        for(int i=0; i<number; i++)
+        retval[i] = new Double( generateDouble() );
+        return retval;
+    }
+
+    public double generateDouble() {
+          return (mu + sigma * prob.normalRand());
+    }
+
+    public double[] generateDouble(int number)
+    {
+        double[] retval = new double[number];
+        for(int i=0; i<number; i++)
+        retval[i] = prob.normalRand();
+        return retval;
+    }
+
+    public double density(Object x)
+    {
+        return density( ((Number) x).doubleValue());
+    }
+
+    public double[] density(Object[] x)
+    {
+        double[] retval = new double[x.length];
+        for(int i=0; i<x.length; i++)
+        retval[i] = density( ((Number) x[i]).doubleValue());
+        return retval;
+    }
+
+    public Object generateObject()
+    {
+        return new Double( generateDouble() );
+    }
+
+    public Object[] generateObject(int number)
+    {
+        Object[] retval = new Object[number];
+        for(int i=0; i<number; i++)
+        retval[i] = (Object) new Double( generateDouble() );
+        return retval;
+    }
+    public String name()
+    {
+        return "Normal Distribution";
+    }
+
+    public String identifier()
+    {
+        return ("N(" + mu + "," + sigma + ")");
+    } 
+
+    public Object[] getParameters() {
+        Object[] params = new Object[2];
+        params[0] = new Double(mu);
+        params[1] = new Double(sigma);
+        return params;
+    }
+
+    public String[] getParameterNames() {
+        String[] params = new String[2];
+        params[0] = "Mean";
+        params[1] = "Standard Deviation";
+        return params;
+    }
+
+    /* I tried to make this robust. */
+    public void setParameters(Object[] params) 
+    {
+        if(params==null)
+            {
+                mu    = 0.0;
+                sigma = 1.0;
+            }
+        else switch(params.length)
+            {
+            default:
+            case 2:
+                if(params[1]==null)
+                    sigma=1.0;
+                else
+                    sigma = ((Number) params[1]).doubleValue();   
+            case 1:
+                if(params[0]==null)
+                    mu=0.0;
+                else
+                    mu = ((Number) params[0]).doubleValue();
+            }
+    }
+
+    public boolean isValid(Object var )
+    {
+        boolean flag=true;
+        double val=0.0;
+        
+        try 
+            {
+                val = ((Number) var).doubleValue();
+            }
+        catch ( Exception e )
+            {
+                flag = false;
+            }
+        
+        if (Double.isNaN(val))
+            flag = false;
+        
+        return flag;
+    }
+
+    public boolean[] isValid(Object[] var )
+    {
+        boolean[] retval = new boolean[var.length];
+        for(int i=0; i<var.length; i++)
+        retval[i] = isValid(var[i]);
+        return retval;
+    }
+
+    static public void main(String[] args) {
+        
+        
+        Normal norm = new Normal( new CollingsPRNG( (new CollingsPRNGAdministrator()).registerPRNGState() )   );
+        System.out.println( norm.generateDouble() );
+        
+        System.out.println( norm.cdf(norm.quantileDouble(0.025)) + "== 0.025");
+        System.out.println( norm.quantileDouble(norm.cdf(-1.96)) + "== -1.96");
+        
+    }
+
+
+}
+

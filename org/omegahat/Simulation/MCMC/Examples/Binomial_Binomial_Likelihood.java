@@ -1,0 +1,76 @@
+
+// line 5 "Binomial_Binomial_Likelihood.jweb"
+package org.omegahat.Simulation.MCMC.Examples;
+
+import java.lang.Math;
+import com.imsl.math.Sfun;
+import org.omegahat.GUtilities.ArrayTools;
+import org.omegahat.Probability.Distributions.UnnormalizedDensity;
+
+
+public class Binomial_Binomial_Likelihood implements UnnormalizedDensity
+{
+    // Fields
+
+    protected int   dataLength = 40;
+    
+    protected int[] dataX = new int[]{ 7, 3, 4, 3, 5, 4, 5, 3, 6, 12, 5, 3,
+                                       1, 3, 5, 3, 11, 2, 2, 2, 3, 5, 3, 4,
+                                       6, 3, 1, 4, 5, 19, 5, 5, 6, 5, 6, 2,
+                                       0, 0, 6, 4 } ;
+
+    protected int[] dataN = new int[]{ 17, 15, 17, 18, 15, 15, 15, 19,
+                                       16, 15, 18, 19, 18, 19, 19, 21,
+                                       17, 16, 12, 17, 18, 18, 19, 19,
+                                       14, 12, 16, 19, 16, 19, 21, 15,
+                                       13, 20, 16, 17, 8, 7, 18, 15 };
+
+
+    // Constructor
+    public Binomial_Binomial_Likelihood() {}
+
+    // Methods Implementing Unnormalized Density
+
+    public double logUnnormalizedPDF( Object paramOb )
+    {
+        return Math.log( unnormalizedPDF( paramOb ) ) ;
+    }
+
+
+    public double unnormalizedPDF( Object paramObj )
+    {
+        double[] params = ArrayTools.Otod( paramObj );
+        if(params.length != 3 ) throw new RuntimeException("Wrong number of parameters!");
+        
+        double eta    = params[0];
+        double pi0    = params[1];
+        double pi1    = params[2];
+        
+        // check range 
+        if( (eta < 0.0) || (pi0 < 0.0) || (pi1 < 0.0) || 
+            (eta > 1.0) || (pi0 > 1.0) || (pi1 > 1.0) )
+            return 0.0;
+        else 
+            return dB_B( dataX, dataN, eta, pi0, pi1 );
+    }
+
+    // Internal Methods
+
+    // unnormalizded Binomial-Binomial mixture 
+    double dB_B( int[] X, int[] N, double eta, double pi0, double pi1 )
+    {
+        double retval = 1.0;
+
+        for(int i=0; i< dataX.length; i++)
+            retval *= eta * dB( X[i], N[i], pi0) + (1.0 - eta) * dB( dataX[i], dataN[i], pi1);
+
+        return retval;
+    } 
+
+    // unnormalized Binomial
+    double dB( int X, int N, double pi )
+    {
+        return Math.pow( pi, X ) * Math.pow( 1.0 - pi, N - X);
+    }
+
+}

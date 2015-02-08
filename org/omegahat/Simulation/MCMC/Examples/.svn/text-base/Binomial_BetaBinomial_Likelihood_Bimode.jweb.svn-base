@@ -1,0 +1,86 @@
+$Id: Binomial_BetaBinomial_Likelihood_Bimode.jweb,v 1.2 2002/10/25 19:43:54 warnes Exp $
+
+$Log: Binomial_BetaBinomial_Likelihood_Bimode.jweb,v $
+Revision 1.2  2002/10/25 19:43:54  warnes
+
+- Added COLT library to the Hydra distribution.
+- Changed example files that used VisualNumeric's JNL (which is no
+  longer available) to use VisualNumeric's IMSL package (included in
+  COLT) instead.
+
+Revision 1.1.1.1  2001/04/04 17:16:20  warneg
+Initial checkin of Hydra formatted for distribution.
+
+
+Revision 1.1  2000/07/07 13:28:09  warnes
+
+Added examples used in paper describing Hydra 
+
+
+<<*>>=
+
+/**
+ * This class computes a Binomial-BetaBinomial likelihood for the Barretts LOH data
+ * 
+ * @author  Gregory R. Warnes
+ * @date    $Date: 2002/10/25 19:43:54 $
+ * @version $Revision: 1.2 $
+ */
+
+package org.omegahat.Simulation.MCMC.Examples;
+
+import java.lang.Math;
+import com.imsl.math.Sfun;
+import org.omegahat.GUtilities.ArrayTools;
+import org.omegahat.Probability.Distributions.UnnormalizedDensity;
+
+
+public class Binomial_BetaBinomial_Likelihood_Bimode extends Binomial_BetaBinomial_Likelihood
+{
+
+    // Constructor
+    public Binomial_BetaBinomial_Likelihood_Bimode() { super(); }
+
+
+    // Methods Implementing Unnormalized Density
+
+    public double logUnnormalizedPDF( Object paramOb )
+    {
+        return Math.log( unnormalizedPDF( paramOb ) ) ;
+    }
+
+
+    public double unnormalizedPDF( Object paramObj )
+    {
+        double[] params = ArrayTools.Otod( paramObj );
+        if(params.length != 4 ) throw new RuntimeException("Wrong number of parameters!");
+        
+        double eta    = params[0];
+        double pi0    = params[1];
+        double pi1    = params[2];
+        double gamma  = params[3];
+        
+        // 
+        double omega1 = 0.5 * Math.exp(gamma) / (1.0 + Math.exp(gamma) );
+
+        // check range 
+        if( (eta < 0.0) || (pi0 < 0.0) || (pi1 < 0.0) || (omega1 < 0.0) ||
+            (eta > 1.0) || (pi0 > 1.0) || (pi1 > 1.0) || (omega1 > 0.5) )
+            return 0.0;
+        else 
+            {
+
+                // uniform prior on gamma over [-30,30]
+                if( gamma < -30 || gamma > 30 ) return 0.0;
+                double prior = 1.0;
+                
+                // induced logit prior
+                // double prior = Math.exp(gamma) / Math.pow( 1 + Math.exp(gamma) , 2 );
+
+                double tmp = unnormalized_density_loh( eta, pi0, pi1, omega1 );
+                return tmp * prior;
+            }
+                       
+    }
+
+}

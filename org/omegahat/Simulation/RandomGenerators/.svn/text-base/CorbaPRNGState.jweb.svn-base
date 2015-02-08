@@ -1,0 +1,68 @@
+@ This is the initial trivial implementation of the
+\IDLInterface{PRNGState} defined in the IDL file \file{CorbaPRNGUtil.idl}.
+This has a single method that returns the class name corresponding to
+this state .
+
+As per usual, we can use the tie mechanism to delegate the CORBA
+services (i.e. the skeletons to a secondary class) and have
+this class extend the existing \Java{} class, e.g.
+\OmegaClass{CollingsPRNGState}.  This may or may not be
+more convenient.
+
+All of this will be run from a small  application
+that instantiates an object of this class
+and puts it on the CORBA bus. It must initialize the ORB and BOA.
+See
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Docs}
+or
+ \dir{org/omegahat/Interfaces/CORBA/DynamicJavaObject/Test}
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+public class CorbaPRNGState 
+               extends CorbaPRNGUtil._PRNGStateImplBase
+{
+ <<Fields>>
+
+ <<Constructors>>
+ <<Get PRNG Name>>
+}
+
+
+@ Here we will probably have a \OmegaClass{PRNGState}.
+<<Fields>>=
+      PRNGState state;
+@ 
+<<Constructors>>=
+
+public CorbaPRNGState(PRNGState in_state) 
+{
+  state = in_state;
+}
+
+@ 
+Again,
+<<Get PRNG Name>>=
+
+/**	
+ * Get the class name of the PRNG that can be instantiated by the PRNGState encapsulated in this CORBA object.
+ */
+public String getPRNGName()
+{
+  return(state.getPRNGName());
+}
+
+
+/**	
+ * Get the class name of the PRNGState encapsulated in this CORBA object.
+ */
+public String getPRNGStateName()
+{
+  return ((Object) state).getClass().getName();
+}
+
+
+@
+
+

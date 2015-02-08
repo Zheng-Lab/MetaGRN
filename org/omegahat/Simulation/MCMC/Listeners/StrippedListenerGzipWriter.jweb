@@ -1,0 +1,88 @@
+This class extends ListenerGzipWriter by overwriting notify to print only the current state, rather than all of the event details.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class StrippedListenerGzipWriter extends StrippedListenerWriter 
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+/*inherited*/
+
+@ %def 
+
+
+<<Accessors>>=
+
+/*inherited*/
+
+@ %def 
+
+
+<<Constructors>>=
+
+public StrippedListenerGzipWriter( String filename, boolean append, boolean storeTime ) throws java.io.IOException
+{
+  out = new PrintWriter( 
+           new GZIPOutputStream( (OutputStream)
+                                 //                new BufferedWriter ( 
+                    new FileOutputStream( filename, append) ));
+
+  this.storeTime = storeTime;
+  
+  if(storeTime) out.println( "Started at: " + new Date() );
+}
+
+public StrippedListenerGzipWriter( String filename, boolean append ) throws java.io.IOException
+{
+  this( filename, append, false );
+}
+
+public StrippedListenerGzipWriter( String filename ) throws java.io.IOException
+{
+  this( filename, false);
+}
+
+@ %def 
+
+<<Methods>>=
+  
+ /* inherited */
+
+@
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.io.*;
+import java.util.Date;
+import java.util.zip.GZIPOutputStream;
+
+@ %def 
+
+
+
+

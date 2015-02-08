@@ -1,0 +1,102 @@
+\documentclass{article}
+\begin{document}
+
+This file describes the hirarchy of Simulation Techiniques.  Its
+purpose is to clarify the \emph{theoretical} inheritance properties of the
+various simulation tools.
+
+\section{Simulation Techinques}
+
+        Explore the properties of a statisitcal distribution by
+        creating samples from the distribution and evaluating the properties
+        of the sample.
+
+\subsection{Resampleing Methods}
+        
+        Generate samples by using the observed data
+
+        Required function:
+        \begin{itemize}
+        \item generate sample given observed data
+        \end{itemize}
+          
+
+
+\subsection{Pure Monte-Carlo}
+
+        Generate the samples directly from the distribution of interest
+
+        Required function:
+        \begin{itemize}
+        \item generate sample given distribution of interest
+        \end{itemize}
+
+\subsection{Markov Chain Monte-Carlo}
+
+        Generate samples by simulating from a process that converges to the distribution of interest.
+
+        Required function: 
+        \begin{itemize}
+        \item  generate next state in process given current state
+        \end{itemize}
+
+
+\subsubsection{General Metropolis-Hastings Update Method}
+
+        Generate the next sample by making a "guess" and then evaluating whether to use the guess or stay at the current state.
+
+        Required functions: 
+        \begin{itemize}
+        \item proposal function -- generate guess given current state 
+        \item acceptance function -- decide whether to use guess or keep current state (usually dependes on target distribution)
+        \end{itemize}
+
+
+\begin{enumerate}
+
+\item Metropolis-Hastings 
+
+        Generate the next sample by making a "guess".  Evaluate whether to use or keep using the Metropolis-Hastings acceptance function
+
+        Required Functions: 
+        \begin{itemize}
+        \item proposal function
+        \item target distribution
+        \end{itemize}
+
+
+\begin{enumerate}
+
+\item Metropolis 
+
+        Generate the next sample symmetrically.  IE,  
+        \[ P(y \to x) = P(x \to y) \mbox{ for all } x, y. \]
+
+        Reqired Functions 
+        \begin{itemize}
+        \item symmetric proposal function
+        \item target distribution
+        \end{itemize}
+
+
+\begin{enumerate}
+
+\item Gibbs Sampler
+
+        Generate the next sample from the full conditional distribution of each variable, conditional on all others
+        IE,  
+        \[ P(x_{t+1,i}=y) = P( X_i=y | X_{i+1} = x_{t,i+1} , \dots , X_p = x_{t,p},  X_{t+1} = x_{t+1,1} , .. , X_{i-1} = x_{t+1,i-1} ) \]
+        
+        Required Functions:
+        \begin{itemize}
+        \item full conditional proposal function
+        \end{itemize}
+            
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,47 @@
+@
+This class is the CORBA-aware version
+of a PRNG implementation
+<<*>>=
+
+package org.omegahat.Simulation.RandomGenerators;
+
+
+public class CorbaRNG 
+              extends Omegahat._RNGImplBase
+
+{
+<<Instance Variables>>
+<<Constructors>>
+<<Get Value>>
+}
+
+@ 
+
+<<Instance Variables>>=
+PseudoRandomNumberGenerator prng;
+@
+
+This should take an actual instance of a distribution
+<<Constructors>>=
+public CorbaRNG(PseudoRandomNumberGenerator prng_in) 
+{
+  prng = prng_in;
+}
+
+
+@ 
+<<Get Value>>=
+public double getNextDouble() {
+  return(prng.nextDouble());
+}
+
+
+@ 
+<<>>=
+
+
+
+
+
+
+

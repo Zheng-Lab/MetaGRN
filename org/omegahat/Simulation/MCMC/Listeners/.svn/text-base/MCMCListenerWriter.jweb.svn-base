@@ -1,0 +1,46 @@
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Listeners/MCMCListenerWriter.jweb,v 1.1.1.1 2001/04/04 17:16:29 warneg Exp $  */
+/* (c) 2000 by Gregory R. Warnes */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+public interface MCMCListenerWriter extends MCMCListener 
+{
+    /** Write out any cached state **/
+    public void flush();
+
+    /** Write out any cached state and then close the output stream. **/
+    public void close();
+
+    /** Write arbitrary text to the output stream. **/
+    public void println(String data);
+
+    /** Write arbitrary text to the output stream. **/
+    public void print(String data);
+
+}
+
+@ %def 
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+    /* none */
+
+@ %def 
+

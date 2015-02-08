@@ -1,0 +1,89 @@
+This class extends ListenerWriter by compressing the data that is written out.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class ListenerGzipWriter extends ListenerWriter 
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+/*inherited*/
+
+@ %def 
+
+
+<<Accessors>>=
+
+/*inherited*/
+
+@ %def 
+
+
+<<Constructors>>=
+
+public ListenerGzipWriter( String filename, boolean append, boolean storeTime ) throws java.io.IOException
+{
+  out = new PrintWriter( 
+           new GZIPOutputStream( (OutputStream)
+				 //                new BufferedWriter ( 
+                    new FileOutputStream( filename, append) ));
+
+  this.storeTime = storeTime;
+  
+  if(storeTime) out.println( "Started at: " + new Date() );
+}
+
+public ListenerGzipWriter( String filename, boolean append ) throws java.io.IOException
+{
+  this( filename, append, false );
+}
+
+public ListenerGzipWriter( String filename ) throws java.io.IOException
+{
+  this( filename, false);
+}
+
+
+@ %def 
+
+<<Methods>>=
+
+/* inherited */
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.io.*;
+import java.util.Date;
+import java.util.zip.GZIPOutputStream;
+
+@ %def 
+
+
+
+

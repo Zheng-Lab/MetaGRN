@@ -1,0 +1,82 @@
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/GeneralProposal.jweb,v 1.1.1.1 2001/04/04 17:16:15 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/** 
+ *  A General proposal distribution generates generates the next state using function of the current state. It must 
+ *  Provide the methods defined in the interface <code>ConditionalDensity</code> so that the Metropolis-Hastings style generators
+ *  can compute the acceptance probability.
+ */
+    public interface GeneralProposal extends MarkovProposal, ConditionalDensity
+{
+
+    <<Methods>>
+}
+
+@ %def 
+
+These methods are for convenience, since its more natural for me to
+think of this as a proposals in a generative context rather than a
+conditional distribution context.  That is, I prefer $ P( x \to y )$
+over $ P( y | x ) $.
+
+
+<<Methods>>=
+
+/** 
+ * Convenience method for computing the probability of proposing a move.  
+ * <p>
+ * Probably implemented as:<p>
+ * <code>
+ * double transitionProbability( Object from, Object to );<p>
+ * {<p>
+ *    return conditionalPDF( to, from );<p>
+ * }<p>
+ * </code><p>
+ */
+double transitionProbability( Object from, Object to );
+
+/** 
+ * Convenience method for computing the log probability of proposing a move.  
+ * <p>
+ * Probably implemented as:<p>
+ * <code>
+ * double logTransitionProbability( Object from, Object to );<p>
+ * {<p>
+ *    return logConditionalPDF( to, from );<p>
+ * }<p>
+ * </code><p>
+ */
+double logTransitionProbability( Object from, Object to );
+
+
+
+@ %def 
+
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+    import org.omegahat.Probability.Distributions.*;
+
+@ %def 
+

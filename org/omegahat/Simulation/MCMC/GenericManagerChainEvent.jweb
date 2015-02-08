@@ -1,0 +1,107 @@
+This event class is used to pass per-chain events from the [[GenericManager]] to the listeners.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+public class GenericManagerChainEvent extends GenericManagerEvent
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+}
+@
+
+<<Fields>>=
+
+public int chain;                /** Which chain generated the event */
+public GenericChainEvent event;  /** The event that was generated */
+// public String description;     // inherited from GenericMCMCEvent
+// public Object source;          // inherited from GenericMCMCEvent
+
+@ %def 
+
+<<Accessors>>=
+
+int getChain()
+{
+    return chain;
+}
+
+void setChain(int chain)
+{
+    this.chain = chain;
+}
+
+GenericChainEvent getEvent()
+{
+    return event ;
+}
+
+
+void setEvent( GenericChainEvent event )
+{
+    this.event = event;
+}
+
+@ %def 
+
+
+
+
+<<Constructors>>=
+
+/** Default constructor */
+protected GenericManagerChainEvent() {} 
+
+/** Construct with all details */
+public GenericManagerChainEvent( Object            source,
+				 int               chain,
+				 GenericChainEvent event )
+{
+    this.source = source;
+    this.description = "Manager Chain Event";
+    this.chain = chain;
+    this.event = event;
+}
+
+
+
+@ %def 
+
+<<Methods>>=
+
+
+public String toString()
+{
+    String retval = description + "\n";
+    retval += "Source= " + source + "\n";
+    retval += "Chain = #" + chain  + "\n";
+    retval += "Event = " + event + "\n";
+    return retval;
+}
+@ %def 
+
+<<Constructors>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.Proposals.*;
+    import org.omegahat.Simulation.MCMC.Targets.*;
+    import org.omegahat.Simulation.MCMC.Listeners.*;
+
+    /* none */
+
+@ %def 

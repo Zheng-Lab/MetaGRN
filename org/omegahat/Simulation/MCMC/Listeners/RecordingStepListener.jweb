@@ -1,0 +1,105 @@
+This class implements a very basic listener.  It counts occurences of
+[[RecordingStepEvent]]]]s and displays the current count when one is
+recieved.
+
+<<*>>=
+
+<<Package>>
+<<Imports>>
+
+/**
+ * Displays contents and counter of <code>RecordingStepEvent<code>s when one is recieved.
+ */
+public class RecordingStepListener extends ListenerPrinter
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Constructors>>
+    <<Methods>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+protected int step=0;
+protected boolean counter=true;
+protected Vector data;
+protected boolean debug;
+
+@ %def 
+
+<<Accessors>>=
+
+public Vector data() { return data; }
+public Vector data( Vector data ) { return this.data=data; }
+
+public boolean debug() { return debug; }
+public boolean debug( boolean debug ) { return this.debug = debug; }
+
+
+
+@ %def 
+
+
+<<Constructors>>=
+
+public RecordingStepListener()
+{
+  data = new Vector(10000);
+}
+
+public RecordingStepListener ( int size )
+{
+  data = new Vector( size );
+}
+
+@ %def 
+
+<<Methods>>=
+
+public void notify( MCMCEvent e )
+{
+    if( e instanceof GenericChainStepEvent )
+    {
+	if (counter) ++step ;
+
+	MCMCState current =  ((GenericChainStepEvent ) e).getCurrent();
+	
+		if( current instanceof ContainerState )
+	{
+	  Object contents = ((ContainerState) current).getContents();
+	  data.add( contents );
+	}
+	else
+          data.add(current);
+    }
+    else 
+    if ( debug() ) System.err.println(" Unrecognized event: " + e );
+}
+
+@ %def 
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+<<Package>>=
+
+  package org.omegahat.Simulation.MCMC.Listeners;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.Simulation.MCMC.*;
+
+import java.util.Vector;
+
+@ %def 
+
+
+
+

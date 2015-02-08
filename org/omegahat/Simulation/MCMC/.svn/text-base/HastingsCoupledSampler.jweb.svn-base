@@ -1,0 +1,44 @@
+
+This file defines an 'marker' interface for a Hastings Coupled Sampler
+that consistes of $C$ component samplers. 
+
+<<Copyright>>=
+
+ /* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/HastingsCoupledSampler.jweb,v 1.1.1.1 2001/04/04 17:16:17 warneg Exp $  */
+
+ /* (c) 2000 Gregory R. Warnes */ 
+ /* May also contain code (c) 1999 The Omegahat Project */
+
+
+
+@ %def 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/**  
+ * This file defines an 'marker' interface for a Hastings Coupled
+ * Sampler that consistes of $C$ component samplers.
+ **/
+public interface HastingsCoupledSampler extends MarkovChain 
+{
+
+    /* no additional methods */
+}
+@
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC;
+
+@ %def 
+
+<<Imports>>=
+
+    /* none */
+
+@ %def 
+

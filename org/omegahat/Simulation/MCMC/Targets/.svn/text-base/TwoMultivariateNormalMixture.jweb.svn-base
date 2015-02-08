@@ -1,0 +1,150 @@
+
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Simulation/MCMC/Targets/TwoMultivariateNormalMixture.jweb,v 1.1.1.1 2001/04/04 17:16:28 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+This file provides a target distribution formed as a upperWeight of two
+multivariate normal distributions. 
+
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+/**
+ * A UpperWeight of Two Unit Multivariate normal densities
+ */
+public class TwoMultivariateNormalMixture implements UnnormalizedDensity
+{
+    <<Fields>>
+    <<Accessors>>
+    <<Methods>>
+    <<Constructors>>
+    <<Main>>
+}
+@
+
+<<Fields>>=
+
+protected double           upperWeight = 0.5; // mixing proportion
+
+protected MVNormal         mvnorm0;  
+protected MVNormal         mvnorm1;  
+
+public boolean DEBUG = false;
+
+@
+
+<<Accessors>>=
+
+public double getUpperWeight() { return upperWeight; }
+public MVNormal getMVNorm0() { return mvnorm0; }
+public MVNormal getMVNorm1() { return mvnorm1; }
+
+
+@
+
+<<Methods>>=
+
+protected double density( double[] state )
+{
+    return (1.0 - upperWeight) * mvnorm0.PDF( state ) +
+           upperWeight         * mvnorm1.PDF( state );
+}
+
+public double unnormalizedPDF( Object state )  // function is unnormalized wrt parameters in state
+                                               // but must be otherwise normalized
+{
+    double retval = (1.0 - upperWeight) * mvnorm0.PDF( state ) +   
+                           upperWeight  * mvnorm1.PDF( state ) ;
+    return retval;
+}
+
+public double logUnnormalizedPDF( Object state )
+{
+    return Math.log( unnormalizedPDF( state ) );
+}
+
+<<Constructors>>=
+
+public TwoMultivariateNormalMixture( PRNG prng )
+{
+  this( 6.0, 10 , prng);
+}
+
+public TwoMultivariateNormalMixture( double upper_center, int dim, PRNG prng )
+{
+    this( upper_center, dim, 0.5, prng );
+}
+
+public TwoMultivariateNormalMixture( double upper_center, int dim , double upperWeight, PRNG prng )
+{
+    double[] mean0 = new double[dim];
+    double[] mean1 = new double[dim];
+    double[][] cov0  = new double[dim][dim];
+    double[][] cov1  = new double[dim][dim];
+
+    for(int i=0; i<dim; i++)
+        {
+            mean0[i] = 0.0;
+            mean1[i] = upper_center;
+
+            for(int j=0; j<dim; j++)
+                {
+                    if(i==j) 
+                        cov0[i][j] = cov1[i][j] = 1.0;
+                    else
+                        cov0[i][j] = cov1[i][j] = 0.0;
+                }
+        }
+
+    this.upperWeight = upperWeight;
+
+    mvnorm0 = new MVNormal(mean0, cov0, prng );
+    mvnorm1 = new MVNormal(mean1, cov1, prng );
+
+}
+
+public TwoMultivariateNormalMixture( double[] mean0, double[][] cov0,
+                                     double[] mean1, double[][] cov1,
+                                     double upperWeight,
+                                     PRNG prng)
+{
+    this.upperWeight = upperWeight;
+
+    mvnorm0 = new MVNormal( mean0, cov0, prng );
+    mvnorm1 = new MVNormal( mean1, cov1, prng );
+}
+
+@
+
+
+<<Main>>=
+
+    /* none */
+
+@ %def 
+
+
+<<Package>>=
+
+    package org.omegahat.Simulation.MCMC.Targets;
+
+@ %def 
+
+<<Imports>>=
+
+    import org.omegahat.GUtilities.ArrayTools;
+    import org.omegahat.Probability.Distributions.MVNormal;
+    import org.omegahat.Probability.Distributions.UnnormalizedDensity;
+    import org.omegahat.Simulation.RandomGenerators.PRNG;
+
+
+@ %def 
+
+

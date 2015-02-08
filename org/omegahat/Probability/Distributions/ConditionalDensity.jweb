@@ -1,0 +1,41 @@
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Probability/Distributions/ConditionalDensity.jweb,v 1.1.1.1 2001/04/04 17:16:09 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+   
+<<*>>=
+
+<<Copyright>>
+<<Package>>
+<<Imports>>
+
+public interface ConditionalDensity 
+{
+    //    public double unnormalizedConditionalDensity( Object state ) { return density( state, conditions ) };
+    //    public double logUnnormalizedConditionalDensity( Object state ){ return logConditionalDensity( state, conditions ) };
+    public double conditionalPDF   ( Object stat, Object conditions); // { return Math.exp(logConditioanlPDF(state, conditions); }
+    public double logConditionalPDF( Object state, Object conditions );   
+}
+
+@ %def 
+
+
+
+<<Package>>=
+
+package org.omegahat.Probability.Distributions;
+
+@ %def 
+
+<<Imports>>=
+
+import java.util.*;
+import org.omegahat.Simulation.RandomGenerators.PRNG;
+import org.omegahat.Simulation.MCMC.*;
+
+@ %def 
+   

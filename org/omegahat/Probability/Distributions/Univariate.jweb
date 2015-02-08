@@ -1,0 +1,29 @@
+
+<<Copyright>>=
+
+/* $Header: /cvsroot/hydra-mcmc/Hydra/org/omegahat/Probability/Distributions/Univariate.jweb,v 1.1.1.1 2001/04/04 17:16:10 warneg Exp $  */
+/* (c) 1999 by the Omegahat Project */
+
+@ %def 
+
+<<*>>=
+
+public interface Univariate
+{}
+
+@ %def 
+
+<<Package>>=
+
+package org.omegahat.Probability.Distributions;
+
+@ %def 
+
+<<Imports>>=
+
+import java.util.*;
+import org.omegahat.Simulation.RandomGenerators.PRNG;
+import org.omegahat.Simulation.MCMC.*;
+
+@ %def 
+   

@@ -1,0 +1,13 @@
+@ Here we list the packages within this module.  This is used in the
+local makefile as well as the top-level makefile to compute all the
+packages in the \OMega{} collection.  This is used in creating the
+complete javadoc files.
+
+
+The RandomGenerators package provides tools for the management and
+generation of distributed random numbers.
+
+<<MODULES>>=
+RandomGenerators
+MCMC
+@

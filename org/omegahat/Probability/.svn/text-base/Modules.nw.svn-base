@@ -1,0 +1,5 @@
+@
+The distributions provides interfaces and classes for statistical distributions.  These distributions have methods for quantiles, densities, pseudo-random deviate generation, cdf's etc as appropriate.
+<<MODULES>>=
+Distributions
+

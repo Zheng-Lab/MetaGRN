@@ -1,0 +1,279 @@
+@ Here we define some routines that can be used in the test suite of
+the \nwanchorto{http://}{SPRNG} software distribution.
+
+The basic idea here is that we will utilize the code in the
+\dir{ExternalCorba} directory (yet to be integrated into the \OMega{}
+tree), and specifically in the \file{libCommonCorba.so} library.
+
+
+<<*>>=
+
+<<Includes>>
+
+<<Globals>>
+
+<<Initialize>>
+<<Obtain Server>>
+
+<<Get PRNG>>
+<<Get Random Value>>
+<<Clean Up>>
+<<Print PRNG>>
+<<Error>>
+
+@ 
+<<Header>>=
+#ifndef SPRNGCORBACLIENT_H
+#define SPRNGCORBACLIENT_H
+
+//#include "CorbaTypedefs.h"
+#include "RSCorba.h"
+
+#include "CorbaPRNGUtil.h"
+
+<<Command Line Argument Struct>>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+<<C Prototypes>>
+
+#ifdef __cplusplus
+}
+#endif
+
+<<Prototypes>>
+
+#endif // end conditional inclusion.
+
+
+
+
+@ 
+Structure used to store the command line arguments
+passed to \Croutine{main}.
+<<Command Line Argument Struct>>=
+typedef struct _CommandLineArgs {
+  char **args;
+  int  length;
+} CommandLineArgs;
+
+@ 
+Stores the command line arguments so that they can
+be supplied to the CORBA initialization.
+<<Globals>>=
+CommandLineArgs CmdArgs;
+int NumPRNG = 0;
+
+
+@ 
+<<C Prototypes>>=
+void initCORBA(void);
+
+
+@ This should be called before any CORBA calls are made and after the
+commnd line arguments have been stored in \CObject{CmdArgs}.  As
+usual, the \EnvVar{ORBACUS_CONFIG} environment variable should be set.
+<<Initialize>>=
+void initCORBA() {
+ InitializeLocalOrb(CmdArgs.args, CmdArgs.length, &CORBAGlobals, true);
+}
+
+
+@ This obtains a new PRNG from the administrator.  First, we ensure
+that we have a reference to the adminstrator.  The first time through
+this routine, this will be false.  In that case, we call
+\Croutine{obtainAdminServer}.  This finds the server via the Naming
+Service.
+
+At this point, we have the server and can call its \Croutine{getPRNG}
+method.
+<<Get PRNG>>=
+int *
+init_rng(int streamnum, int nstreams, int seed, int parame)
+{
+ int first = 1;
+
+ while(AdministratorServer == NULL) {
+
+   /* If we loop here, make sure and sleep while 5s between checks. */
+   if (first==1) 
+     first=0;
+   else
+     {
+       printf("Sleeping 5 seconds before trying again...\n");
+       sleep(5);
+     }
+   printf("Looking for PRNGAdminServer...\n");
+   obtainAdministratorServer();	
+ }
+
+ first = 1;
+ while(FactoryServer == NULL) {
+
+   /* If we loop here, make sure and sleep while 5s between checks. */
+   if (first==1) 
+     first=0;
+   else
+     {
+       printf("Sleeping 5 seconds before trying again...\n");
+       sleep(5);
+     }
+
+   printf("Looking for PRNGFactoryServer...\n");
+   obtainFactoryServer();
+ }
+
+
+  printf("Asking the PRNGAdministratorServer for a PRNGState...\n");
+  CorbaPRNGUtil_PRNGState_ptr prngState = AdministratorServer->registerPRNGState();
+  printf("Asking the PRNGFactoryServer to instantiate the PRNG...\n");
+  CorbaPRNGUtil_PRNG_ptr prng = FactoryServer->instantiate(prngState);
+
+     /* Stick this into the approriate field in the appropriate
+        struct, etc.  I doubt it is supposed to be returned as is.
+      */
+
+  NumPRNG++;
+
+  return((int*) prng);   
+}
+
+
+@
+<<C Prototypes>>=
+int *init_rng(int streamnum, int nstreams, int seed, int parame);
+
+@ This obtains the next random value from the specified PRNG.  There
+are some issues as with the \Croutine{init_sprng} about the casting to
+the appropriate type for the argument to this routine.
+<<Get Random Value>>=
+double
+get_rn_dbl(int *f)
+{
+ CorbaPRNGUtil_PRNG_ptr prng = (CorbaPRNGUtil_PRNG_ptr) f;
+ return( prng->nextDouble() );
+}
+
+@
+<<C Prototypes>>=
+//double get_rn_dbl(CorbaPRNGUtil_PRNG_ptr prng);
+double get_rn_dbl(int *f);
+
+@ This function should release the prng.  Right now it really just a no-op
+because I don't know how to release a CORBA object.
+<<Clean Up>>=
+//int free_rng(CorbaPRNGUtil_PRNG_ptr prng)
+int free_rng(int *foo)
+{
+  return --NumPRNG;
+  // Corba_Release(prng)
+}
+
+
+@
+<<C Prototypes>>=
+int free_rng(int *);
+
+@
+
+
+The name used to register the server with the CORBA naming
+service and similarly, how we identify the value.
+<<Globals>>=
+char *DefaultAdministratorName[] = {"PRNGAdministrator"};
+char *DefaultFactoryName[]       = {"PRNGFactory"};
+
+
+@ 
+<<Prototypes>>=
+CorbaPRNGUtil_PRNGAdministrator_ptr obtainAdministratorServer();
+CorbaPRNGUtil_PRNGFactory_ptr obtainFactoryServer();
+
+
+@  This routine communicates with the Naming Service
+and obtains a reference to the object registered
+by the default name we are using for the administrator.
+We then narrow this to the appropriate type for the 
+PRNGAdministrator server and off we go....
+
+<<Obtain Server>>=
+CorbaPRNGUtil_PRNGAdministrator_ptr
+obtainAdministratorServer()
+{
+ CORBAObject_ptr obj = getNestedName((const char **)DefaultAdministratorName, 
+                                      sizeof(DefaultAdministratorName)/sizeof(DefaultAdministratorName[0]),
+	                              &CORBAGlobals);
+
+  
+ AdministratorServer =  CorbaPRNGUtil_PRNGAdministrator::_narrow(obj);
+
+return(AdministratorServer);
+}
+
+CorbaPRNGUtil_PRNGFactory_ptr
+obtainFactoryServer()
+{
+ CORBAObject_ptr obj = getNestedName((const char **)DefaultFactoryName, 
+                                      sizeof(DefaultFactoryName)/sizeof(DefaultFactoryName[0]),
+	                              &CORBAGlobals);
+
+  
+ FactoryServer =  CorbaPRNGUtil_PRNGFactory::_narrow(obj);
+
+return(FactoryServer);
+}
+
+@
+<<Error>>=
+
+void Error(char* blah, ...)
+{
+}
+
+
+@
+<<Print PRNG>>=
+int
+print_rng(int *f)
+{
+ CorbaPRNGUtil_PRNG_ptr prng = (CorbaPRNGUtil_PRNG_ptr) f;
+ printf("%s\n", CORBAGlobals.orb->object_to_string(prng));
+
+return(-1);
+}
+
+@ 
+<<C Prototypes>>=
+int print_rng(int *f);
+
+
+@ 
+This is stored globally since we only need to obtain it once.
+We could make it static.
+<<Globals>>=
+ CorbaPRNGUtil_PRNGAdministrator_ptr AdministratorServer;
+ CorbaPRNGUtil_PRNGFactory_ptr FactoryServer;
+
+@ 
+<<C Prototypes>>=
+bool registerServer(CORBAObject_ptr server);
+
+@ This is needed by the routines in the library \file{libCommonCorba}.
+<<Globals>>=
+CORBAConnection CORBAGlobals;
+
+
+@ 
+<<Includes>>=
+#include "SPRNGCorbaClient.h"
+
+#include "CORBAinit.h" // from ExternalCorba
+#include "NamingService.h"
+#include <unistd.h>
+
+
+#include <stdio.h>
+
+
