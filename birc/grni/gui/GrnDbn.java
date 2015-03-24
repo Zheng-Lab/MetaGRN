@@ -95,13 +95,9 @@ public class GrnDbn extends GrnDbnDisplay {
 					//hdb = new Binomial_HDBNf(genes, inputFile, iterations);
 					dbn.dbnMcmcWithOutPrior();
 				}
-							
-				//hdb.dbnRun();
-				//hdb.execute();       
+							       
 				dbn.execute();		// start swingWorker as a worker thread
 				logger.log(Level.INFO, "End of Dbn ");
-				//frame_dbn.dispose();
-				//logger.log(Level.INFO, "dbn frame closed ");
 			}
 		});
 	}

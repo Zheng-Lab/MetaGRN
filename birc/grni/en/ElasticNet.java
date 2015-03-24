@@ -14,6 +14,8 @@ public class ElasticNet
 	
 	/* final network*/
 	private int[][] finalNetwork = null;
+	private int[][] normalizedNetworkEN =null;
+	
 	
 //	/**
 //	 * Constructor, read input data of elastic net algorithm
@@ -24,6 +26,14 @@ public class ElasticNet
 //		this.inputFilePath = inputFilePath;
 //	}
 	
+	public int[][] getNormalizedNetworkEN() {
+		return normalizedNetworkEN;
+	}
+
+	public void setNormalizedNetworkEN(int[][] normalizedNetworkEN) {
+		this.normalizedNetworkEN = normalizedNetworkEN;
+	}
+
 	/* getter*/
 	public double[][] getxOriginalNorm() {
 		return xOriginalNorm;
@@ -160,8 +170,14 @@ public class ElasticNet
 		/* convert degree of freedom (dof) into two-dimension version*/
 		int[][] dofTwoDim = new int[1][];					/* horizontal, 1 * n*/
 		dofTwoDim[0] = Arrays.copyOf(dof, dof.length);
+		System.out.println("run in Elastic Net");
+		FalseDiscoveryRate fdr=new FalseDiscoveryRate(T, dofTwoDim);
+		this.finalNetwork = fdr.networkConstructor();
+		/*this.normalizedNetworkEN=fdr.generateNormalizedNetwork();
+		if(normalizedNetworkEN ==null){
+			System.out.println("normalized network is null");
+		}*/
 		
-		this.finalNetwork = new FalseDiscoveryRate(T, dofTwoDim).networkConstructor();
 	}
 	
 	public void oneIteration(double[] a, GlmnetOptions options, CVErr cvErr, ArrayList<double[]> columnListOfBen, 

@@ -480,6 +480,7 @@ public class CommonUtil {
     
     public static InputData readInput(String inputFilePath, boolean withHeader, boolean genesAreColumnHeader) throws IOException{
 //    	birc.grni.util.Logging.logger.log(Level.FINE, "Beginning of readInput.");
+    	System.out.println("withHeader is checked or not: " +withHeader);
     	
     	ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
     	if(!withHeader)	//without header

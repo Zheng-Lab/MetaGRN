@@ -36,6 +36,8 @@ public class Wait extends GenericWindow
 		setAlwaysOnTop(true);
         setResizable(false);
         setLocationRelativeTo(GnwGuiSettings.getInstance().getGnwGui().getFrame());
+        //zmx
+        //setLocationRelativeTo(frame);
 	}
 	
 	// ----------------------------------------------------------------------------

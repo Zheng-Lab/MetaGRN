@@ -106,8 +106,25 @@ public class ProgressBarAdaptorEN extends SwingWorker<Void, Void> {
 		
 		//TEST
 //		this.finalNetwork = new FalseDiscoveryRate(T, dofTwoDim).networkConstructor();
-		int[][] finalNetwork = new FalseDiscoveryRate(T, dofTwoDim).networkConstructor();
+		
+		
+		FalseDiscoveryRate fdr = new FalseDiscoveryRate(T, dofTwoDim);
+		int[][] finalNetwork = fdr.networkConstructor();
+		//int[][] normalizedNetworkEN= fdr.generateNormalizedNetwork();
+		//int[][] finalNetwork = new FalseDiscoveryRate(T, dofTwoDim).networkConstructor();
+		//double[][] unnormalizedNetwork =fdr.unnormalizedMatrix;
+		int[][] normalizedNetworkEN= fdr.normalizedNetworkEN;
+		//zmx
+		
+		System.out.println("Final network structure:");
+		/*for(int i=0;i<finalNetwork.length;i++){
+			for(int j=0;j<finalNetwork[0].length;j++)
+				System.out.print(finalNetwork[i][j]);
+			System.out.println("");
+		}*/
+		
 		algorithm.setFinalNetwork(finalNetwork);
+		//algorithm.setNormalizedNetworkEN(normalizedNetworkEN);
 		
 		return null;
 	}
@@ -115,11 +132,13 @@ public class ProgressBarAdaptorEN extends SwingWorker<Void, Void> {
 	public void done() {
 		//TEST
 		int[][] finalNetwork = this.algorithm.getFinalNetwork();
+		int[][] normalizedNetworkEN= this.algorithm.getNormalizedNetworkEN();
 		if(finalNetwork == null)
 			throw new NullPointerException("The final network of elastic net is null!");
 		else {
-			int genes = finalNetwork.length;	/* number of genes*/
+			int genes = finalNetwork.length;	 //number of genes
 			GrnElasticNet.resultPrinter(finalNetwork, genes, this.inputData.getGeneNames());
 		}
+		
 	}
 }

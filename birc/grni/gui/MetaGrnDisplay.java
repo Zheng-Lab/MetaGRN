@@ -53,6 +53,7 @@ public class MetaGrnDisplay extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	protected JLabel inputFileLabel;
+	protected JLabel emptyLabel;
 	protected JTextField inputFileTextField;
 	protected JButton inputFileButton;
 
@@ -72,6 +73,19 @@ public class MetaGrnDisplay extends JPanel {
 	private JCheckBox lassoAlgorithmCheckBox;			/* choose to investigate lasso algorithm*/
 	private JCheckBox lassoDelayAlgorithmCheckBox;		/* choose to investigate lasso delay algorithm*/
 	private JCheckBox ridgeAlgorithmCheckBox;			/* choose to investigate ridge algorithm*/
+	
+	//ZMX
+	//original user network
+	private JLabel originalUserNetworkLabel;
+	private JCheckBox originalUserNetworkCheckBox;				/*choose to import user modified network*/
+	private JTextField originalUserNetworkInputFileTextField;	
+	private JButton originalUserNetworkInputFileButton;
+	
+	//modified user network
+	private JLabel modifiedUserNetworkLabel;
+	private JCheckBox modifiedUserNetworkCheckBox;				/*choose to import user modified network*/
+	private JTextField modifiedUserNetworkInputFileTextField;	
+	private JButton modifiedUserNetworkInputFileButton;
 	
 	/* how many times of simulation we will do*/
 	private JLabel numberOfSimulationLabel;
@@ -93,6 +107,8 @@ public class MetaGrnDisplay extends JPanel {
 	private JPanel networkFormatButtonPanel;
 	
 	private ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
+	//ZMX
+	//private ArrayList<ArrayList<Double>> userNetworkInputDataMatrix = new ArrayList<ArrayList<Double>>();
 	
 	public MetaGrnDisplay() {
 		
@@ -201,6 +217,7 @@ public class MetaGrnDisplay extends JPanel {
 		withheaderCheckBox = new JCheckBox("Input with header");
 		withheaderCheckBox.setBackground(Color.WHITE);
 		
+		
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.weighty = 1;
@@ -263,6 +280,9 @@ public class MetaGrnDisplay extends JPanel {
 		ridgeAlgorithmCheckBox = new JCheckBox("Ridge Rigression");
 		ridgeAlgorithmCheckBox.setBackground(Color.WHITE);
 		
+		
+		
+		
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.weighty = 1;
@@ -270,6 +290,8 @@ public class MetaGrnDisplay extends JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.insets = new Insets(0,15,0,0);
 		this.add(chooseAlgorithmLabel, gridBagConstraints);
+		
+		
 		
 		gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
@@ -296,6 +318,150 @@ public class MetaGrnDisplay extends JPanel {
 		gridBagConstraints.gridx = 6;
 		this.add(ridgeAlgorithmCheckBox, gridBagConstraints);
 		
+		
+		//zmx original user network
+		gridBagConstraints = new GridBagConstraints();						/* restore default*/
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 0;
+		gridBagConstraints.weighty = 0;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.insets = new Insets(0,15,0,0);
+		
+		
+		originalUserNetworkCheckBox = new JCheckBox("User Network");
+		originalUserNetworkCheckBox.setBackground(Color.WHITE);
+		this.add(originalUserNetworkCheckBox, gridBagConstraints);
+		
+		
+		originalUserNetworkInputFileTextField = new JTextField("Upload data file for original user network:");
+		originalUserNetworkInputFileTextField.setEnabled(false);
+		originalUserNetworkInputFileButton = new JButton("Choose");
+		originalUserNetworkInputFileButton.setEnabled(false);
+		
+		originalUserNetworkInputFileButton.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+							JFrame frame = new JFrame();
+							FileDialog fileDialog = new FileDialog(frame);
+							fileDialog.setVisible(true);
+							String selectedDir = fileDialog.getDirectory();
+							String selectedFile = fileDialog.getFile();							
+							if(selectedFile != null)							
+								originalUserNetworkInputFileTextField.setText(new File(selectedDir, selectedFile).getAbsolutePath());
+					    }
+				}
+		);
+		
+		gridBagConstraints= new GridBagConstraints();							/*restore default*/
+		
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.gridx=1;
+		gridBagConstraints.gridwidth=5;
+		this.add(originalUserNetworkInputFileTextField,gridBagConstraints);
+		
+		gridBagConstraints= new GridBagConstraints();							/*restore default*/
+		
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.weighty = 0;
+		//gridBagConstraints.gridx = 6;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+		gridBagConstraints.insets = new Insets(0,10,0,10);
+		this.add(originalUserNetworkInputFileButton, gridBagConstraints);
+		
+		originalUserNetworkCheckBox.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						Boolean originalUserNetworkSelect=originalUserNetworkCheckBox.isSelected();
+						originalUserNetworkInputFileTextField.setEnabled(originalUserNetworkSelect);
+						originalUserNetworkInputFileButton.setEnabled(originalUserNetworkSelect);
+					}
+				});
+		
+		
+		emptyLabel = new JLabel("   ");
+		gridBagConstraints = new GridBagConstraints();						/* restore default*/
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 0;
+		gridBagConstraints.weighty = 0;
+		gridBagConstraints.gridy = 6;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.insets = new Insets(0,15,0,0);
+		this.add(emptyLabel,gridBagConstraints);
+		
+		//zmx modified user network
+		gridBagConstraints = new GridBagConstraints();						/* restore default*/
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 0;
+		gridBagConstraints.weighty = 0;
+		gridBagConstraints.gridy = 7;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.insets = new Insets(0,15,0,0);
+		
+		
+		modifiedUserNetworkCheckBox = new JCheckBox("Modified User Network");
+		modifiedUserNetworkCheckBox.setBackground(Color.WHITE);
+		this.add(modifiedUserNetworkCheckBox, gridBagConstraints);
+		
+		
+		modifiedUserNetworkInputFileTextField = new JTextField("Upload data file for modified user network:");
+		modifiedUserNetworkInputFileTextField.setEnabled(false);
+		modifiedUserNetworkInputFileButton = new JButton("Choose");
+		modifiedUserNetworkInputFileButton.setEnabled(false);
+		
+		modifiedUserNetworkInputFileButton.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+							JFrame frame = new JFrame();
+							FileDialog fileDialog = new FileDialog(frame);
+							fileDialog.setVisible(true);
+							String selectedDir = fileDialog.getDirectory();
+							String selectedFile = fileDialog.getFile();							
+							if(selectedFile != null)							
+								modifiedUserNetworkInputFileTextField.setText(new File(selectedDir, selectedFile).getAbsolutePath());
+					    }
+				}
+		);
+		
+		gridBagConstraints= new GridBagConstraints();							/*restore default*/
+		
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.gridx=1;
+		gridBagConstraints.gridwidth=5;
+		gridBagConstraints.gridy=7;
+		this.add(modifiedUserNetworkInputFileTextField,gridBagConstraints);
+		
+		gridBagConstraints= new GridBagConstraints();							/*restore default*/
+		
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 0;
+		gridBagConstraints.weighty = 0;
+		//gridBagConstraints.gridx = 6;
+		//gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 7;
+		gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+		gridBagConstraints.insets = new Insets(0,10,0,10);
+		this.add(modifiedUserNetworkInputFileButton, gridBagConstraints);
+		
+		modifiedUserNetworkCheckBox.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						Boolean modifiedUserNetworkSelect=modifiedUserNetworkCheckBox.isSelected();
+						modifiedUserNetworkInputFileTextField.setEnabled(modifiedUserNetworkSelect);
+						modifiedUserNetworkInputFileButton.setEnabled(modifiedUserNetworkSelect);
+					}
+				});
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
 		/* number of simulations*/
@@ -307,7 +473,10 @@ public class MetaGrnDisplay extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.weighty = 1;
-		gridBagConstraints.gridy = 5;
+		//ZMX
+		//gridBagConstraints.gridy = 5;
+		//gridBagConstraints.gridy = 6;
+		gridBagConstraints.gridy = 8;
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.insets = new Insets(0,15,0,0);
 		this.add(this.numberOfSimulationLabel, gridBagConstraints);
@@ -317,7 +486,9 @@ public class MetaGrnDisplay extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.weighty = 0;
-		gridBagConstraints.gridy = 5;
+		//ZMX
+		//gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 8;
 		gridBagConstraints.gridx = 1;
 		this.add(this.numberOfSimulationSpinner, gridBagConstraints);
 		
@@ -329,7 +500,9 @@ public class MetaGrnDisplay extends JPanel {
 		
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1;
-		gridBagConstraints.gridy = 6;
+		//ZMX
+		//gridBagConstraints.gridy = 6;
+		gridBagConstraints.gridy = 9;
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.insets = new Insets(0,15,0,0);
 		this.add(this.storeNetworkCheckBox, gridBagConstraints);
@@ -349,7 +522,9 @@ public class MetaGrnDisplay extends JPanel {
 //		gridBagConstraints.weightx = 0;
 		gridBagConstraints.weighty = 0;
 		gridBagConstraints.insets = new Insets(0,0,15,0);
-		gridBagConstraints.gridy = 7;
+		//ZMX
+		//gridBagConstraints.gridy = 7;
+		gridBagConstraints.gridy = 10;
 		gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		this.add(this.bottomButtonPanel, gridBagConstraints);
@@ -391,17 +566,25 @@ public class MetaGrnDisplay extends JPanel {
 					String inputFilePath = inputFileTextField.getText();
 					InputData originalData = null;
 					try {
-						originalData = CommonUtil.readInput(inputFilePath, withheaderCheckBox.isEnabled()/*withHeader*/, rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header")/*geneNameAreColumnHeader*/);
+						originalData = CommonUtil.readInput(inputFilePath, withheaderCheckBox.isSelected()/*withHeader*/, rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header")/*geneNameAreColumnHeader*/);
+						
 					} catch(IOException ioex) {
 						ioex.printStackTrace();
 					}
 					inputDataMatrix = originalData.getData();
+					System.out.println("generateNetworkButton: inputdataMatrix size: "+inputDataMatrix.get(0).size());
 					
 					if(dbnAlgorithmCheckBox.isSelected())
 					{
 						GrnDbn.runByMeta = true;
 						GrnDbn grnDbn = new GrnDbn(new JFrame());
 						grnDbn.getDataFilePathDbn().setText(inputFilePath);
+						grnDbn.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnDbn.columnHeaderRadioButton.setSelected(true);
+						else
+							grnDbn.rowHeaderRadioButton.setSelected(true);
+						//grnDbn.
 						grnDbn.frame_dbn.setVisible(true);
 					}
 					
@@ -410,6 +593,11 @@ public class MetaGrnDisplay extends JPanel {
 						GrnRf.runByMeta = true;
 						GrnRf grnRf = new GrnRf(new JFrame());
 						grnRf.getDataFilePathField().setText(inputFilePath);
+						grnRf.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnRf.columnHeaderRadioButton.setSelected(true);
+						else
+							grnRf.rowHeaderRadioButton.setSelected(true);
 						grnRf.frameRf.setVisible(true);
 					}
 					
@@ -418,6 +606,11 @@ public class MetaGrnDisplay extends JPanel {
 						GrnElasticNet.runByMeta = true;
 						GrnElasticNet grnElasticNet = new GrnElasticNet(new JFrame());
 						grnElasticNet.getDataFilePathField().setText(inputFilePath);
+						grnElasticNet.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnElasticNet.columnHeaderRadioButton.setSelected(true);
+						else
+							grnElasticNet.rowHeaderRadioButton.setSelected(true);
 						grnElasticNet.frameElasticNet.setVisible(true);
 					}
 					
@@ -426,6 +619,11 @@ public class MetaGrnDisplay extends JPanel {
 						GrnLasso.runByMeta = true;
 						GrnLasso grnLasso = new GrnLasso(new JFrame());
 						grnLasso.getDataFilePathField().setText(inputFilePath);
+						grnLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnLasso.columnHeaderRadioButton.setSelected(true);
+						else
+							grnLasso.rowHeaderRadioButton.setSelected(true);
 						grnLasso.frameLasso.setVisible(true);
 					}
 					
@@ -434,6 +632,11 @@ public class MetaGrnDisplay extends JPanel {
 						GrnTimeDelayLasso.runByMeta = true;
 						GrnTimeDelayLasso grnTimeDelayLasso = new GrnTimeDelayLasso(new JFrame());
 						grnTimeDelayLasso.getInputFilePathTextField().setText(inputFilePath);
+						grnTimeDelayLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnTimeDelayLasso.columnHeaderRadioButton.setSelected(true);
+						else
+							grnTimeDelayLasso.rowHeaderRadioButton.setSelected(true);
 						grnTimeDelayLasso.frame_lassoDelay.setVisible(true);
 					}
 					
@@ -442,8 +645,14 @@ public class MetaGrnDisplay extends JPanel {
 						GrnRidge.runByMeta = true;
 						GrnRidge grnRidge = new GrnRidge(new JFrame());
 						grnRidge.getInputFilePathField().setText(inputFilePath);
+						grnRidge.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnRidge.columnHeaderRadioButton.setSelected(true);
+						else
+							grnRidge.rowHeaderRadioButton.setSelected(true);
 						grnRidge.frame_ridge.setVisible(true);
 					}
+					
 					
 					/* only after generating networks, we can use Meta-GRN*/
 					//TODO: not reasonable, need change
@@ -452,10 +661,10 @@ public class MetaGrnDisplay extends JPanel {
 			}
 		);
 		
-		this.metaGrnButton.addActionListener(
-			new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					try {
+//		this.metaGrnButton.addActionListener(
+//			new ActionListener() {
+//				public void actionPerformed(ActionEvent e) {
+//					try {
 //						/* perform all algorithms on the input data and save each output to a separate file*/
 //						ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
 //						String inputFilePath = inputFileTextField.getText();
@@ -590,7 +799,10 @@ public class MetaGrnDisplay extends JPanel {
 ////							}
 ////						}
 ////						resultFilePrinter_DBN.close();
-						
+		this.metaGrnButton.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try {			
 						if(generateDataOnlyCheckBox.isSelected())	/* synthesize data from network directly*/
 						{
 							if(networkFormatButtonGroup.getSelection().getActionCommand().equals("Matrix"))
@@ -685,6 +897,9 @@ public class MetaGrnDisplay extends JPanel {
 							DynamicalModelElement metaDynamicNetwork_LASSO_DELAY = null;
 							DynamicalModelElement metaDynamicNetwork_DBN = null;
 							DynamicalModelElement metaDynamicNetwork_RIDGE = null;
+							//ZMX
+							DynamicalModelElement metaDynamicNetwork_USER_Original = null;
+							DynamicalModelElement metaDynamicNetwork_USER_Modified = null;
 							
 							if(rfAlgorithmCheckBox.isSelected())
 							{
@@ -779,6 +994,49 @@ public class MetaGrnDisplay extends JPanel {
 								}
 							}
 							
+							
+							//ZMX original user network
+							if(originalUserNetworkCheckBox.isSelected())
+							{
+								/* load directly*/
+								String originalUserNetworkInputFilePath = originalUserNetworkInputFileTextField.getText();
+								StructureElement metaNetwork_USER_Original = loadStructureItem("Original_User_NETWORK", new File(originalUserNetworkInputFilePath).toURI().toURL(), ImodNetwork.TSV);
+								metaNetwork_USER_Original.getNetwork().removeAutoregulatoryInteractions();
+								
+								/* Create a new dynamic network from a static one and initialize its parameters.*/
+								metaDynamicNetwork_USER_Original = new DynamicalModelElement(metaNetwork_USER_Original);
+								metaDynamicNetwork_USER_Original.getGeneNetwork().randomInitialization();
+								
+								if (metaNetwork_USER_Original.hasChildren())
+								{
+									for (IElement element : metaNetwork_USER_Original.getChildren())
+										metaDynamicNetwork_USER_Original.addChild(element);
+								}
+								
+								
+							}
+							
+							//ZMX modified user network
+							if(modifiedUserNetworkCheckBox.isSelected())
+							{
+								/* load directly*/
+								String modifiedUserNetworkInputFilePath = modifiedUserNetworkInputFileTextField.getText();
+								StructureElement metaNetwork_USER_modified = loadStructureItem("modified_User_NETWORK", new File(modifiedUserNetworkInputFilePath).toURI().toURL(), ImodNetwork.TSV);
+								metaNetwork_USER_modified.getNetwork().removeAutoregulatoryInteractions();
+								
+								/* Create a new dynamic network from a static one and initialize its parameters.*/
+								metaDynamicNetwork_USER_Modified = new DynamicalModelElement(metaNetwork_USER_modified);
+								metaDynamicNetwork_USER_Modified.getGeneNetwork().randomInitialization();
+								
+								if (metaNetwork_USER_modified.hasChildren())
+								{
+									for (IElement element : metaNetwork_USER_modified.getChildren())
+										metaDynamicNetwork_USER_Modified.addChild(element);
+								}
+								
+								
+							}
+							
 							HashMap<String, NetworkElement> dynamicNeworks = new HashMap<String, NetworkElement>();
 							
 							dynamicNeworks.put("RF", metaDynamicNetwork_RF);
@@ -787,7 +1045,11 @@ public class MetaGrnDisplay extends JPanel {
 							dynamicNeworks.put("LASSO_DELAY", metaDynamicNetwork_LASSO_DELAY);
 							dynamicNeworks.put("DBN", metaDynamicNetwork_DBN);
 							dynamicNeworks.put("RIDGE", metaDynamicNetwork_RIDGE);
+							//ZMX
+							dynamicNeworks.put("Original_USER_NETWORK", metaDynamicNetwork_USER_Original);
+							dynamicNeworks.put("Modified_USER_NETWORK", metaDynamicNetwork_USER_Modified);
 							
+							System.out.println("MetaGRN Run Button inputdataMatrix size: "+inputDataMatrix.get(0).size());
 							generateDREAM3GoldStandard(dynamicNeworks, Integer.parseInt(numberOfSimulationSpinner.getValue().toString()), inputDataMatrix);
 						}
 						
@@ -807,6 +1069,7 @@ public class MetaGrnDisplay extends JPanel {
 	 */
 	public static void generateDREAM3GoldStandard(HashMap<String, NetworkElement> networks, int numberOfSimulations, ArrayList<ArrayList<Double>> inputData /*genename is column header*/) throws Exception
 	{
+		System.out.println("METAGRNDISPLAY: matrix size is: "+inputData.get(0).size());
 		MySimulation rd = new MySimulation(new Frame(), networks, numberOfSimulations, inputData);
 		rd.setVisible(true);
 	}

@@ -117,14 +117,15 @@ public class GnwGui extends GnwGuiWindow {
 	/**
 	 * Build and initialize the GUI.
 	 */
-	public void run()
+	//zmx
+	public void run(Boolean visible)
 	{
 		setGnwConsole();
 
 		// display the splash
 		splashScreen_ = new SplashScreen(new Frame(), GnwGuiSettings.getInstance().getSplashScreenImage(),
 				SplashScreen.NORMAL, true, true, false);
-		splashScreen_.setVisible(true);
+		splashScreen_.setVisible(visible);
 
 		initialize();
 
@@ -136,7 +137,7 @@ public class GnwGui extends GnwGuiWindow {
 		
 		// hide the splash and display the loaded GUI interface
 		splashScreen_.setVisible(false);
-		this.getFrame().setVisible(true);
+		this.getFrame().setVisible(visible);
 	}
 
 
@@ -356,6 +357,8 @@ public class GnwGui extends GnwGuiWindow {
 
 		// Create a URL for the desired page
 		URL url = GnwSettings.getInstance().getLastSettingsURL();
+		if(url==null)
+			System.out.println("url is null!!!!");
 		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
 		String str = "";
 		String tmp = in.readLine();

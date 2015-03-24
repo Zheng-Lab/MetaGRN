@@ -1,0 +1,157 @@
+<project name="MetaGRN" default="dist" basedir=".">
+    <description>
+        build GRNInfer project, generate executable jar
+    </description>
+  	
+  	<!-- set global properties for this build -->
+  	<property name="src" value="src"/>
+  	<property name="build" value="build"/>
+  	<property name="dist"  value="dist"/>
+  	<property name="lib" value="lib"/>	
+  	<property name="resource" value="resource"/>
+  	<property name="nativelib" value="nativelib"/>
+  	<property name="dependentlibs" value="deplibs"/> 
+    <property name="projectname" value="MetaGRN"/>
+	
+	<property name="workspace" location="C:\Users\zhan0355\Desktop\workspace\MetaGRN"/>
+
+	<!-- ant javac cannot handle inner classes, so we use eclipse to compile first and generate jar directly-->
+  	
+  	<!-- <target name="init"> -->
+		<!-- Clear all class files already there in ${src} directory and its sub-directories-->	
+		<!--
+		<delete>
+			<fileset dir="${basedir}/${src}" includes="**/*.class"/>
+		</delete>
+		-->
+
+    	<!-- Create the time stamp -->
+    	<!-- <tstamp/> -->
+	
+	    <!-- Create the build directory structure used by compile -->
+   		<!-- <mkdir dir="${basedir}/${build}"/> -->
+  	<!-- </target> -->
+
+  	<!-- <target name="compile" depends="init" description="compile the source "> -->
+		<!--
+		<path id="compile-classpath">
+			<pathelement location="${basedir}/${build}"/>
+			<fileset dir="${basedir}/${lib}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+		-->
+	
+    	<!-- Compile the java code from ${src} into ${build} -->
+    	<!--
+    	<javac srcdir="${basedir}/${src}" destdir="${basedir}/${build}" includeantruntime="false">
+			<classpath refid="compile-classpath"/>
+		</javac>
+		-->
+  	<!--</target> -->
+
+  	<!-- <target name="dist" depends="compile" description="generate the distribution"> -->
+  	<target name="dist" description="generate the distribution" >
+  		<mkdir dir="${basedir}/${build}"/>
+  		
+  		<!-- copy class files and other resource files except java source files into build folder-->
+  		<copy todir="${basedir}/${build}">
+		<!-- TEST: Copy class files from eclipse workspace directly-->
+  			<!--
+			<fileset dir="${basedir}/${src}" excludes="**/*.java"/>
+			-->
+			<fileset dir="${workspace}" includes="birc/** ch/** org/** edu/**" excludes="**/*.java"/>
+  		</copy>
+  		
+  		<!-- Create the distribution directory -->
+	    <mkdir dir="${basedir}/${dist}"/>
+  	
+  		<!-- Copy other resources into jar basedir to include it into final jar file -->
+		
+		<!-- copy the config.xml used by DBN algorithm-->
+		<copy todir="${basedir}/${build}" file="${workspace}/config.xml"/>
+		
+		<!-- copy resource files, for example, pictures-->
+		<copy todir="${basedir}/${build}">
+        	<fileset dir="${workspace}">  
+				<include name="${resource}/**"/>
+			</fileset>
+    	</copy>
+    	
+		<!-- copy our own native lib-->
+		<copy todir="${basedir}/${build}">
+        	<fileset dir="${workspace}">  
+				<include name="${nativelib}/**"/>
+			</fileset>
+    	</copy>
+	
+		<!-- copy dependent libs used by our own native lib-->
+		<copy todir="${basedir}/${build}">
+        	<fileset dir="${workspace}">  
+				<include name="${dependentlibs}/**"/>
+			</fileset>
+    	</copy>
+	
+		<!-- copy third-party jar into build folder-->
+		<copy todir="${basedir}/${build}">
+        	<fileset dir="${workspace}/${lib}">  
+				<include name="**"/>
+			</fileset>
+    	</copy>
+	
+		<path id="build.classpath">
+        	<fileset dir="${basedir}/${build}">
+          		<include name="**/*.jar" />
+	        </fileset>
+    	</path>
+
+
+		<pathconvert property="manifest.classpath" pathsep=" ">
+	        <path refid="build.classpath" />
+	        <mapper>
+	            <chainedmapper>
+	                <flattenmapper />
+	                <globmapper from="*.jar" to="*.jar" />
+	            </chainedmapper>
+	        </mapper>
+	    </pathconvert>
+	
+		<!--
+		<manifestclasspath property="jar.classpath" jarfile="${basedir}/${dist}/${projectname}.jar">
+			<classpath refid="jar-classpath"/>
+   		</manifestclasspath>
+		-->
+
+    	<!-- Put everything in ${build} into the ${dist}/${projectname}.jar file -->
+		<jar jarfile="${basedir}/${dist}/${projectname}.jar">
+			<manifest>
+				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+				<attribute name="Class-Path" value=". ${manifest.classpath}"/>
+				<attribute name="Rsrc-Main-Class" value="birc.grni.gui.GrnGuiMain"/>
+				<attribute name="Rsrc-Class-Path" value="./ ${manifest.classpath}"/>
+			</manifest>
+			
+			<!-- make jar library files accessible in the generated executable jar file-->
+			<zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="${basedir}/${build}"/>
+		</jar>
+	
+	<!-- <jar jarfile="${dist}/${projectname}.jar">
+		<manifest>
+			<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+			<attribute name="Rsrc-Main-Class" value="birc.grni.gui.GrnGuiMain"/>
+			<attribute name="Class-Path" value="${jar.classpath}"/>
+			<attribute name="Rsrc-Class-Path" value="${jar.classpath}"/>
+		</manifest>
+		<fileset dir="${build}" />
+		<zipfileset src="jar-in-jar-loader.zip"/>
+		<zipfileset dir="${basedir}\lib" includes="**/*.jar"/>
+	</jar> -->
+  	</target>
+
+  	<target name="clean" description="clean up" >
+    	<!-- Delete the ${build} and ${dist} directory trees -->
+    	<delete dir="${build}"/>
+    	<delete dir="${dist}"/>
+  	</target>
+</project>

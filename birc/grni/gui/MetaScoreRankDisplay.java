@@ -31,7 +31,8 @@ public class MetaScoreRankDisplay {
 		headerPanel.setLayout(cardLayout);
 		headerPanel.add(header, "header");
 		metaScoreRankFrame.getContentPane().add(headerPanel, BorderLayout.NORTH);
-		table = new JTable(rankTable, new String[]{"Algorithms", "Rank"});
+		//zmx
+		table = new JTable(rankTable, new String[]{"Algorithms","Rank","Distance"});
 		table.setEnabled(false);
 		metaScoreRankPanel.setLayout(new BorderLayout());
 		metaScoreRankPanel.add(table.getTableHeader(), BorderLayout.PAGE_START);

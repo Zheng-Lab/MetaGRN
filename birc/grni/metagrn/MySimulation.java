@@ -25,6 +25,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.math.ConvergenceException;
+import org.apache.commons.math3.linear.*;
+import org.apache.commons.math3.stat.correlation.Covariance;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
 import birc.grni.gui.MetaScoreRank;
 import ch.epfl.lis.gnw.BenchmarkGeneratorDream4;
@@ -432,6 +436,7 @@ public class MySimulation extends SimulationWindow {
 			if(this.item_ != null)
 				enterAction(entry.getKey(), simulationIndex);
 		}
+		
 	}
 	
 	// ----------------------------------------------------------------------------
@@ -590,6 +595,7 @@ public class MySimulation extends SimulationWindow {
 			// be sure to have set the output directory before running the simulation
 			// LIU
 //			simulation.start();
+			
 			simulation.run();
 		}
 		catch (Exception e)
@@ -597,9 +603,91 @@ public class MySimulation extends SimulationWindow {
 			log_.log(Level.WARNING, "Simulation::enterAction(): " + e.getMessage(), e);
 		}
 	}
-	
+	public static double[][] ToDD(ArrayList<ArrayList<Double>> input){
+		int numrow = input.size();
+		int numcol = input.get(0).size();
+		double[][] dd = new double[numrow][numcol];
+		for(int i = 0; i<numrow; i++){
+			for(int j = 0; j<numcol; j++)
+				dd[i][j] = input.get(i).get(j);
+		}
+		return dd;
+	}
+	public static ArrayList<ArrayList<Double>> ToAA(RealMatrix m){
+		ArrayList<ArrayList<Double>> aa = new ArrayList<ArrayList<Double>>();
+		for(int i = 0; i<m.getRowDimension(); i++){
+			ArrayList<Double> a = new ArrayList<Double>();
+			for(int j = 0; j<m.getColumnDimension(); j++)
+				a.add(m.getEntry(i, j));
+			aa.add(a);
+		}
+		return aa;
+	}
+	public static RealMatrix ToCOV(ArrayList<ArrayList<Double>> input){
+		// assuming non-zero sizes
+		return new Covariance(ToDD(input)).getCovarianceMatrix();
+	}
+	public static void generateCov(ArrayList<ArrayList<Double>> input, ArrayList output){
+		RealMatrix cov = ToCOV(input);
+		int numInputDims = cov.getColumnDimension();
+		SingularValueDecomposition svd = new SingularValueDecomposition(cov);
+		double[] svalues = svd.getSingularValues();
+		double threshold = 0.95;
+		double sum = 0;
+		for(int i = 0; i<numInputDims; i++)
+			sum += svalues[i];
+		double accu = 0;
+		int firstN = 0;
+		for(int i = 0; i<numInputDims; i++){
+			accu += svalues[i];
+			if (accu/sum > threshold){
+				firstN = i;
+				break;
+			}
+		}
+		RealMatrix transform = svd.getU().getSubMatrix(0, cov.getColumnDimension()-1, 0, firstN);
+		output.add(transform);
+		// compute mean
+		RealMatrix inputdd = new Array2DRowRealMatrix(ToDD(input));
+		double[] mean = new double[inputdd.getColumnDimension()];
+		for(int j = 0; j<inputdd.getColumnDimension(); j++){
+			mean[j] = new Mean().evaluate(inputdd.getColumn(j));
+		}
+		output.add(mean);
+		//return transform;
+	}
+	public static ArrayList getMeanAndVar(RealMatrix inputdd){
+		double[] mean = new double[inputdd.getColumnDimension()];
+		double[] var  = new double[inputdd.getColumnDimension()];
+		for(int j = 0; j<inputdd.getColumnDimension(); j++){
+			mean[j] = new Mean().evaluate(inputdd.getColumn(j));
+			var [j] = new Variance().evaluate(inputdd.getColumn(j));
+		}
+		System.out.println(mean.toString());
+		System.out.println(var.toString());
+		ArrayList ar = new ArrayList();
+		ar.add(mean);
+		ar.add(var);
+		return ar;
+		//return mean;
+	}
+	public static ArrayList<ArrayList<Double>> applyPCA(ArrayList<ArrayList<Double>> input, ArrayList PCAoutput){
+		RealMatrix m = new Array2DRowRealMatrix(ToDD(input));
+		RealMatrix transform = (RealMatrix)PCAoutput.get(0);
+		double[] mean = (double[])PCAoutput.get(1);
+		for(int i = 0; i < m.getRowDimension(); i++){
+			for(int j = 0; j<m.getColumnDimension(); j++){
+				m.setEntry(i, j, m.getEntry(i, j) - mean[j]);
+			}
+		}
+		//ArrayList ar = getMeanAndVar(m);
+		return ToAA(m.multiply(transform));
+	}
 	public void metaScoreRank() throws IOException {
-
+		
+		
+		//ZMX
+		log_.log(Level.WARNING, "establish meta score rank table begin" );
 		// LIU
 		// ranks of MetaScore
 		HashMap<String, Double> algoScoreMap = new HashMap<String, Double>();
@@ -629,8 +717,17 @@ public class MySimulation extends SimulationWindow {
 					dream4TsDataMatrix.add(list);
 				}
 				br.close();
-			
-				double metaScore = MetaScore.sampleOverlap(inputDataMatrix, dream4TsDataMatrix); 
+				//System.out.println("original input data matrix has how many nodes: "+inputDataMatrix.get(0).size());
+				//System.out.println("original dream4 data matrix has how many nodes: "+dream4TsDataMatrix.get(0).size());
+				//System.out.println("inputDataMatrix size: "+inputDataMatrix.size()+"DreamDataMatrix size: "+dream4TsDataMatrix.size());
+				ArrayList PCAoutput = new ArrayList();
+				generateCov(inputDataMatrix, PCAoutput);
+				
+				double metaScore = MetaScore.sampleOverlap(
+						applyPCA(inputDataMatrix, PCAoutput),
+						applyPCA(dream4TsDataMatrix, PCAoutput)
+					); 
+				//double metaScore=MetaScore.sampleOverlap(inputDataMatrix, dream4TsDataMatrix);
 				metaScoreList.add(metaScore);
 			}
 			Collections.sort(metaScoreList);// euclidean distance, the lower the better
@@ -649,20 +746,23 @@ public class MySimulation extends SimulationWindow {
 				}
 			} 
 		);
-	
-		String[][] metaScoreRankTable = new String[algoScoreMapEntryList.size()][2];
+		//zmx
+		String[][] metaScoreRankTable = new String[algoScoreMapEntryList.size()][3];
 		int rank = 1;
 		double currentValue = algoScoreMapEntryList.get(0).getValue();
 		metaScoreRankTable[0][0] = algoScoreMapEntryList.get(0).getKey();
 		metaScoreRankTable[0][1] = rank + "";
+		metaScoreRankTable[0][2] =currentValue+"";
 		for(int i = 1; i< algoScoreMapEntryList.size();i++) {
 			metaScoreRankTable[i][0] = algoScoreMapEntryList.get(i).getKey();
 			if(algoScoreMapEntryList.get(i).getValue() > currentValue) {
 				rank++; // euclidean distance, the lower the better
 			}
 			metaScoreRankTable[i][1] = rank + "";
+			metaScoreRankTable[i][2] = algoScoreMapEntryList.get(i).getValue()+"";
 		}
-		
+		//ZMX
+		log_.log(Level.WARNING, "establish meta score rank table done" );
 		MetaScoreRank metaScoreRank = new MetaScoreRank(new JFrame(), metaScoreRankTable);
 		metaScoreRank.metaScoreRankFrame.setVisible(true);
 	}

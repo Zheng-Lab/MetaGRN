@@ -20,7 +20,7 @@ public class GrnGuiMain extends GrnGui {
 
 	
 	
-	public static void main(String[] args) {
+	//public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//CHANGE BY LIU
 //		try {
@@ -36,7 +36,7 @@ public class GrnGuiMain extends GrnGui {
 //		Logger l = Logger.getLogger("");
 //		l.addHandler(fh);
 //		l.setLevel(Level.CONFIG);
-		
+	public static void main(String[] args){	
 		logger.log(Level.INFO, "Start point of the programme");
 		
 		try 
@@ -47,6 +47,7 @@ public class GrnGuiMain extends GrnGui {
 		}
 		
 		GrnGuiMain grnGuiMain = new GrnGuiMain();
+		
 		grnGuiMain.initialize();
 		
 		//CHANGE BY LIU
@@ -100,6 +101,20 @@ public class GrnGuiMain extends GrnGui {
 				header.setInfo("Visualization of the Inferred networks ");
 			}
 		});
+		
+		//zmx
+		indirectCompareButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//inferenceAlgoPanel.refreshAllModels();
+				mainLayout.show(mainPanel, indirectComparePanel.getName());
+				header.setTitle("Network Comparision");
+
+			}
+		});
+		
+		
 		
 		helpButton.addActionListener(new ActionListener() {
 			

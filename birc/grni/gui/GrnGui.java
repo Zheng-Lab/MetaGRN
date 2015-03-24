@@ -43,6 +43,7 @@ public class GrnGui {
 	protected JPanel metaGrnPanel;//LIU
 	protected JPanel visualizationPanel;
 	protected JScrollPane helpPanel;
+	protected JPanel indirectComparePanel;//ZMX
 	
 	protected ButtonGroup mainButtonGroup;
 	protected JButton exitButton;
@@ -51,6 +52,8 @@ public class GrnGui {
 	protected JButton metaGrnButton;//LIU
 	protected JButton visualizationButton;
 	protected JButton helpButton;
+	protected JButton indirectCompareButton;//ZMX
+	
 	
 	protected GrnInference inferenceAlgoTypes;
 	private GrnVisualization grnVisualization;
@@ -111,7 +114,8 @@ public class GrnGui {
 		mainButtonPanel.setFocusCycleRoot(true);
 		// CHANGE BY LIU
 //		final GridLayout gridLayout_1 = new GridLayout(5,1,10,10);
-		final GridLayout gridLayout_1 = new GridLayout(6,1,10,10);
+//		final GridLayout gridLayout_1 = new GridLayout(6,1,10,10);
+		final GridLayout gridLayout_1 = new GridLayout(7,1,10,10);
 		mainButtonPanel.setLayout(gridLayout_1);
 		mainButtonPanel.setMaximumSize(new Dimension(200, 200));
 		mainButtonPanel.setSize(200,300);
@@ -236,6 +240,26 @@ public class GrnGui {
 		mainButtonPanel.add(visualizationButton);
 		visualizationButton.setPreferredSize(new Dimension(70,50));
 		mainButtonGroup.add(visualizationButton);
+		
+		
+		//add indirect compare panel and button
+		indirectComparePanel = new JPanel();
+		indirectComparePanel.setName("Network Comparison Panel");
+		indirectComparePanel.setBackground(Color.WHITE);
+		indirectComparePanel.setLayout(new BorderLayout());
+		mainPanel.add(indirectComparePanel, indirectComparePanel.getName());
+		indirectComparePanel.add(new IndirectCompareDisplay());
+		
+		
+		
+		indirectCompareButton = new JButton("Network Comparision");
+		mainButtonPanel.add(indirectCompareButton);
+		indirectCompareButton.setPreferredSize(new Dimension(70,50));
+		mainButtonGroup.add(indirectCompareButton);
+		
+		
+		
+		
 		
 		// add help panel and button
 		

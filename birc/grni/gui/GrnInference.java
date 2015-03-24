@@ -58,8 +58,26 @@ public class GrnInference extends GrnInferencePanel{
 				timeDelayLassoInference();
 			}
 		});
+		
+		//zmx
+				ensembleButton.addActionListener(new ActionListener(){
+					
+					public void actionPerformed(ActionEvent e){
+						ensembleInference();
+					
+						
+					}
+					
+				
+				});
+		
 	}
-	
+	//zmx
+	public void ensembleInference(){
+		GrnEnsemble.runByMeta=false;
+		GrnEnsemble grn_ensemble = new GrnEnsemble(new JFrame());
+		grn_ensemble.frameEnsemble.setVisible(true);
+	}
 	public void dbnInference() {
 		
 		//ADD BY LIU:

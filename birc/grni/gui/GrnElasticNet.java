@@ -47,6 +47,7 @@ public class GrnElasticNet extends GrnElasticNetDisplay
 					InputData inputData = CommonUtil.readInput(inputFilePath, withHeader, geneNameAreColumnHeader);
 					ProgressBarAdaptorEN progressBarAdaptor = new ProgressBarAdaptorEN(inputData);
 					progressBarAdaptor.execute();
+					
 				}
 				catch (Exception exception)
 				{

@@ -173,10 +173,13 @@ public class GnwGuiSettings {
 	 * Get Universal instance
 	 */
 	static public GnwGuiSettings getInstance() {
+		
 		if (instance_ == null) {
 			instance_ = new GnwGuiSettings();
 		}
+		//System.out.println("Finished getting instance");
 		return instance_;
+		
 	}
 
 	
@@ -338,7 +341,12 @@ public class GnwGuiSettings {
 	public NetworkDesktop getNetworkDesktop() { return networkDesktop_; }
 	
 	public void setGnwGui(GnwGui app) { gnwgui_ = app; }
-	public GnwGui getGnwGui() { return gnwgui_; }
+	//zmx
+	public GnwGui getGnwGui() { 
+		if(gnwgui_ ==null)
+			System.out.println("gnw gui is null");
+		
+		return gnwgui_; }
 	
 	public void setSnapshotImage(URL path) { snapshotImage_ = path; }
 	public URL getSnapshotImage() { return snapshotImage_; }

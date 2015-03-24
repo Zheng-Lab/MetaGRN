@@ -43,6 +43,11 @@ public class MetaScore {
 //		br.close();
 	}
 	
+	public static double var(ArrayList<ArrayList<Double>> input){
+		
+		return 0.0;
+	}
+	
 	/**
 	 * euclidean distance, exp2 - exp1, the lower the better 
 	 * column name of matrix is gene
@@ -54,6 +59,7 @@ public class MetaScore {
 		// exp1 and exp2 can have different lines, that is, different numbers of time points in the time series experiment
 		int size1 = exp1_in.size();
 		int size2 = exp2_in.size();
+		//System.out.println("size 1: "+size1+" size 2:"+size2);
 		ArrayList<ArrayList<Double>> exp1 = null;
 		ArrayList<ArrayList<Double>> exp2 = null;
 		if(size1 > size2) {
@@ -69,7 +75,10 @@ public class MetaScore {
 				exp2.add(exp2_in.get(i));
 			}
 		}
-		
+		/*System.out.println("New Size: size 1: "+exp1.size()+" size 2:"+exp2.size());
+		System.out.println(exp1);
+		System.out.println("11111111111111111111111111111111");
+		System.out.println(exp2);*/
 		ArrayList<ArrayList<Double>> INTER = new ArrayList<ArrayList<Double>>();
 		for(int i = 0; i< exp1.size(); i++) { // expr1.size() is the number of rows
 			ArrayList<Double> list = new ArrayList<Double>();
@@ -80,22 +89,28 @@ public class MetaScore {
 		}
 		
 		for(int i = 0; i< exp1.size(); i++) {
+			//System.out.println("i is: "+i);
 			for(int j = 0; j< exp2.size(); j++) {
-				INTER.get(i).set(j, distance(exp1.get(i), exp2.get(j))); // ith row, jth column of the result matrix 
+				INTER.get(i).set(j, distance(exp1.get(i), exp2.get(j)));
+				//System.out.print("j is: "+j);// ith row, jth column of the result matrix 
 			}
+			//   System.out.println("");
 		}
-		
+		//find the coordinate with min value
 		ArrayList<Integer> arrindMinINTER = minCoord(INTER);
+		//column of min coordinate value
 		int col = arrindMinINTER.get(1);
 		ArrayList<Double> column = new ArrayList<Double>();
 		for(ArrayList<Double> list : INTER) {
 			column.add(list.get(col));
 		}
-		
+		//average value of column
 		double avedist1 = mean(column);
 		
 		for(int i = 0; i< exp2.size(); i++) {
 			for(int j = 0; j< exp1.size(); j++) {
+				//System.out.println("testinggggggggggggggggggggggggggggg");
+				//System.out.println("i: "+exp2.get(i)+"j: "+exp1.get(j));
 				INTER.get(i).set(j, distance(exp2.get(i), exp1.get(j))); // ith row, jth column of the result matrix 
 			}
 		}
@@ -108,6 +123,7 @@ public class MetaScore {
 		}
 		
 		double avedist2= mean(column);
+		System.out.println("distance in sampleOverlap is: "+avedist1+"\t"+avedist2);
 		
 		return (avedist1 + avedist2)/2;
 	}
@@ -122,9 +138,11 @@ public class MetaScore {
 	 */
 	public static double distance(ArrayList<Double> v1, ArrayList<Double> v2) {
 		double sum = 0;
-		for(int i = 0; i< v1.size(); i++) {
+		int i;
+		for(i = 0; i< v1.size(); i++) {
 			sum += Math.pow(v2.get(i) - v1.get(i), 2);
 		}
+		
 		return Math.sqrt(sum);
 	}
 	

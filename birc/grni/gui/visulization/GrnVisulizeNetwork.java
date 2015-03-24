@@ -32,7 +32,6 @@ public class GrnVisulizeNetwork {
 		//CHANGE BY LIU: use PrinterStream to format output better and use platform independent newline
 		//FileWriter resultFileWriter = new FileWriter(filepath);
 		PrintStream resultFilePrinter = new PrintStream(new File(filepath));
-
 		// write results according to standard format
 		for (int m = 0; m < genes; m++) {
 			for (int n = 0; n < genes; n++) {
@@ -50,9 +49,7 @@ public class GrnVisulizeNetwork {
 		}
 		//resultFileWriter.close();
 		resultFilePrinter.close();
-
 		URL inputfileURL = null;
-
 		inputfileURL = new File(filepath).toURI().toURL();
 		
 		String networkName = "Network Name";	

@@ -14,6 +14,8 @@ public class GrnInferencePanel extends JPanel{
 	protected JButton elasticNetButton;
 	protected JButton ridgeButton;
 	protected JButton delayLassoButton;
+	//zmx
+	protected JButton ensembleButton;
 	
 	protected FlowLayout algoPanelLayout;
 	
@@ -66,6 +68,13 @@ public class GrnInferencePanel extends JPanel{
 		ridgeButton.setPreferredSize(new Dimension(100, 80));
 		ridgeButton.setText("<html><center>Ridge<br>Regression</center></html>");
 		this.add(ridgeButton);
+		
+		//zmx
+		ensembleButton = new JButton();
+		ensembleButton.setMargin(new Insets(2, 0, 2, 0));
+		ensembleButton.setPreferredSize(new Dimension(100, 80));
+		ensembleButton.setText("<html><center>Ensemble<br>Method</center></html>");
+		this.add(ensembleButton);
 		
 	}
 

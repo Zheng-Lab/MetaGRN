@@ -72,7 +72,7 @@ public class Main {
 			setLookAndFeel();
 			
 			GnwGui gui = new GnwGui();
-			gui.run();
+			gui.run(true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -11,6 +11,10 @@ public class FalseDiscoveryRate {
 	protected double [][] Tridge;
 	protected int [][] dofMatrix;
 	private int numGenes;
+	protected double [][]unnormalizedMatrix;
+	protected double[] rankingList;
+	//zmx
+	protected int [][] normalizedNetworkEN;
 	
 	public FalseDiscoveryRate(double [][] Tdata, int [][] dofdata){
 		this.Tridge=Tdata;
@@ -20,6 +24,9 @@ public class FalseDiscoveryRate {
 	
 	public int [][] networkConstructor(){
 		double [][] q2Matrix = new double[numGenes][numGenes];
+		unnormalizedMatrix = new double[numGenes][numGenes];
+		normalizedNetworkEN = new int[numGenes][numGenes];
+		rankingList = new double[numGenes*numGenes];
 		for(int i=0;i<numGenes;i++){
 			for(int j=0;j<numGenes;j++){
 				q2Matrix[i][j]=1 - StudentT.studentTcdf(Math.abs(Tridge[i][j]), dofMatrix[0][j]);
@@ -35,6 +42,13 @@ public class FalseDiscoveryRate {
 				k++;
 			}
 		}
+		
+		//print q2Matrix values
+		/*for(int i=0;i<q2Matrix.length;i++){
+		for(int j=0;j<q2Matrix[0].length;j++)
+			System.out.print(q2Matrix[i][j]+"\t");
+		System.out.println("");
+		}*/
 		Arrays.sort(q2SortRs);
 		int suValue = q2SortRs.length;
 		double [] q1Matrix = new double [suValue];
@@ -75,10 +89,80 @@ public class FalseDiscoveryRate {
 				}else{
 					pMatrix [i][j] = 0;
 				}
+				unnormalizedMatrix[i][j]=1-qValue;
+				rankingList[i*numGenes+j]=1-qValue;
 					
 			}
 		}
-		
+		/*for(int i=0;i<numGenes;i++){
+			for(int j=0;j<numGenes;j++)
+				System.out.print(q2Matrix[i][j]+"\t");
+			System.out.println("");
+		}
+		for(int i=0;i<numGenes;i++){
+			for(int j=0;j<numGenes;j++)
+				System.out.print(unnormalizedMatrix[i][j]+"\t");
+			System.out.println("");
+		}*/
+		Arrays.sort(rankingList);
+		normalizedNetworkEN=generateNormalizedNetwork();
+/*		for(int i=0;i<numGenes;i++){
+			for(int j=0;j<numGenes;j++){
+				System.out.println("unnormalizedMatrix value: "+unnormalizedMatrix[i][j]);
+				for(int z=0;z<numGenes*numGenes;z++){
+					
+					System.out.println("rankingList value: "+rankingList[z]+" z value is: "+z);
+					if(Double.compare(unnormalizedMatrix[i][j], rankingList[z])==0){
+						System.out.println("value equal"+z);
+						normalizedNetworkEN[i][j]=z;
+						break;
+					}
+				}
+			}
+		}
+		System.out.println("generate normalized network finish");
+		for(int i=0;i<numGenes;i++){
+			for(int j=0;j<numGenes;j++){
+				System.out.print(normalizedNetworkEN[i][j]+"\t");
+			}
+			System.out.println("");
+			
+		}*/
+		//return normalizedNetworkEN;
+	
 		return pMatrix;
 	}
+	public int[][] generateNormalizedNetwork(){
+		//int [][] normalizedNetworkEN = new int [numGenes][numGenes];
+		//System.out.println("generate normalized network start");
+		for(int i=0;i<numGenes;i++){
+			for(int j=0;j<numGenes;j++){
+				//System.out.println("unnormalizedMatrix value: "+unnormalizedMatrix[i][j]);
+				for(int z=0;z<numGenes*numGenes;z++){
+					
+					//System.out.println("rankingList value: "+rankingList[z]+" z value is: "+z);
+					try{
+					if(Double.compare(unnormalizedMatrix[i][j], rankingList[z])==0){
+						//System.out.println("value equal"+z);
+						normalizedNetworkEN[i][j]=z;
+						break;
+					}
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		//System.out.println("generate normalized network finish");
+		/*for(int i=0;i<numGenes;i++){
+			for(int j=0;j<numGenes;j++){
+				System.out.print(normalizedNetworkEN[i][j]+"\t");
+			}
+			System.out.println("");
+			
+		}*/
+		return normalizedNetworkEN;
+	}
+	
+	
 }

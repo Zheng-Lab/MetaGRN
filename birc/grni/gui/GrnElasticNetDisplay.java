@@ -36,6 +36,9 @@ public class GrnElasticNetDisplay {
 	private JLabel rowColumnChooseLabel;
 	private JPanel rowColumnChooseButtonPanel;
 	
+	protected JRadioButton rowHeaderRadioButton;
+	protected JRadioButton columnHeaderRadioButton;
+	
 	protected JCheckBox withheaderCheckBox;
 	
 	public static JProgressBar progressBarElasticNet;			/* progress bar*/
@@ -149,8 +152,29 @@ public class GrnElasticNetDisplay {
 		rowColumnChooseButtonGroup = new ButtonGroup();
 		rowColumnChooseButtonPanel = new JPanel();
 		rowColumnChooseButtonPanel.setBackground(Color.WHITE);
-		addRadioButton("column header", rowColumnChooseButtonGroup, rowColumnChooseButtonPanel, true);
-		addRadioButton("row header", rowColumnChooseButtonGroup, rowColumnChooseButtonPanel, false);
+		
+		//column header radio button
+		columnHeaderRadioButton = new JRadioButton("column header", true);
+		rowColumnChooseButtonGroup.add(columnHeaderRadioButton);
+		rowColumnChooseButtonPanel.add(columnHeaderRadioButton);
+		columnHeaderRadioButton.setBackground(Color.WHITE);
+		columnHeaderRadioButton.setActionCommand("column header");
+		
+		rowColumnChooseButtonGroup.add(columnHeaderRadioButton);
+		rowColumnChooseButtonPanel.add(columnHeaderRadioButton);
+		
+		//row header radio button
+		rowHeaderRadioButton = new JRadioButton("row header", true);
+		rowColumnChooseButtonGroup.add(rowHeaderRadioButton);
+		rowColumnChooseButtonPanel.add(rowHeaderRadioButton);
+		rowHeaderRadioButton.setBackground(Color.WHITE);
+		rowHeaderRadioButton.setActionCommand("row header");
+		
+		rowColumnChooseButtonGroup.add(rowHeaderRadioButton);
+		rowColumnChooseButtonPanel.add(rowHeaderRadioButton);
+		
+		//addRadioButton("column header", rowColumnChooseButtonGroup, rowColumnChooseButtonPanel, true);
+		//addRadioButton("row header", rowColumnChooseButtonGroup, rowColumnChooseButtonPanel, false);
 		
 		textFieldLayoutConstraints.fill = GridBagConstraints.HORIZONTAL;
 		textFieldLayoutConstraints.weighty = 1;

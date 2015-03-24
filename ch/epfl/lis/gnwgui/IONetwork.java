@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 package ch.epfl.lis.gnwgui;
 
+import java.awt.Frame;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -163,9 +164,15 @@ public class IONetwork
 
 	public static void saveAs(NetworkElement item)
 	{
+		//GnwSettings.getInstance().getOutputDirectory()
+		/*if(GnwGuiSettings.getInstance().getGnwGui().getFrame()==null)
+			System.out.println("gui setting is null");
+		if(GnwSettings.getInstance().getOutputDirectory()==null)
+			System.out.println("output dir is null");*/
 		IODialog dialog = new IODialog(GnwGuiSettings.getInstance().getGnwGui().getFrame(), "Save network",
 				GnwSettings.getInstance().getOutputDirectory(), IODialog.SAVE);
-
+		
+		System.out.println("!!!!!!!!! output dir is: "+GnwSettings.getInstance().getOutputDirectory());
 		dialog.addFilter(new FilterNetworkTSV());
 		dialog.addFilter(new FilterNetworkTSVDREAM());
 		dialog.addFilter(new FilterNetworkGML());
@@ -185,6 +192,18 @@ public class IONetwork
 			
 			ne.element_ = item;		
 			ne.fileAbsPath_ = dialog.getSelection();
+			//ZMX
+			Structure structure =null;
+			if (item instanceof StructureElement) {
+				structure = ((StructureElement)item).getNetwork();
+			} else if (item instanceof DynamicalModelElement) {
+				structure = ((DynamicalModelElement)item).getGeneNetwork();
+			}
+			System.out.println("11111111111111111111111111111111111");
+			System.out.println("fileabs path is: "+ne.fileAbsPath_);
+			System.out.println("ne's structure edge is "+structure.getNumEdges());
+			System.out.println("ne's structure node is "+structure.getSize());
+			System.out.println("11111111111111111111111111111111111");
 			ne.f_ = dialog.getSelectedFilter();
 			
 			ne.execute();
@@ -193,6 +212,7 @@ public class IONetwork
 				wait.start();
 		}
 	}
+	
 
 	// ----------------------------------------------------------------------------
 
@@ -683,7 +703,8 @@ public class IONetwork
 				N = ((DynamicalModelElement) element_).getGeneNetwork().getSize();
 			else
 				log_.log(Level.WARNING, "IONetwork::displayWaitingBox(): Unknown item type");
-			
+			//zmx
+			System.out.println("no of network size is: "+N);
 			return (N > wDialogMinNetworkSize_);
 		}
 		
@@ -702,6 +723,10 @@ public class IONetwork
 					String[] extension = {FilterNetworkTSV.ext};
 					String path = FilenameUtilities.addExtension(fileAbsPath_, extension);
 					url = GnwSettings.getInstance().getURL(path);
+					System.out.println("path tsv is: "+path);
+					System.out.println("path url is: "+url);
+					//Structure structure =null;
+					
 					exportTSVStructure(element_, url);
 				}
 				else if (selectedFilter instanceof FilterNetworkTSVDREAM)
@@ -725,7 +750,8 @@ public class IONetwork
 					String path = FilenameUtilities.addExtension(fileAbsPath_, extension);
 					url = GnwSettings.getInstance().getURL(path);
 					exportDOTStructure(element_, url);
-					log_.log(Level.INFO, "Writing file " + path);
+					System.out.println("path dot is: "+path);
+					//log_.log(Level.INFO, "Writing file " + path);
 				}
 				else if (selectedFilter instanceof FilterNetworkSBML) {
 					String[] extension = {FilterNetworkSBML.ext};
