@@ -1,8 +1,0 @@
-nDim = 10;
-center = 5;
-Double[] state = new Double[nDim]; for(int i=0; i < nDim; i++) { state[i] = new Double(center*i/2.); }
-state;
-numChains = 10;
-MultiState   mState                  = new MultiState ( numChains, state );
-mState.mean();
-mState.var();
