@@ -316,31 +316,20 @@ public class CommonUtil {
 		Logging.logger.log(Level.INFO, "Beginning of loadJarNativeLib.");
 	    try
 	    {
-	    	java.io.InputStream in = Class.class.getClass().getResourceAsStream(relativePath);
+		    Logging.logger.log(Level.INFO, "Begin loading temp library file: " + relativePath + ".");
+	    	
+		    java.io.InputStream in = Class.class.getClass().getResourceAsStream(relativePath);
 	    	byte[] buffer = new byte[1024];
 		    int read = -1;
 		    /* extract the dll file name*/
 		    File dllFile = new File(relativePath);
 		    String prefix = dllFile.getName();	
 		    
-		    //TEST
 		    File tmpFolder = new File("MetaGRNTmp");
 		    if(!tmpFolder.exists())
 		    	tmpFolder.mkdir();
 		    File tempNativeLibFile = new File(tmpFolder.getAbsoluteFile() + "/" + dllFile.getName());
 		    
-		    //TEST
-//		    File temp = File.createTempFile(prefix, "");			/* prefix of the temp file is the original dll file name*/
-//		    
-//		    /* copy the original dll file into temp file*/
-//		    java.io.FileOutputStream fos = new FileOutputStream(temp);
-//		    while((read = in.read(buffer)) != -1) {
-//		        fos.write(buffer, 0, read);
-//		    }
-//		    fos.close();
-//		    in.close();
-		    
-		    //TEST
 		    /* copy the original dll file into our own temp folder*/
 		    java.io.FileOutputStream fos = new FileOutputStream(tempNativeLibFile);
 		    while((read = in.read(buffer)) != -1) {
@@ -349,9 +338,7 @@ public class CommonUtil {
 		    fos.close();
 		    in.close();
 		    
-		    //TEST
-		    //Logging.logger.log(Level.FINE, "Begin loading temp library file: " + temp.getAbsolutePath() + ".");
-		    Logging.logger.log(Level.INFO, "Begin loading temp library file: " + tempNativeLibFile.getAbsolutePath() + ".");
+		    
 		    /* load temp file as dll*/
 		    try {
 		    	System.load(tempNativeLibFile.getAbsolutePath());
@@ -360,43 +347,6 @@ public class CommonUtil {
 		    } finally {
 		    	Logging.logger.log(Level.INFO, "Loading temp library file successful.");
 		    }
-		    
-		    /* 
-		     * the following code is used to delete temp files left by last time use of our program.
-		     * Since after termination of our program, the temp file is still in use (Q: loaded by System.load() and haven't been released),
-		     * File.deleteOnExit() won't work for the temp file.
-		     * */
-//			final String libraryPrefix = prefix;
-//			final String lockSuffix = ".lock";
-//	
-//			/* create lock file */
-//			final File lock = new File(temp.getAbsolutePath() + lockSuffix);
-//			
-//			lock.createNewFile();
-//			lock.deleteOnExit();
-//	
-//			/* file filter for library file (without .lock files) */
-//			FileFilter tmpDirFilter = new FileFilter() {
-//				public boolean accept(File pathname) {
-//					return pathname.getName().startsWith(libraryPrefix)
-//							&& !pathname.getName().endsWith(lockSuffix);
-//				}
-//			};
-//	
-//			/* get all library files from temp folder */
-//			String tmpDirName = System.getProperty("java.io.tmpdir");
-//			File tmpDir = new File(tmpDirName);
-//			File[] tmpFiles = tmpDir.listFiles(tmpDirFilter);
-//	
-//			/* delete all files which don't have an accompanying lock file which is left by last time use of our program*/
-//			for (int i = 0; i < tmpFiles.length; i++) {
-//				/* Create a file to represent the lock and test. */
-//				File lockFile = new File(tmpFiles[i].getAbsolutePath() + lockSuffix);
-//				if (!lockFile.exists()) {
-//					//System.out.println("deleting: " + tmpFiles[i].getAbsolutePath());
-//					tmpFiles[i].delete();
-//				}
-//			}
 	    }
 	    catch(IOException e)
 	    {
@@ -479,15 +429,12 @@ public class CommonUtil {
     }
     
     public static InputData readInput(String inputFilePath, boolean withHeader, boolean genesAreColumnHeader) throws IOException{
-//    	birc.grni.util.Logging.logger.log(Level.FINE, "Beginning of readInput.");
-    	System.out.println("withHeader is checked or not: " +withHeader);
-    	
+
     	ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
     	if(!withHeader)	//without header
     	{
     		if(genesAreColumnHeader)
     		{
-//    			birc.grni.util.Logging.logger.log(Level.FINE, "InputFile Format: Without Header & Genes Are Column.");
     			BufferedReader brInputFile = new BufferedReader(new FileReader(inputFilePath));
     	    	String oneLine = "";
 				while ((oneLine = brInputFile.readLine()) != null) {
@@ -502,16 +449,6 @@ public class CommonUtil {
 					}
 				}
 				brInputFile.close();
-				
-				//TEST
-//				for(int iii = 0; iii< inputDataMatrix.size(); iii++) {
-//					String line = "";
-//					for(int jjj = 0; jjj< inputDataMatrix.get(iii).size(); jjj++) {
-//						line += inputDataMatrix.get(iii).get(jjj) + " ";
-//					}
-//					line = line.trim();
-//					birc.grni.util.Logging.logger.log(Level.FINE, line);
-//				}
 				
 				return new InputData(null, null, inputDataMatrix);
     		}
