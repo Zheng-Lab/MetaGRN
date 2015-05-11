@@ -1,6 +1,6 @@
 <project name="MetaGRN" default="dist" basedir=".">
     <description>
-        build GRNInfer project, generate executable jar
+        build MetaGRN project, generate executable jar
     </description>
   	
   	<!-- set global properties for this build -->
@@ -13,7 +13,7 @@
   	<property name="dependentlibs" value="deplibs"/> 
     <property name="projectname" value="MetaGRN"/>
 	
-	<property name="workspace" location="C:\Users\zhan0355\Desktop\workspace\MetaGRN"/>
+    <property name="workspace" location="/home/liuxingliang/eclipse_git/metagrn"/>
 
 	<!-- ant javac cannot handle inner classes, so we use eclipse to compile first and generate jar directly-->
   	

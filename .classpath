@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path=""/>
+	<classpathentry excluding="ant/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/apache-mime4j-0.6.jar"/>
 	<classpathentry kind="lib" path="lib/collections-generic-4.01.jar"/>
@@ -53,5 +53,5 @@
 	<classpathentry kind="lib" path="lib/postgresql.jar"/>
 	<classpathentry kind="lib" path="lib/sbml2.jar"/>
 	<classpathentry kind="lib" path="lib/skinlf.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path=""/>
 </classpath>
