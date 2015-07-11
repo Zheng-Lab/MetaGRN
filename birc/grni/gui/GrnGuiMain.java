@@ -116,16 +116,17 @@ public class GrnGuiMain extends GrnGui {
 		
 		
 		
-		helpButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed( final ActionEvent e) {
-				// TODO Auto-generated method stub
-				mainLayout.show(mainPanel, helpPanel.getName());
-				header.setTitle("Help");
-				header.setInfo("Software manual and Documentation");
-			}
-		});
+		// liuxingliang
+		// helpButton.addActionListener(new ActionListener() {
+		// 	
+		// 	@Override
+		// 	public void actionPerformed( final ActionEvent e) {
+		// 		// TODO Auto-generated method stub
+		// 		mainLayout.show(mainPanel, helpPanel.getName());
+		// 		header.setTitle("Help");
+		// 		header.setInfo("Software manual and Documentation");
+		// 	}
+		// });
 		
 		exitButton.addActionListener(new ActionListener() {
 			

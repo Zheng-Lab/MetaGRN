@@ -1,14 +1,13 @@
 package birc.grni.gui.visulization;
 
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.PrintStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-
-import birc.grni.gui.GrnDbn;
 
 import ch.epfl.lis.gnwgui.IONetwork;
 import ch.epfl.lis.gnwgui.NetworkElement;
@@ -20,7 +19,7 @@ public class GrnVisulizeNetwork {
 	
 	private static Logger logger = Logger.getLogger(GrnVisulizeNetwork.class.getName());
 
-	public GrnVisulizeNetwork(int [][] network, int genes) throws Exception {
+	public GrnVisulizeNetwork(int [][] network, int numberOfGenes, ArrayList<String> geneNames) throws Exception {
 
 		//String filepath = "tmp/network.txt";
 		String tmpDir = System.getProperty("java.io.tmpdir");		
@@ -29,25 +28,37 @@ public class GrnVisulizeNetwork {
 		
 		logger.log(Level.INFO, "Visualization started");
 		
-		//CHANGE BY LIU: use PrinterStream to format output better and use platform independent newline
-		//FileWriter resultFileWriter = new FileWriter(filepath);
+		// liuxingliang 
+		// use PrinterStream to format output better and use platform independent newline
+		// add logic for real gene names
 		PrintStream resultFilePrinter = new PrintStream(new File(filepath));
-		// write results according to standard format
-		for (int m = 0; m < genes; m++) {
-			for (int n = 0; n < genes; n++) {
-
-				if (network[m][n] == 1) {
-					resultFilePrinter.print("G" + (m + 1) + "\t" + "G" + (n + 1)
-							+ "\t" + 1);
-
-				} else {
-					resultFilePrinter.print("G" + (m + 1) + "\t" + "G" + (n + 1)
-							+ "\t" + 0);
+		if(geneNames != null) {
+			for(int m=0; m<numberOfGenes; m++)
+			{
+				for(int n=0; n<numberOfGenes; n++) 
+				{   
+					if(network[m][n] == 1) 
+						resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+					else
+    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+					
+					resultFilePrinter.println();
 				}
-				resultFilePrinter.println();
+			}
+		} else {
+			for(int m=0; m<numberOfGenes; m++)
+			{
+				for(int n=0; n<numberOfGenes; n++) 
+				{   
+					if(network[m][n] == 1) 
+						resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+					else
+    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+					
+					resultFilePrinter.println();
+				}
 			}
 		}
-		//resultFileWriter.close();
 		resultFilePrinter.close();
 		URL inputfileURL = null;
 		inputfileURL = new File(filepath).toURI().toURL();

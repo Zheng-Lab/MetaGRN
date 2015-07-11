@@ -1,22 +1,18 @@
 package birc.grni.gui;
 
-import birc.grni.gui.visulization.GrnVisulizeNetwork;
-import birc.grni.ridge.ProgressBarAdaptorRidge;
-
-import java.awt.Color;
-import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.util.ArrayList;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import birc.grni.ridge.ProgressBarAdaptorRidge;
+import birc.grni.util.CommonUtil;
+import birc.grni.util.exception.BadInputFormatException;
 
 
 
@@ -62,11 +58,18 @@ public class GrnRidge extends GrnRidgeDisplay {
 				try {
 					// CHANGE BY LIU:
 //					ProgressBarAdaptorRidge progressBarAdaptor = new ProgressBarAdaptorRidge (filePath);
-					ProgressBarAdaptorRidge progressBarAdaptor = new ProgressBarAdaptorRidge (filePath, withHeader, geneNameAreColumnHeader);
+					FileReader inputFileReader = new FileReader(filePath);
+					ProgressBarAdaptorRidge progressBarAdaptor = new ProgressBarAdaptorRidge (inputFileReader, withHeader, geneNameAreColumnHeader);
 					
 					progressBarAdaptor.execute();
-				} catch (IOException ioex) {
-					ioex.printStackTrace();
+				} catch(FileNotFoundException fnfex) {
+					JOptionPane.showMessageDialog(null, fnfex.getMessage(), "FileNotFound", JOptionPane.ERROR_MESSAGE);
+				} catch(BadInputFormatException badInputFormatEx) {
+					JOptionPane.showMessageDialog(null, badInputFormatEx.getMessage(), "BadInputFormat", JOptionPane.ERROR_MESSAGE);
+				} catch(IOException ioex) {
+					JOptionPane.showMessageDialog(null, ioex.getMessage(), "IOException", JOptionPane.ERROR_MESSAGE);
+				} finally {
+					startButtonRidge.setEnabled(true);
 				}
 			}
 		});
@@ -174,107 +177,104 @@ public class GrnRidge extends GrnRidgeDisplay {
 	public static void ridgeResultPrinter (int [][] network, int numberOfGenes, ArrayList<String> geneNames) {
 		
 		startButtonRidge.setEnabled(true);
+		CommonUtil.resultPrinter(network, numberOfGenes, geneNames, runByMeta, "RIDGE.tsv", null);
 		
-		if(!runByMeta)
-		{
-			Object [] options = {"Save Result" , "Visualize Result"};
-			int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			
-			if(optionValue == JOptionPane.OK_OPTION){
-				JFrame frame = new JFrame();
-				FileDialog saveFileDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
-				saveFileDialog.setVisible(true);
-				String selectedDir = saveFileDialog.getDirectory();
-				String selectedFile = saveFileDialog.getFile();
-				if(selectedFile != null) 
-				{
-					String resultSavePath = new File(selectedDir, selectedFile).getAbsolutePath();
-					try {
-						PrintStream resultFilePrinter = new PrintStream(new File(resultSavePath));
-						if(geneNames != null) {
-							for(int m=0; m<numberOfGenes; m++)
-							{
-								for(int n=0; n<numberOfGenes; n++) 
-								{   
-									if(network[m][n] == 1) 
-										resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
-									else
-				    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
-									
-									resultFilePrinter.println();
-								}
-							}
-						} else {
-							for(int m=0; m<numberOfGenes; m++)
-							{
-								for(int n=0; n<numberOfGenes; n++) 
-								{   
-									if(network[m][n] == 1) 
-										resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
-									else
-				    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
-									
-									resultFilePrinter.println();
-								}
-							}
-						}
-						resultFilePrinter.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}  	
-			}
-			
-			if(optionValue == JOptionPane.NO_OPTION){
-				// create a visualization class object and pass the network
-				try {
-					GrnVisulizeNetwork visualization = new GrnVisulizeNetwork(network, numberOfGenes);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		else
-		{
-			try {
-				File resultFile = new File("RIDGE.tsv");
-//				resultFile.deleteOnExit();
-				PrintStream resultFilePrinter = new PrintStream(resultFile);
-				if(geneNames != null) {
-					for(int m=0; m<numberOfGenes; m++)
-					{
-						for(int n=0; n<numberOfGenes; n++) 
-						{   
-							if(network[m][n] == 1) 
-								resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
-							else
-		    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
-							
-							resultFilePrinter.println();
-						}
-					}
-				} else {
-					for(int m=0; m<numberOfGenes; m++)
-					{
-						for(int n=0; n<numberOfGenes; n++) 
-						{   
-							if(network[m][n] == 1) 
-								resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
-							else
-		    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
-							
-							resultFilePrinter.println();
-						}
-					}
-				}
-				resultFilePrinter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private void printReslt(){
-		
+		// if(!runByMeta)
+		// {
+		// 	Object [] options = {"Save Result" , "Visualize Result"};
+		// 	int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		// 	
+		// 	if(optionValue == JOptionPane.OK_OPTION){
+		// 		JFrame frame = new JFrame();
+		// 		FileDialog saveFileDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+		// 		saveFileDialog.setVisible(true);
+		// 		String selectedDir = saveFileDialog.getDirectory();
+		// 		String selectedFile = saveFileDialog.getFile();
+		// 		if(selectedFile != null) 
+		// 		{
+		// 			String resultSavePath = new File(selectedDir, selectedFile).getAbsolutePath();
+		// 			try {
+		// 				PrintStream resultFilePrinter = new PrintStream(new File(resultSavePath));
+		// 				if(geneNames != null) {
+		// 					for(int m=0; m<numberOfGenes; m++)
+		// 					{
+		// 						for(int n=0; n<numberOfGenes; n++) 
+		// 						{   
+		// 							if(network[m][n] == 1) 
+		// 								resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+		// 							else
+		// 		    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+		// 							
+		// 							resultFilePrinter.println();
+		// 						}
+		// 					}
+		// 				} else {
+		// 					for(int m=0; m<numberOfGenes; m++)
+		// 					{
+		// 						for(int n=0; n<numberOfGenes; n++) 
+		// 						{   
+		// 							if(network[m][n] == 1) 
+		// 								resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+		// 							else
+		// 		    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+		// 							
+		// 							resultFilePrinter.println();
+		// 						}
+		// 					}
+		// 				}
+		// 				resultFilePrinter.close();
+		// 			} catch (IOException e) {
+		// 				e.printStackTrace();
+		// 			}
+		// 		}  	
+		// 	}
+		// 	
+		// 	if(optionValue == JOptionPane.NO_OPTION){
+		// 		// create a visualization class object and pass the network
+		// 		try {
+		// 			GrnVisulizeNetwork visualization = new GrnVisulizeNetwork(network, numberOfGenes);
+		// 		} catch (Exception e) {
+		// 			e.printStackTrace();
+		// 		}
+		// 	}
+		// }
+		// else
+		// {
+		// 	try {
+		// 		File resultFile = new File("RIDGE.tsv");
+//		// 		resultFile.deleteOnExit();
+		// 		PrintStream resultFilePrinter = new PrintStream(resultFile);
+		// 		if(geneNames != null) {
+		// 			for(int m=0; m<numberOfGenes; m++)
+		// 			{
+		// 				for(int n=0; n<numberOfGenes; n++) 
+		// 				{   
+		// 					if(network[m][n] == 1) 
+		// 						resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+		// 					else
+		//     				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+		// 					
+		// 					resultFilePrinter.println();
+		// 				}
+		// 			}
+		// 		} else {
+		// 			for(int m=0; m<numberOfGenes; m++)
+		// 			{
+		// 				for(int n=0; n<numberOfGenes; n++) 
+		// 				{   
+		// 					if(network[m][n] == 1) 
+		// 						resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+		// 					else
+		//     				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+		// 					
+		// 					resultFilePrinter.println();
+		// 				}
+		// 			}
+		// 		}
+		// 		resultFilePrinter.close();
+		// 	} catch (IOException e) {
+		// 		e.printStackTrace();
+		// 	}
+		// }
 	}
 }

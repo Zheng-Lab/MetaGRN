@@ -1,21 +1,18 @@
 package birc.grni.dbn;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Scanner;
 
 import birc.grni.util.CommonUtil;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class DbnDiscretization {
 	
-	String inputPath;
 	ArrayList<ArrayList<Double>> input = new ArrayList<ArrayList<Double>>();;
 	int [][] discretizeInput;
 	int [][] dbnData;
@@ -38,10 +35,14 @@ public class DbnDiscretization {
 //		dbnData = new int [numSamples -1 ][numGenes*2];
 //	}
 	
-	public DbnDiscretization(String path, boolean withHeader, boolean geneNameAreColumnHeader) {
-		// TODO Auto-generated constructor stub
-		this.inputPath = path;
-		readInput(withHeader, geneNameAreColumnHeader);
+	public DbnDiscretization(FileReader inputFileReader, boolean withHeader, boolean geneNameAreColumnHeader) throws BadInputFormatException, IOException {
+		
+		// liuxingliang
+		InputData inputData = CommonUtil.readInput(inputFileReader, withHeader, geneNameAreColumnHeader);
+		ProgressBarAdaptorDBN.inputData = inputData;	/* Q: better method*/
+		this.input = inputData.getData();
+		//readInput(withHeader, geneNameAreColumnHeader);
+		
 		numGenes = input.get(0).size();
 		numSamples = input.size();
 		discretizeInput = new int [numSamples][numGenes];
@@ -79,16 +80,17 @@ public class DbnDiscretization {
 //		
 //	}
 	
-	public void readInput(boolean withHeader, boolean geneNameAreColumnHeader) {
-		try
-		{
-			InputData inputData = CommonUtil.readInput(inputPath, withHeader, geneNameAreColumnHeader);
-			ProgressBarAdaptorDBN.inputData = inputData;	/* Q: better method*/
-			this.input = inputData.getData();
-		} catch (IOException ioex) {
-			ioex.printStackTrace();
-		}
-	}
+	// liuxingliang
+	// public void readInput(boolean withHeader, boolean geneNameAreColumnHeader) {
+	// 	try
+	// 	{
+	// 		InputData inputData = CommonUtil.readInput(inputPath, withHeader, geneNameAreColumnHeader);
+	// 		ProgressBarAdaptorDBN.inputData = inputData;	/* Q: better method*/
+	// 		this.input = inputData.getData();
+	// 	} catch (IOException ioex) {
+	// 		ioex.printStackTrace();
+	// 	}
+	// }
 	
 	/* input data is discretized in to 3 state using equal width method*/
 	public void discretize(){

@@ -1,15 +1,22 @@
 package birc.grni.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import birc.grni.dbn.ProgressBarAdaptorDBN;
-import birc.grni.gui.visulization.GrnVisulizeNetwork;
+import birc.grni.util.CommonUtil;
+import birc.grni.util.exception.BadInputFormatException;
 
 
 public class GrnDbn extends GrnDbnDisplay {
@@ -83,27 +90,40 @@ public class GrnDbn extends GrnDbnDisplay {
 				
 				// CHANGE BY LIU:
 //				ProgressBarAdaptorDBN dbn = new ProgressBarAdaptorDBN(inputFile, iterations);
-				ProgressBarAdaptorDBN dbn = new ProgressBarAdaptorDBN(inputFile, iterations, withHeader, geneNameAreColumnHeader);
+				try {
+					FileReader inputFileReader = new FileReader(inputFile); 
+					ProgressBarAdaptorDBN dbn = new ProgressBarAdaptorDBN(inputFileReader, iterations, withHeader, geneNameAreColumnHeader);
 				
-				if(select){
-					int beta =(Integer)betaSpinner.getModel().getValue();
-					String priorFile =priorDataTextField.getText();
-					//hdb = new Binomial_HDBNf(genes, inputFile, iterations, beta, priorFile);
-					dbn.dbnMcmcWithPrior(beta, priorFile);
+					if(select){
+						int beta =(Integer)betaSpinner.getModel().getValue();
+						String priorFile =priorDataTextField.getText();
+						//hdb = new Binomial_HDBNf(genes, inputFile, iterations, beta, priorFile);
+						dbn.dbnMcmcWithPrior(beta, priorFile);
+						
+					}else{
+						//hdb = new Binomial_HDBNf(genes, inputFile, iterations);
+						dbn.dbnMcmcWithOutPrior();
+					}
+								       
+					dbn.execute();		// start swingWorker as a worker thread
 					
-				}else{
-					//hdb = new Binomial_HDBNf(genes, inputFile, iterations);
-					dbn.dbnMcmcWithOutPrior();
+				} catch(FileNotFoundException fnfex) {
+					JOptionPane.showMessageDialog(null, fnfex.getMessage(), "FileNotFound", JOptionPane.ERROR_MESSAGE);
+				} catch(BadInputFormatException badInputFormatEx) {
+					JOptionPane.showMessageDialog(null, badInputFormatEx.getMessage(), "BadInputFormat", JOptionPane.ERROR_MESSAGE);
+				} catch(IOException ioex) {
+					JOptionPane.showMessageDialog(null, ioex.getMessage(), "IOException", JOptionPane.ERROR_MESSAGE);
+				} finally {
+					startButton.setEnabled(true);
 				}
-							       
-				dbn.execute();		// start swingWorker as a worker thread
+
 				logger.log(Level.INFO, "End of Dbn ");
 			}
 		});
 	}
 	
 	private void enablePrior(){
-		boolean select =priorDataCheckBox.isSelected();
+		boolean select = priorDataCheckBox.isSelected();
 		priorDataTextField.setEnabled(select);
 		priorSelectButton.setEnabled(select);
 		betaSpinner.setEnabled(select);
@@ -213,103 +233,104 @@ public class GrnDbn extends GrnDbnDisplay {
 	public static void dbnResultPrinter(int network [][], int numberOfGenes, ArrayList<String> geneNames)
 	{	
 		startButton.setEnabled(true);
+		CommonUtil.resultPrinter(network, numberOfGenes, geneNames, runByMeta, "DBN.tsv", null);
 		
-		if(!runByMeta)
-		{
-			Object [] options = {"Save Result" , "Visualize Result"};
-			int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			
-			if(optionValue == JOptionPane.OK_OPTION) {
-				JFrame frame = new JFrame();
-				FileDialog saveFileDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
-				saveFileDialog.setVisible(true);
-				String selectedDir = saveFileDialog.getDirectory();
-				String selectedFile = saveFileDialog.getFile();
-				if(selectedFile != null)
-				{
-					String resultSavePath = new File(selectedDir, selectedFile).getAbsolutePath();
-					try {
-						PrintStream resultFilePrinter = new PrintStream(new File(resultSavePath));
-						if(geneNames != null) {
-							for(int m=0; m<numberOfGenes; m++)
-							{
-								for(int n=0; n<numberOfGenes; n++) 
-								{   
-									if(network[m][n] == 1) 
-										resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
-									else
-				    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
-									
-									resultFilePrinter.println();
-								}
-							}
-						} else {
-							for(int m=0; m<numberOfGenes; m++)
-							{
-								for(int n=0; n<numberOfGenes; n++) 
-								{   
-									if(network[m][n] == 1) 
-										resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
-									else
-				    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
-									
-									resultFilePrinter.println();
-								}
-							}
-						}
-						resultFilePrinter.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			if(optionValue == JOptionPane.NO_OPTION){
-				logger.log(Level.INFO, "visualization has selected");
-				// create a visualization class object and pass the network
-				try {
-					GrnVisulizeNetwork visualization = new GrnVisulizeNetwork(network, numberOfGenes);
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "exception has thrown - " + e.toString());
-					e.printStackTrace();
-				}
-			}
-		} else {
-			try {
-				File resultFile = new File("DBN.tsv");
-//				resultFile.deleteOnExit();
-				PrintStream resultFilePrinter = new PrintStream(resultFile);
-				if(geneNames != null) {
-					for(int m=0; m<numberOfGenes; m++)
-					{
-						for(int n=0; n<numberOfGenes; n++) 
-						{   
-							if(network[m][n] == 1) 
-								resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
-							else
-		    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
-							
-							resultFilePrinter.println();
-						}
-					}
-				} else {
-					for(int m=0; m<numberOfGenes; m++)
-					{
-						for(int n=0; n<numberOfGenes; n++) 
-						{   
-							if(network[m][n] == 1) 
-								resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
-							else
-		    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
-							
-							resultFilePrinter.println();
-						}
-					}
-				}
-				resultFilePrinter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		// if(!runByMeta)
+		// {
+		// 	Object [] options = {"Save Result" , "Visualize Result"};
+		// 	int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		// 	
+		// 	if(optionValue == JOptionPane.OK_OPTION) {
+		// 		JFrame frame = new JFrame();
+		// 		FileDialog saveFileDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+		// 		saveFileDialog.setVisible(true);
+		// 		String selectedDir = saveFileDialog.getDirectory();
+		// 		String selectedFile = saveFileDialog.getFile();
+		// 		if(selectedFile != null)
+		// 		{
+		// 			String resultSavePath = new File(selectedDir, selectedFile).getAbsolutePath();
+		// 			try {
+		// 				PrintStream resultFilePrinter = new PrintStream(new File(resultSavePath));
+		// 				if(geneNames != null) {
+		// 					for(int m=0; m<numberOfGenes; m++)
+		// 					{
+		// 						for(int n=0; n<numberOfGenes; n++) 
+		// 						{   
+		// 							if(network[m][n] == 1) 
+		// 								resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+		// 							else
+		// 		    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+		// 							
+		// 							resultFilePrinter.println();
+		// 						}
+		// 					}
+		// 				} else {
+		// 					for(int m=0; m<numberOfGenes; m++)
+		// 					{
+		// 						for(int n=0; n<numberOfGenes; n++) 
+		// 						{   
+		// 							if(network[m][n] == 1) 
+		// 								resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+		// 							else
+		// 		    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+		// 							
+		// 							resultFilePrinter.println();
+		// 						}
+		// 					}
+		// 				}
+		// 				resultFilePrinter.close();
+		// 			} catch (IOException e) {
+		// 				e.printStackTrace();
+		// 			}
+		// 		}
+		// 	}
+		// 	
+		// 	if(optionValue == JOptionPane.NO_OPTION){
+		// 		logger.log(Level.INFO, "visualization has selected");
+		// 		// create a visualization class object and pass the network
+		// 		try {
+		// 			GrnVisulizeNetwork visualization = new GrnVisulizeNetwork(network, numberOfGenes);
+		// 		} catch (Exception e) {
+		// 			logger.log(Level.SEVERE, "exception has thrown - " + e.toString());
+		// 			e.printStackTrace();
+		// 		}
+		// 	}
+		// } else {
+		// 	try {
+		// 		File resultFile = new File("DBN.tsv");
+//		// 		resultFile.deleteOnExit();
+		// 		PrintStream resultFilePrinter = new PrintStream(resultFile);
+		// 		if(geneNames != null) {
+		// 			for(int m=0; m<numberOfGenes; m++)
+		// 			{
+		// 				for(int n=0; n<numberOfGenes; n++) 
+		// 				{   
+		// 					if(network[m][n] == 1) 
+		// 						resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+		// 					else
+		//     				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+		// 					
+		// 					resultFilePrinter.println();
+		// 				}
+		// 			}
+		// 		} else {
+		// 			for(int m=0; m<numberOfGenes; m++)
+		// 			{
+		// 				for(int n=0; n<numberOfGenes; n++) 
+		// 				{   
+		// 					if(network[m][n] == 1) 
+		// 						resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+		// 					else
+		//     				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+		// 					
+		// 					resultFilePrinter.println();
+		// 				}
+		// 			}
+		// 		}
+		// 		resultFilePrinter.close();
+		// 	} catch (IOException e) {
+		// 		e.printStackTrace();
+		// 	}
+		// }
 	}
 }

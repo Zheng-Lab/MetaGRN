@@ -1,10 +1,14 @@
 package birc.grni.ridge;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.SwingWorker;
-import birc.grni.gui.*;
+
+import birc.grni.gui.GrnRidge;
+import birc.grni.gui.GrnRidgeDisplay;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class ProgressBarAdaptorRidge extends SwingWorker<Void, Void> {
 
@@ -40,10 +44,10 @@ public class ProgressBarAdaptorRidge extends SwingWorker<Void, Void> {
 //		GrnRidgeDisplay.ridgeProgressBar.setMaximum(numGenes-1);
 //	}
 	
-	public ProgressBarAdaptorRidge(String filePath, boolean withHeader, boolean geneNameAreColumnHeader) throws IOException{
+	public ProgressBarAdaptorRidge(FileReader inputFileReader, boolean withHeader, boolean geneNameAreColumnHeader) throws BadInputFormatException, IOException{
 	
 		InputPreProcessRidge in = new InputPreProcessRidge();	
-		in.processInput(filePath, withHeader, geneNameAreColumnHeader);
+		in.processInput(inputFileReader, withHeader, geneNameAreColumnHeader);
 		
 		/*compare number of genes and samples in the file with the GUI inputs */
 		/*if(genes != in.numGeneInFile){

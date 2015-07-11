@@ -1,14 +1,12 @@
 package birc.grni.ridge;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import birc.grni.util.CommonUtil;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 
 public class InputPreProcessRidge {
@@ -55,9 +53,9 @@ public class InputPreProcessRidge {
 //			
 //	}
 	
-	public void processInput(String filePath, boolean withHeader, boolean geneNameAreColumnHeader) throws FileNotFoundException , IOException{
+	public void processInput(FileReader inputFileReader, boolean withHeader, boolean geneNameAreColumnHeader) throws BadInputFormatException, IOException{
 			
-			InputData inputData = CommonUtil.readInput(filePath, withHeader, geneNameAreColumnHeader);
+			InputData inputData = CommonUtil.readInput(inputFileReader, withHeader, geneNameAreColumnHeader);
 			ProgressBarAdaptorRidge.inputData = inputData;	/*Q: better method */
 			ArrayList<ArrayList<Double>> expressArray = inputData.getData();
 			

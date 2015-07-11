@@ -31,12 +31,12 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
 import birc.grni.gui.MetaScoreRank;
+import birc.grni.util.GLOBALVAR;
 import ch.epfl.lis.gnw.BenchmarkGeneratorDream4;
 import ch.epfl.lis.gnw.CancelException;
 import ch.epfl.lis.gnw.GeneNetwork;
 import ch.epfl.lis.gnw.GnwSettings;
 import ch.epfl.lis.gnwgui.DynamicalModelElement;
-import ch.epfl.lis.gnwgui.IODialog;
 import ch.epfl.lis.gnwgui.NetworkElement;
 import ch.epfl.lis.gnwgui.windows.SimulationWindow;
 
@@ -74,6 +74,10 @@ public class MySimulation extends SimulationWindow {
 		this.inputDataMatrix = inputDataMatrix;
 		
 		GnwSettings settings = GnwSettings.getInstance();
+		// liuxingliang
+		settings.generateTsDREAM4TimeSeries(true);
+		settings.setNumTimeSeries(1);
+		settings.setLoadPerturbations(false);
 		
 		// Model
 		model_.setModel(new DefaultComboBoxModel<String>(new String[] {"Deterministic (ODEs)", "Stochastic (SDEs)", "Run both (ODEs and SDEs)"}));
@@ -84,29 +88,32 @@ public class MySimulation extends SimulationWindow {
 		else if (settings.getSimulateODE() && settings.getSimulateSDE())
 			model_.setSelectedIndex(2);
 		
-		// Experiments
-		wtSS_.setSelected(true);
-		wtSS_.setEnabled(false);
+		// liuxingliang
+		// // Experiments
+		// wtSS_.setSelected(true);
+		// wtSS_.setEnabled(false);
 		
-		knockoutSS_.setSelected(settings.generateSsKnockouts());
-		knockdownSS_.setSelected(settings.generateSsKnockdowns());
-		multifactorialSS_.setSelected(settings.generateSsMultifactorial());
-		dualKnockoutSS_.setSelected(settings.generateSsDualKnockouts());
+		// liuxingliang
+		// knockoutSS_.setSelected(settings.generateSsKnockouts());
+		// knockdownSS_.setSelected(settings.generateSsKnockdowns());
+		// multifactorialSS_.setSelected(settings.generateSsMultifactorial());
+		// dualKnockoutSS_.setSelected(settings.generateSsDualKnockouts());
 		
-		knockoutTS_.setSelected(settings.generateTsKnockouts());
-		knockdownTS_.setSelected(settings.generateTsKnockdowns());
-		multifactorialTS_.setSelected(settings.generateTsMultifactorial());
-		dualKnockoutTS_.setSelected(settings.generateTsDualKnockouts());
+		// knockoutTS_.setSelected(settings.generateTsKnockouts());
+		// knockdownTS_.setSelected(settings.generateTsKnockdowns());
+		// multifactorialTS_.setSelected(settings.generateTsMultifactorial());
+		// dualKnockoutTS_.setSelected(settings.generateTsDualKnockouts());
 		
-		timeSeriesAsDream4_.setSelected(settings.generateTsDREAM4TimeSeries());
+		// timeSeriesAsDream4_.setSelected(settings.generateTsDREAM4TimeSeries());
 		
 		// Set model of "number of time series" spinner
 		SpinnerNumberModel model = new SpinnerNumberModel();
-		model.setMinimum(1);
-		model.setMaximum(10000);
-		model.setStepSize(1);
-		model.setValue(settings.getNumTimeSeries());
-		numTimeSeries_.setModel(model);
+		// liuxingliang
+		// model.setMinimum(1);
+		// model.setMaximum(10000);
+		// model.setStepSize(1);
+		// model.setValue(settings.getNumTimeSeries());
+		// numTimeSeries_.setModel(model);
 		
 		// Set model of "duration" spinner
 		model = new SpinnerNumberModel();
@@ -132,8 +139,9 @@ public class MySimulation extends SimulationWindow {
 		model.setValue(numMeasuredPoints);
 		numPointsPerTimeSeries_.setModel(model);
 		
-		perturbationNew_.setSelected(!settings.getLoadPerturbations());
-		perturbationLoad_.setSelected(settings.getLoadPerturbations());
+		// liuxingliang
+		// perturbationNew_.setSelected(!settings.getLoadPerturbations());
+		// perturbationLoad_.setSelected(settings.getLoadPerturbations());
 		
 		// Noise
 		
@@ -170,10 +178,12 @@ public class MySimulation extends SimulationWindow {
 		normalizeNoise_.setSelected(settings.getNormalizeAfterAddingNoise());
 		
 		// Set the text field with the user path
-		userPath_.setText(GnwSettings.getInstance().getOutputDirectory());
+		// liuxingliang
+		//userPath_.setText(GnwSettings.getInstance().getOutputDirectory());
 		
 		setModelAction();
-		setExperimentAction();
+		// liuxingliang
+		// setExperimentAction();
 		setNoiseAction();
 		
 		//TEST
@@ -204,37 +214,47 @@ public class MySimulation extends SimulationWindow {
 			}
 		});
 		
-		dream4Settings_.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setDream4Settings();
-			}
-		});
-
-		browse_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				
-				IODialog dialog = new IODialog(new Frame(""), "Select Target Folder", 
-						GnwSettings.getInstance().getOutputDirectory(), IODialog.LOAD);
-				
-				dialog.selectOnlyFolder(true);
-				dialog.display();
-				
-				if (dialog.getSelection() != null)
-					userPath_.setText(dialog.getSelection());
-			}
-		});
+		// liuxingliang
+		// dream4Settings_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(ActionEvent arg0) {
+		// 		setDream4Settings();
+		// 	}
+		// });
+		
+		// liuxingliang
+		// browse_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		
+		// 		IODialog dialog = new IODialog(new Frame(""), "Select Target Folder", 
+		// 				GnwSettings.getInstance().getOutputDirectory(), IODialog.LOAD);
+		// 		
+		// 		dialog.selectOnlyFolder(true);
+		// 		dialog.display();
+		// 		
+		// 		if (dialog.getSelection() != null)
+		// 			userPath_.setText(dialog.getSelection());
+		// 	}
+		// });
 		
 		runButton_.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent arg0) {
-				//CHANGE BY LIU
+				// liuxingliang
+				myCardLayout_.show(runButtonAndSnakePanel_, snakePanel_.getName());
+				snake_.start();
+
 				for(int i = 0; i< numberOfSimulations; i++)
 					enterAllActions(i);
-//				enterAction();
+
+				// liuxingliang
+				finalizeAfterSuccess();
+
 				try {
 					metaScoreRank();
 				} catch(IOException ioex) {
 					ioex.printStackTrace();
 				}
+				
+				
 			}
 		});
 		
@@ -245,59 +265,60 @@ public class MySimulation extends SimulationWindow {
 			}
 		});
 		
-		knockoutSS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// liuxingliang
+		// knockoutSS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		knockdownSS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// knockdownSS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		multifactorialSS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// multifactorialSS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		dualKnockoutSS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// dualKnockoutSS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		knockoutTS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// knockoutTS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		knockdownTS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// knockdownTS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		multifactorialTS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// multifactorialTS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		dualKnockoutTS_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// dualKnockoutTS_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
-		timeSeriesAsDream4_.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent arg0) {
-				setExperimentAction();
-			}
-		});
+		// timeSeriesAsDream4_.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(final ActionEvent arg0) {
+		// 		setExperimentAction();
+		// 	}
+		// });
 		
 		noNoise_.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent arg0) {
@@ -342,69 +363,71 @@ public class MySimulation extends SimulationWindow {
 	
 	// ----------------------------------------------------------------------------
 	
-	/** Set parameters as we did for the DREAM4 benchmarks */
-	public void setDream4Settings() {
-			
-		// Model
-		model_.setSelectedIndex(2);
-		
-		// Experiments
-		knockoutSS_.setSelected(true);
-		knockdownSS_.setSelected(true);
-		multifactorialSS_.setSelected(true);
-		dualKnockoutSS_.setSelected(true);
-		
-		knockoutTS_.setSelected(false);
-		knockdownTS_.setSelected(false);
-		multifactorialTS_.setSelected(false);
-		dualKnockoutTS_.setSelected(false);
-		
-		timeSeriesAsDream4_.setSelected(true);
-		
-		// Set "number of time series" spinner
-		//numTimeSeries_.getModel().setValue(99);
-		numTimeSeries_.setValue(10);
-		
-		// "duration" spinner
-		tmax_.setValue(1000);
-		
-		// Set model of "number of points per time serie" spinner
-		numPointsPerTimeSeries_.setValue(21);
-		
-		perturbationNew_.setSelected(true);
-		perturbationLoad_.setSelected(false);
-		
-		// Noise
-		
-		// Diffusion multiplier (SDE only)
-		sdeDiffusionCoeff_.setValue(0.05);
-		
-		noNoise_.setSelected(false);
-		useMicroarrayNoise_.setSelected(true);
-		useLogNormalNoise_.setSelected(false);
-		addGaussianNoise_.setSelected(false);
-		addLogNormalNoise_.setSelected(false);
-		
-		normalizeNoise_.setSelected(true);
-		
-		// Enables/disables stuff in the GUI (num time points etc., which may be disabled/gray otherwise)
-		setExperimentAction();
-		setNoiseAction();
-		setModelAction();
-	}
+	// liuxingliang
+	// /** Set parameters as we did for the DREAM4 benchmarks */
+	// public void setDream4Settings() {
+	// 		
+	// 	// Model
+	// 	model_.setSelectedIndex(2);
+	// 	
+	// 	// Experiments
+	// 	knockoutSS_.setSelected(true);
+	// 	knockdownSS_.setSelected(true);
+	// 	multifactorialSS_.setSelected(true);
+	// 	dualKnockoutSS_.setSelected(true);
+	// 	
+	// 	knockoutTS_.setSelected(false);
+	// 	knockdownTS_.setSelected(false);
+	// 	multifactorialTS_.setSelected(false);
+	// 	dualKnockoutTS_.setSelected(false);
+	// 	
+	// 	timeSeriesAsDream4_.setSelected(true);
+	// 	
+	// 	// Set "number of time series" spinner
+	// 	//numTimeSeries_.getModel().setValue(99);
+	// 	numTimeSeries_.setValue(10);
+	// 	
+	// 	// "duration" spinner
+	// 	tmax_.setValue(1000);
+	// 	
+	// 	// Set model of "number of points per time serie" spinner
+	// 	numPointsPerTimeSeries_.setValue(21);
+	// 	
+	// 	perturbationNew_.setSelected(true);
+	// 	perturbationLoad_.setSelected(false);
+	// 	
+	// 	// Noise
+	// 	
+	// 	// Diffusion multiplier (SDE only)
+	// 	sdeDiffusionCoeff_.setValue(0.05);
+	// 	
+	// 	noNoise_.setSelected(false);
+	// 	useMicroarrayNoise_.setSelected(true);
+	// 	useLogNormalNoise_.setSelected(false);
+	// 	addGaussianNoise_.setSelected(false);
+	// 	addLogNormalNoise_.setSelected(false);
+	// 	
+	// 	normalizeNoise_.setSelected(true);
+	// 	
+	// 	// Enables/disables stuff in the GUI (num time points etc., which may be disabled/gray otherwise)
+	// 	setExperimentAction();
+	// 	setNoiseAction();
+	// 	setModelAction();
+	// }
 	
 	
 	// ----------------------------------------------------------------------------
 	
-	public void setExperimentAction() {		
-		boolean useTimeSeries = (knockoutTS_.isSelected() || knockdownTS_.isSelected() || multifactorialTS_.isSelected() || dualKnockoutTS_.isSelected() || timeSeriesAsDream4_.isSelected());
-		numTimeSeriesLabel_.setEnabled(timeSeriesAsDream4_.isSelected());
-		numTimeSeries_.setEnabled(timeSeriesAsDream4_.isSelected());
-		durationOfSeriesLabel_.setEnabled(useTimeSeries);
-		numPointsPerSeriesLabel_.setEnabled(useTimeSeries);
-		tmax_.setEnabled(useTimeSeries);
-		numPointsPerTimeSeries_.setEnabled(useTimeSeries);
-	}
+	// liuxingliang
+	// public void setExperimentAction() {		
+	// 	boolean useTimeSeries = (knockoutTS_.isSelected() || knockdownTS_.isSelected() || multifactorialTS_.isSelected() || dualKnockoutTS_.isSelected() || timeSeriesAsDream4_.isSelected());
+	// 	numTimeSeriesLabel_.setEnabled(timeSeriesAsDream4_.isSelected());
+	// 	numTimeSeries_.setEnabled(timeSeriesAsDream4_.isSelected());
+	// 	durationOfSeriesLabel_.setEnabled(useTimeSeries);
+	// 	numPointsPerSeriesLabel_.setEnabled(useTimeSeries);
+	// 	tmax_.setEnabled(useTimeSeries);
+	// 	numPointsPerTimeSeries_.setEnabled(useTimeSeries);
+	// }
 	
 	
 	// ----------------------------------------------------------------------------
@@ -538,22 +561,23 @@ public class MySimulation extends SimulationWindow {
 			settings.setSimulateODE(model_.getSelectedIndex() == 0 || model_.getSelectedIndex() == 2);
 			settings.setSimulateSDE(model_.getSelectedIndex() == 1 || model_.getSelectedIndex() == 2);
 			
-			// Experiments
-			settings.generateSsKnockouts(knockoutSS_.isSelected());
-			settings.generateSsKnockdowns(knockdownSS_.isSelected());
-			settings.generateSsMultifactorial(multifactorialSS_.isSelected());
-			settings.generateSsDualKnockouts(dualKnockoutSS_.isSelected());
+			// liuxingliang
+			// // Experiments
+			// settings.generateSsKnockouts(knockoutSS_.isSelected());
+			// settings.generateSsKnockdowns(knockdownSS_.isSelected());
+			// settings.generateSsMultifactorial(multifactorialSS_.isSelected());
+			// settings.generateSsDualKnockouts(dualKnockoutSS_.isSelected());
 			
-			settings.generateTsKnockouts(knockoutTS_.isSelected());
-			settings.generateTsKnockdowns(knockdownTS_.isSelected());
-			settings.generateTsMultifactorial(multifactorialTS_.isSelected());
-			settings.generateTsDualKnockouts(dualKnockoutTS_.isSelected());
+			// settings.generateTsKnockouts(knockoutTS_.isSelected());
+			// settings.generateTsKnockdowns(knockdownTS_.isSelected());
+			// settings.generateTsMultifactorial(multifactorialTS_.isSelected());
+			// settings.generateTsDualKnockouts(dualKnockoutTS_.isSelected());
 			
-			settings.generateTsDREAM4TimeSeries(timeSeriesAsDream4_.isSelected());
+			// settings.generateTsDREAM4TimeSeries(timeSeriesAsDream4_.isSelected());
 			
-			if (timeSeriesAsDream4_.isSelected()) { // is saved only if "Time series as in DREAM4 is selected"
-				settings.setNumTimeSeries((Integer) numTimeSeries_.getModel().getValue());
-			}
+			// if (timeSeriesAsDream4_.isSelected()) { // is saved only if "Time series as in DREAM4 is selected"
+			// 	settings.setNumTimeSeries((Integer) numTimeSeries_.getModel().getValue());
+			// }
 			
 			// TODO check that correct
 			int maxt = (Integer) tmax_.getModel().getValue();
@@ -564,7 +588,8 @@ public class MySimulation extends SimulationWindow {
 				settings.setDt(dt);
 				//settings.setNumMeasuredPoints((Integer) numPointsPerTimeSerie_.getModel().getValue());
 			
-			settings.setLoadPerturbations(perturbationLoad_.isSelected());
+			// liuxingliang
+			// settings.setLoadPerturbations(perturbationLoad_.isSelected());
 			
 			if (settings.getSimulateSDE())
 				settings.setNoiseCoefficientSDE((Double) sdeDiffusionCoeff_.getModel().getValue());
@@ -586,7 +611,8 @@ public class MySimulation extends SimulationWindow {
 			simulation = new MySimulationThread(grn);
 			
 			// Perhaps make a test on the path validity
-			File destDir = new File(userPath_.getText()+"/"+networkName+"/"+simulationIndex);
+			//File destDir = new File(userPath_.getText()+"/"+networkName+"/"+simulationIndex);
+			File destDir = new File(GLOBALVAR.simulationNetworkTmpDir+ File.separator +networkName+ File.separator +simulationIndex);
 			if(!destDir.exists())
 				destDir.mkdirs();
 			settings.setOutputDirectory(destDir.getAbsolutePath());
@@ -691,7 +717,10 @@ public class MySimulation extends SimulationWindow {
 		// LIU
 		// ranks of MetaScore
 		HashMap<String, Double> algoScoreMap = new HashMap<String, Double>();
-		String simulatedDataDir = userPath_.getText(); 
+
+		//String simulatedDataDir = userPath_.getText(); 
+		String simulatedDataDir = GLOBALVAR.simulationNetworkTmpDir; 
+
 		Set<Map.Entry<String, NetworkElement>> chosenNetworkSet = networks.entrySet();
 		for(Map.Entry<String, NetworkElement> entry : chosenNetworkSet) {
 			if(entry.getValue() == null) {
@@ -772,9 +801,10 @@ public class MySimulation extends SimulationWindow {
 	/** Add tooltips for all elements of the window */
 	private void addTooltips() {
 				
-		dream4Settings_.setToolTipText(
-				"<html>Set all parameters of this window to the values<br>" +
-				"that were used to generate the DREAM4 challenges</html>");
+		// liuxingliang
+		// dream4Settings_.setToolTipText(
+		// 		"<html>Set all parameters of this window to the values<br>" +
+		// 		"that were used to generate the DREAM4 challenges</html>");
 		normalizeNoise_.setToolTipText(
 				"<html>After adding experimental noise (measurement error), normalize<br>" +
 				"by dividing all concentrations values by the maximum mRNA<br>" +
@@ -798,45 +828,48 @@ public class MySimulation extends SimulationWindow {
 				"(Tu, Stolovitzky, and Klein. <i>PNAS</i>, 99:14031-14036, 2002)</html>");
 		
 		String networkName = "<i>" + item_.getLabel() + "</i>";
-		perturbationLoad_.setToolTipText(
-				"<html>Load the perturbations from the following files<br>" +
-				"(they must be located in the output directory):<br>" +
-				"- " + networkName + "_multifactorial_perturbations.tsv<br>" +
-				"- " + networkName + "_dualknockouts_perturbations.tsv<br>" +
-				"- " + networkName + "_dream4_timeseries_perturbations.tsv</html>");
-		perturbationNew_.setToolTipText(
-				"<html>Generate new perturbations, select if you don't have<br>" +
-				"predefined perturbations that you want to use</html>");
+		// liuxingliang
+		// perturbationLoad_.setToolTipText(
+		// 		"<html>Load the perturbations from the following files<br>" +
+		// 		"(they must be located in the output directory):<br>" +
+		// 		"- " + networkName + "_multifactorial_perturbations.tsv<br>" +
+		// 		"- " + networkName + "_dualknockouts_perturbations.tsv<br>" +
+		// 		"- " + networkName + "_dream4_timeseries_perturbations.tsv</html>");
+		// perturbationNew_.setToolTipText(
+		// 		"<html>Generate new perturbations, select if you don't have<br>" +
+		// 		"predefined perturbations that you want to use</html>");
 		
-		timeSeriesAsDream4_.setToolTipText(
-				"<html>Generate time series as those provided in DREAM4 (<i>in addition</i><br>" +
-				"to time series for knockouts, knockdowns, etc. selected above)</html>");
-		dualKnockoutTS_.setToolTipText(
-				"<html>Trajectories for dual knockouts (at t=0 is the<br>" +
-				"wild-type, at this time the dual knockout is done)</html>");
-		multifactorialTS_.setToolTipText(
-				"<html>Trajectories for multifactorial perturbations (at t=0 is<br>" +
-				"the wild-type, at this time the perturbation is applied)</html>");
-		knockdownTS_.setToolTipText(
-				"<html>Trajectories for knockdowns (at t=0 is the<br>" +
-				"wild-type, at this time the knockdown is done)</html>");
-		knockoutTS_.setToolTipText(
-				"<html>Trajectories for the knockouts (at t=0 is the<br>" +
-				" wild-type, at this time the knockout is done)</html>");
-		dualKnockoutSS_.setToolTipText(
-				"<html>Steady states for dual knockouts (pairs are selected<br>" +
-				"according to how many genes they co-regulate)</html>");
-		multifactorialSS_.setToolTipText(
-				"<html>Steady states for multifactorial perturbations</html>");
+		// liuxingliang
+		// timeSeriesAsDream4_.setToolTipText(
+		// 		"<html>Generate time series as those provided in DREAM4 (<i>in addition</i><br>" +
+		// 		"to time series for knockouts, knockdowns, etc. selected above)</html>");
+		// dualKnockoutTS_.setToolTipText(
+		// 		"<html>Trajectories for dual knockouts (at t=0 is the<br>" +
+		// 		"wild-type, at this time the dual knockout is done)</html>");
+		// multifactorialTS_.setToolTipText(
+		// 		"<html>Trajectories for multifactorial perturbations (at t=0 is<br>" +
+		// 		"the wild-type, at this time the perturbation is applied)</html>");
+		// knockdownTS_.setToolTipText(
+		// 		"<html>Trajectories for knockdowns (at t=0 is the<br>" +
+		// 		"wild-type, at this time the knockdown is done)</html>");
+		// knockoutTS_.setToolTipText(
+		// 		"<html>Trajectories for the knockouts (at t=0 is the<br>" +
+		// 		" wild-type, at this time the knockout is done)</html>");
+		// dualKnockoutSS_.setToolTipText(
+		// 		"<html>Steady states for dual knockouts (pairs are selected<br>" +
+		// 		"according to how many genes they co-regulate)</html>");
+		// multifactorialSS_.setToolTipText(
+		// 		"<html>Steady states for multifactorial perturbations</html>");
 		logNormalNoise_.setToolTipText(
 				"<html>Standard deviation of the log-normal noise</html>");
-		numTimeSeries_.setToolTipText(
-				"<html>The number of time series (a different perturbation<br>" +
-				"is used for every time series)</html>");
-		knockdownSS_.setToolTipText(
-				"<html>Steady states for knockdown of every gene</html>");
-		knockoutSS_.setToolTipText(
-				"<html>Steady states for knockout of every gene</html>");
+		// liuxingliang
+		// numTimeSeries_.setToolTipText(
+		// 		"<html>The number of time series (a different perturbation<br>" +
+		// 		"is used for every time series)</html>");
+		// knockdownSS_.setToolTipText(
+		// 		"<html>Steady states for knockdown of every gene</html>");
+		// knockoutSS_.setToolTipText(
+		//		"<html>Steady states for knockout of every gene</html>");
 		model_.setToolTipText(
 				"<html>Select ODEs (deterministic) or SDEs (noise in dynamics) for the<br>" +
 				"simulation of all experiments selected below. If you select both,<br>" +
@@ -1037,14 +1070,12 @@ public class MySimulation extends SimulationWindow {
 
 		public void run()
 		{
-			snake_.start();
-			myCardLayout_.show(runButtonAndSnakePanel_, snakePanel_.getName());
-
 			try
 			{
 				benchmarkGenerator_.setOutputDirectory(GnwSettings.getInstance().getOutputDirectory());
 				benchmarkGenerator_.generateBenchmark(); // all the options have been saved in GnwSettings
-				finalizeAfterSuccess();
+				// liuxingliang
+				//finalizeAfterSuccess();
 				log_.log(Level.INFO, "Done!");
 				
 			}
@@ -1056,7 +1087,8 @@ public class MySimulation extends SimulationWindow {
 						"with the command-line argument -Xmx1024m to use maximum 1024Mb of memory, " +
 						"-Xmx2048m to use max 2048Mb, etc.");
 				JOptionPane.showMessageDialog(new Frame(), "Out of memory, see console for details.", "GNW message", JOptionPane.WARNING_MESSAGE);
-				finalizeAfterFail();
+				// liuxingliang
+				// finalizeAfterFail();
 				
 			}
 			catch (IllegalArgumentException e)
@@ -1064,50 +1096,71 @@ public class MySimulation extends SimulationWindow {
 				log_.log(Level.WARNING, e.getMessage(), e);
 				JOptionPane.showMessageDialog(new Frame(), "Illegal argument, see console for details.", "GNW message", JOptionPane.WARNING_MESSAGE);
 				log_.log(Level.INFO, "Potential orkaround: gene names must contain at least one char (e.g. \"5\" is not a valid gene name, but \"G5\" is)");
-				finalizeAfterFail();
+				// liuxingliang
+				// finalizeAfterFail();
 			}
 			catch (CancelException e)
 			{
 				// do not display an annoying dialog to say "cancelled!"
 				log_.log(Level.INFO, e.getMessage());
-				finalizeAfterFail();
+				// liuxingliang
+				// finalizeAfterFail();
 			}
 			catch (ConvergenceException e)
 			{
 				log_.log(Level.WARNING, "Simulation::run(): " + e.getMessage(), e);
 				JOptionPane.showMessageDialog(new Frame(), "Unable to converge, see console for details.", "GNW message", JOptionPane.WARNING_MESSAGE);
-				finalizeAfterFail();
+				// liuxingliang
+				// finalizeAfterFail();
 			}
 			catch (RuntimeException e)
 			{
 				log_.log(Level.WARNING, "Simulation::run(): " + e.getMessage(), e);
 				JOptionPane.showMessageDialog(new Frame(), "Runtime exception, see console for details.", "GNW message", JOptionPane.WARNING_MESSAGE);
-				finalizeAfterFail();
+				// liuxingliang
+				// finalizeAfterFail();
 			}
 			catch (Exception e)
 			{
 				log_.log(Level.WARNING, "Simulation::run(): " + e.getMessage(), e);
 				JOptionPane.showMessageDialog(new Frame(), "Error encountered, see console for details.", "GNW message", JOptionPane.WARNING_MESSAGE);
-				finalizeAfterFail();
+				// liuxingliang
+				// finalizeAfterFail();
 			}
 	    }
 			
-		// ----------------------------------------------------------------------------
+		// liuxingliang
+		// // ----------------------------------------------------------------------------
 		
-		public void finalizeAfterSuccess()
-		{
-			snake_.stop();
-			myCardLayout_.show(runButtonAndSnakePanel_, runPanel_.getName());
-			escapeAction(); // close the simulation window
-		}
+		// public void finalizeAfterSuccess()
+		// {
+		// 	snake_.stop();
+		// 	myCardLayout_.show(runButtonAndSnakePanel_, runPanel_.getName());
+		// 	escapeAction(); // close the simulation window
+		// }
 		
-		// ----------------------------------------------------------------------------
+		// // ----------------------------------------------------------------------------
 		
-		public void finalizeAfterFail()
-		{
-			snake_.stop();
-			myCardLayout_.show(runButtonAndSnakePanel_, runPanel_.getName());
-			//escapeAction(); // close the simulation window
-		}
+		// public void finalizeAfterFail()
+		// {
+		// 	snake_.stop();
+		// 	myCardLayout_.show(runButtonAndSnakePanel_, runPanel_.getName());
+		// 	//escapeAction(); // close the simulation window
+		// }
+	}
+	
+	// liuxingliang: move out from class: MySimulationThread
+	public void finalizeAfterSuccess()
+	{
+		snake_.stop();
+		myCardLayout_.show(runButtonAndSnakePanel_, runPanel_.getName());
+		escapeAction(); // close the simulation window
+	}
+	
+	public void finalizeAfterFail()
+	{
+		snake_.stop();
+		myCardLayout_.show(runButtonAndSnakePanel_, runPanel_.getName());
+		//escapeAction(); // close the simulation window
 	}
 }

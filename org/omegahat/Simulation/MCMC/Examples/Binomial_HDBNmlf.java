@@ -293,8 +293,11 @@ public class Binomial_HDBNmlf implements UnnormalizedDensity
 			String line =null;
 			int j=0;
 			while((line=br.readLine())!=null){
+			
+				// liuxingliang
+				//cell = line.split(",");
+				cell = line.split("\\p{javaWhitespace}+");
 				
-				cell = line.split(",");
                 for(int i=nogenes/2; i<nogenes; i++)
                 {
                 	double y1 = Double.parseDouble(cell[i-nogenes/2]);

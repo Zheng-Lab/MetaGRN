@@ -1,8 +1,11 @@
 package birc.grni.ridge;
 
-import java.io.*;
-import birc.grni.gui.*;
+import java.io.FileReader;
+import java.io.IOException;
+
+import birc.grni.gui.GrnRidge;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class RidgeRegressionNoGUI {
 
@@ -38,10 +41,10 @@ public class RidgeRegressionNoGUI {
 //		GrnRidgeDisplay.ridgeProgressBar.setMaximum(numGenes-1);
 //	}
 	
-	public RidgeRegressionNoGUI(String filePath, boolean withHeader, boolean geneNameAreColumnHeader) throws IOException{
+	public RidgeRegressionNoGUI(FileReader inputFileReader, boolean withHeader, boolean geneNameAreColumnHeader) throws BadInputFormatException, IOException {
 	
 		InputPreProcessRidge in = new InputPreProcessRidge();	
-		in.processInput(filePath, withHeader, geneNameAreColumnHeader);
+		in.processInput(inputFileReader, withHeader, geneNameAreColumnHeader);
 		
 		/*compare number of genes and samples in the file with the GUI inputs */
 		/*if(genes != in.numGeneInFile){
@@ -80,7 +83,7 @@ public class RidgeRegressionNoGUI {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		RidgeRegressionNoGUI ridgeNoGui = new RidgeRegressionNoGUI("E:/data/data_10G30T_ridge.txt", false, true);
+		RidgeRegressionNoGUI ridgeNoGui = new RidgeRegressionNoGUI(new FileReader("E:/data/data_10G30T_ridge.txt"), false, true);
 		ridgeNoGui.run();
 		ridgeNoGui.done();
 	}

@@ -1,10 +1,30 @@
 package birc.grni.util;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.jar.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import birc.grni.gui.ResultDialog;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class CommonUtil {
 	
@@ -325,7 +345,7 @@ public class CommonUtil {
 		    File dllFile = new File(relativePath);
 		    String prefix = dllFile.getName();	
 		    
-		    File tmpFolder = new File("MetaGRNTmp");
+		    File tmpFolder = new File(GLOBALVAR.tmpDir);
 		    if(!tmpFolder.exists())
 		    	tmpFolder.mkdir();
 		    File tempNativeLibFile = new File(tmpFolder.getAbsoluteFile() + "/" + dllFile.getName());
@@ -428,17 +448,27 @@ public class CommonUtil {
         return sortedArray;
     }
     
-    public static InputData readInput(String inputFilePath, boolean withHeader, boolean genesAreColumnHeader) throws IOException{
+    public static InputData readInput(FileReader inputFileReader, boolean withHeader, boolean genesAreColumnHeader) throws BadInputFormatException, IOException{
 
+    	Pattern inputLineNotHeaderFormatPattern = Pattern.compile("\\d+(\\.\\d+)?(\t\\d+(\\.\\d+)?)*");
+    	Matcher inputLineNotHeaderFormatMatcher = null;
+    	Pattern inputLineHeaderFormatPattern = Pattern.compile("\t\\S+(\t\\S+)*");
+    	Matcher inputLineHeaderFormatMatcher = null;
+    	
     	ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
     	if(!withHeader)	//without header
     	{
     		if(genesAreColumnHeader)
     		{
-    			BufferedReader brInputFile = new BufferedReader(new FileReader(inputFilePath));
+    			BufferedReader brInputFile = new BufferedReader(inputFileReader);
     	    	String oneLine = "";
 				while ((oneLine = brInputFile.readLine()) != null) {
 					if(!oneLine.equals("")) {
+						inputLineNotHeaderFormatMatcher = inputLineNotHeaderFormatPattern.matcher(oneLine);
+						if(!inputLineNotHeaderFormatMatcher.matches()) {
+							throw new BadInputFormatException("Input matrix data format is not correct");
+						}
+
 						ArrayList<Double> oneLineArrayList = new ArrayList<Double>();
 						Scanner sc = new Scanner(oneLine);
 						while(sc.hasNext()) {
@@ -457,10 +487,15 @@ public class CommonUtil {
     			/* read data into a temporary matrix whose column header is time point and then convert the temporary matrix
     			 * into a matrix whose column header is gene name*/
     			ArrayList<ArrayList<Double>> tempInputDataMatrix = new ArrayList<ArrayList<Double>>();
-    			BufferedReader brInputFile = new BufferedReader(new FileReader(inputFilePath));
+    			BufferedReader brInputFile = new BufferedReader(inputFileReader);
     	    	String oneLine = "";
 				while ((oneLine = brInputFile.readLine()) != null) {
 					if(!oneLine.equals("")) {
+						inputLineNotHeaderFormatMatcher = inputLineNotHeaderFormatPattern.matcher(oneLine);
+						if(!inputLineNotHeaderFormatMatcher.matches()) {
+							throw new BadInputFormatException("Input matrix data format is not correct");
+						}
+
 						ArrayList<Double> oneLineArrayList = new ArrayList<Double>();
 						Scanner sc = new Scanner(oneLine);
 						while(sc.hasNext()) {
@@ -490,16 +525,26 @@ public class CommonUtil {
     	{
     		if(genesAreColumnHeader)
     		{
-    			BufferedReader brInputFile = new BufferedReader(new FileReader(inputFilePath));
+    			BufferedReader brInputFile = new BufferedReader(inputFileReader);
     			/* get the column header*/
     			String columnHeaderLine = brInputFile.readLine();
-    			String[] rawColumnHeaderArray = columnHeaderLine.split("\\s");
+    			inputLineHeaderFormatMatcher = inputLineHeaderFormatPattern.matcher(columnHeaderLine);
+    			if(!inputLineHeaderFormatMatcher.matches()) {
+    				throw new BadInputFormatException("Bad header format in the input");
+    			}
+
+    			String[] columnHeaderArray = columnHeaderLine.trim().split("\\s");
     			ArrayList<String> rowHeader = new ArrayList<String>();
     			/* store the data without header*/
     	    	String oneLine = "";
 				while ((oneLine = brInputFile.readLine()) != null) {
 					if(!oneLine.equals("")) {
 						String[] oneLineArray = oneLine.split("\\s");
+
+						if(oneLineArray.length != columnHeaderArray.length + 1) {
+							throw new BadInputFormatException("Bad header format in the input");
+						}
+
 						/* store row header*/
 						rowHeader.add(oneLineArray[0].trim());
 						/* store data*/
@@ -517,16 +562,20 @@ public class CommonUtil {
 				int columnHeaderLength = inputDataMatrix.get(0).size();
 				ArrayList<String> columnHeader = new ArrayList<String>();
 				for(int i = 0; i < columnHeaderLength; i++)
-					columnHeader.add(0, rawColumnHeaderArray[rawColumnHeaderArray.length - 1 - i]);
+					columnHeader.add(0, columnHeaderArray[columnHeaderArray.length - 1 - i]);
 				
 				return new InputData(rowHeader, columnHeader, inputDataMatrix);
     		}
     		else
     		{
-    			BufferedReader brInputFile = new BufferedReader(new FileReader(inputFilePath));
+    			BufferedReader brInputFile = new BufferedReader(inputFileReader);
     			/* get the row header*/
     			String rowHeaderLine = brInputFile.readLine();
-    			String[] rawRowHeaderArray = rowHeaderLine.split("\\s");
+    			inputLineHeaderFormatMatcher = inputLineHeaderFormatPattern.matcher(rowHeaderLine);
+    			if(!inputLineHeaderFormatMatcher.matches()) {
+    				throw new BadInputFormatException("Bad header format in the input");
+    			}
+    			String[] rowHeaderArray = rowHeaderLine.trim().split("\\s");
     			ArrayList<String> columnHeader = new ArrayList<String>();
     			/* store the data without header*/
     			ArrayList<ArrayList<Double>> tempInputDataMatrix = new ArrayList<ArrayList<Double>>();
@@ -534,6 +583,11 @@ public class CommonUtil {
     			while((oneLine = brInputFile.readLine()) != null) {
     				if(!oneLine.equals("")) {
 	    				String[] oneLineArray = oneLine.split("\\s");
+	    				
+	    				if(oneLineArray.length != rowHeaderArray.length + 1) {
+							throw new BadInputFormatException("Bad header format in the input");
+						}
+
 	    				/* store column header*/
 	    				columnHeader.add(oneLineArray[0].trim());
 	    				/* store data*/
@@ -559,10 +613,58 @@ public class CommonUtil {
     			int rowHeaderLength = inputDataMatrix.size();
     			ArrayList<String> rowHeader = new ArrayList<String>();
     			for(int i = 0; i < rowHeaderLength; i++)
-    				rowHeader.add(0, rawRowHeaderArray[rawRowHeaderArray.length - 1 - i]);
+    				rowHeader.add(0, rowHeaderArray[rowHeaderArray.length - 1 - i]);
     			
     			return new InputData(rowHeader, columnHeader, inputDataMatrix);
     		}
     	}
     }
+    
+    public static void resultPrinter(int network [][], int numberOfGenes, ArrayList<String> geneNames, boolean runByMeta, String metaNetworkReferenceResultFilePath, int[][] timeDelay)
+	{	
+		if(!runByMeta)
+		{
+			new ResultDialog(null, network, numberOfGenes, geneNames, timeDelay).setVisible(true);
+			
+		} else { 
+			
+			try {
+				File resultFile = new File(metaNetworkReferenceResultFilePath);
+//				resultFile.deleteOnExit();
+				PrintStream resultFilePrinter = new PrintStream(resultFile);
+				if(geneNames != null) {
+					for(int m=0; m<numberOfGenes; m++)
+					{
+						for(int n=0; n<numberOfGenes; n++) 
+						{   
+							if(network[m][n] == 1) 
+								resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+							else
+		    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+							
+							resultFilePrinter.println();
+						}
+					}
+				} else {
+					for(int m=0; m<numberOfGenes; m++)
+					{
+						for(int n=0; n<numberOfGenes; n++) 
+						{   
+							if(network[m][n] == 1) 
+								resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+							else
+		    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+							
+							resultFilePrinter.println();
+						}
+					}
+				}
+				resultFilePrinter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+    
+   
 }

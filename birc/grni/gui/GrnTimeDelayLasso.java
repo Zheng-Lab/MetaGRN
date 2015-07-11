@@ -1,24 +1,21 @@
 package birc.grni.gui;
 
-import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
 
-import birc.grni.gui.visulization.GrnVisulizeNetwork;
 import birc.grni.lasso.delay.ProgressBarAdaptorLassoDelay;
 import birc.grni.util.CommonUtil;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class GrnTimeDelayLasso extends GrnTimeDelayLassoDisplay {
 	
@@ -65,11 +62,18 @@ public class GrnTimeDelayLasso extends GrnTimeDelayLassoDisplay {
 //				TimeDelayAlgorithm del = new TimeDelayAlgorithm(filePath, delay);
 				try {
 //					birc.grni.util.Logging.logger.log(Level.FINE, "Before Enterring CommonUtil.readInput.");
-					InputData inputData = CommonUtil.readInput(filePath, withHeader, geneNameAreColumnHeader);
+					FileReader inputFileReader = new FileReader(filePath);
+					InputData inputData = CommonUtil.readInput(inputFileReader, withHeader, geneNameAreColumnHeader);
 					ProgressBarAdaptorLassoDelay del = new ProgressBarAdaptorLassoDelay(inputData, delay);
 					del.execute();
-				} catch (IOException ioex) {
-					ioex.printStackTrace();
+				} catch(FileNotFoundException fnfex) {
+					JOptionPane.showMessageDialog(null, fnfex.getMessage(), "FileNotFound", JOptionPane.ERROR_MESSAGE);
+				} catch(BadInputFormatException badInputFormatEx) {
+					JOptionPane.showMessageDialog(null, badInputFormatEx.getMessage(), "BadInputFormat", JOptionPane.ERROR_MESSAGE);
+				} catch(IOException ioex) {
+					JOptionPane.showMessageDialog(null, ioex.getMessage(), "IOException", JOptionPane.ERROR_MESSAGE);
+				} finally {
+					startButton.setEnabled(true);
 				}
 			}
 		});
@@ -162,154 +166,155 @@ public class GrnTimeDelayLasso extends GrnTimeDelayLassoDisplay {
 	public static void timeDelayLassoResult(int[][] network, int[][] delayInfo, int numberOfGenes, /* LIU */ArrayList<String> geneNames) {
 		
 		startButton.setEnabled(true);
+		CommonUtil.resultPrinter(network, numberOfGenes, geneNames, runByMeta, "LASSO_DELAY.tsv", delayInfo);
 
-		if(!runByMeta)
-		{
-			/* pop up the file chooser window to save delay information */
-			JFrame frameDelay = new JFrame();
-			FileDialog saveFileDialogDelay = new FileDialog(frameDelay, "Save the Time-delay result", FileDialog.SAVE);
-			saveFileDialogDelay.setVisible(true);
-			String selectedDirDelay = saveFileDialogDelay.getDirectory();
-			String selectedFileDelay = saveFileDialogDelay.getFile();
-			if (selectedFileDelay != null) {
-				String resultSavePath = new File(selectedDirDelay, selectedFileDelay).getAbsolutePath();
-				try {
-					PrintStream printer = new PrintStream(new File(resultSavePath));
-					// write time-delay results according to standard format
-					// 1st column - regulator gene
-					// 2nd column - target gene
-					// 3rd column - delay
-					// printer.print("Regulator" + "\t" + "Regulatee" + "\t" + "Delay");
-					// printer.println();
+		// if(!runByMeta)
+		// {
+		// 	/* pop up the file chooser window to save delay information */
+		// 	JFrame frameDelay = new JFrame();
+		// 	FileDialog saveFileDialogDelay = new FileDialog(frameDelay, "Save the Time-delay result", FileDialog.SAVE);
+		// 	saveFileDialogDelay.setVisible(true);
+		// 	String selectedDirDelay = saveFileDialogDelay.getDirectory();
+		// 	String selectedFileDelay = saveFileDialogDelay.getFile();
+		// 	if (selectedFileDelay != null) {
+		// 		String resultSavePath = new File(selectedDirDelay, selectedFileDelay).getAbsolutePath();
+		// 		try {
+		// 			PrintStream printer = new PrintStream(new File(resultSavePath));
+		// 			// write time-delay results according to standard format
+		// 			// 1st column - regulator gene
+		// 			// 2nd column - target gene
+		// 			// 3rd column - delay
+		// 			// printer.print("Regulator" + "\t" + "Regulatee" + "\t" + "Delay");
+		// 			// printer.println();
 	
-					// LIU
-					if (geneNames != null) {
-						for (int m = 0; m < numberOfGenes; m++) {
-							for (int n = 0; n < numberOfGenes; n++) {
-								if (delayInfo[m][n] != 0) {
-									int delay = delayInfo[m][n];
-									printer.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + delay);
-									printer.println();
-								}
-							}
-						}
-					} else {
-						for (int m = 0; m < numberOfGenes; m++) {
-							for (int n = 0; n < numberOfGenes; n++) {
-								if (delayInfo[m][n] != 0) {
-									int delay = delayInfo[m][n];
-									printer.print("G" + (m + 1) + "\t" + "G" + (n + 1) + "\t" + delay);
-									printer.println();
-								}
-							}
-						}
-					}
-					printer.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+		// 			// LIU
+		// 			if (geneNames != null) {
+		// 				for (int m = 0; m < numberOfGenes; m++) {
+		// 					for (int n = 0; n < numberOfGenes; n++) {
+		// 						if (delayInfo[m][n] != 0) {
+		// 							int delay = delayInfo[m][n];
+		// 							printer.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + delay);
+		// 							printer.println();
+		// 						}
+		// 					}
+		// 				}
+		// 			} else {
+		// 				for (int m = 0; m < numberOfGenes; m++) {
+		// 					for (int n = 0; n < numberOfGenes; n++) {
+		// 						if (delayInfo[m][n] != 0) {
+		// 							int delay = delayInfo[m][n];
+		// 							printer.print("G" + (m + 1) + "\t" + "G" + (n + 1) + "\t" + delay);
+		// 							printer.println();
+		// 						}
+		// 					}
+		// 				}
+		// 			}
+		// 			printer.close();
+		// 		} catch (IOException e) {
+		// 			// TODO Auto-generated catch block
+		// 			e.printStackTrace();
+		// 		}
+		// 	}
 	
-			Object[] options = { "Save the network", "Visualize the network" };
-			int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the Network results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		// 	Object[] options = { "Save the network", "Visualize the network" };
+		// 	int optionValue = JOptionPane.showOptionDialog(null, "What do you like to do for the Network results?", "Inference Result", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 	
-			if (optionValue == JOptionPane.OK_OPTION) {
-				// CHANGE BY LIU: use native save dialog (need to test)
-				JFrame frame = new JFrame();
-				FileDialog saveFileDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
-				saveFileDialog.setVisible(true);
-				String selectedDir = saveFileDialog.getDirectory();
-				String selectedFile = saveFileDialog.getFile();
-				if (selectedFile != null) {
-					String resultSavePath = new File(selectedDir, selectedFile).getAbsolutePath();
-					try {
-						PrintStream printer = new PrintStream(new File(resultSavePath));
-						// write results according to standard format
-						//LIU
-						if(geneNames != null)
-						{
-							for (int m = 0; m < numberOfGenes; m++) {
-								for (int n = 0; n < numberOfGenes; n++) {
-									if (network[m][n] == 1) {
-										printer.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
-									} else {
-										printer.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
-									}
-									printer.println();
-								}
-							}
-						}
-						else
-						{
-							for (int m = 0; m < numberOfGenes; m++) {
-								for (int n = 0; n < numberOfGenes; n++) {
+		// 	if (optionValue == JOptionPane.OK_OPTION) {
+		// 		// CHANGE BY LIU: use native save dialog (need to test)
+		// 		JFrame frame = new JFrame();
+		// 		FileDialog saveFileDialog = new FileDialog(frame, "Save", FileDialog.SAVE);
+		// 		saveFileDialog.setVisible(true);
+		// 		String selectedDir = saveFileDialog.getDirectory();
+		// 		String selectedFile = saveFileDialog.getFile();
+		// 		if (selectedFile != null) {
+		// 			String resultSavePath = new File(selectedDir, selectedFile).getAbsolutePath();
+		// 			try {
+		// 				PrintStream printer = new PrintStream(new File(resultSavePath));
+		// 				// write results according to standard format
+		// 				//LIU
+		// 				if(geneNames != null)
+		// 				{
+		// 					for (int m = 0; m < numberOfGenes; m++) {
+		// 						for (int n = 0; n < numberOfGenes; n++) {
+		// 							if (network[m][n] == 1) {
+		// 								printer.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+		// 							} else {
+		// 								printer.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+		// 							}
+		// 							printer.println();
+		// 						}
+		// 					}
+		// 				}
+		// 				else
+		// 				{
+		// 					for (int m = 0; m < numberOfGenes; m++) {
+		// 						for (int n = 0; n < numberOfGenes; n++) {
 		
-									if (network[m][n] == 1) {
-										printer.print("G" + (m + 1) + "\t" + "G" + (n + 1) + "\t" + 1);
-									} else {
-										printer.print("G" + (m + 1) + "\t" + "G" + (n + 1) + "\t" + 0);
-									}
-									printer.println();
-								}
-							}
-						}
-						printer.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
+		// 							if (network[m][n] == 1) {
+		// 								printer.print("G" + (m + 1) + "\t" + "G" + (n + 1) + "\t" + 1);
+		// 							} else {
+		// 								printer.print("G" + (m + 1) + "\t" + "G" + (n + 1) + "\t" + 0);
+		// 							}
+		// 							printer.println();
+		// 						}
+		// 					}
+		// 				}
+		// 				printer.close();
+		// 			} catch (IOException e) {
+		// 				// TODO Auto-generated catch block
+		// 				e.printStackTrace();
+		// 			}
+		// 		}
+		// 	}
 	
-			if (optionValue == JOptionPane.NO_OPTION) {
-				// create a visualization class object and pass the network
-				try {
-					/*LIU:GrnVisulizeNetwork visualization = */new GrnVisulizeNetwork(network, numberOfGenes);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		} 
-		else
-		{
-			try 
-			{
-				File resultFile = new File("LASSO_DELAY.tsv");
-				PrintStream resultFilePrinter = new PrintStream(resultFile);
-				if(geneNames != null) {
-					for(int m=0; m<numberOfGenes; m++)
-					{
-						for(int n=0; n<numberOfGenes; n++) 
-						{   
-							if(network[m][n] == 1) 
-								resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
-							else
-		    				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
-							
-							resultFilePrinter.println();
-						}
-					}
-				} else {
-					for(int m=0; m<numberOfGenes; m++)
-					{
-						for(int n=0; n<numberOfGenes; n++) 
-						{   
-							if(network[m][n] == 1) 
-								resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
-							else
-		    				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
-							
-							resultFilePrinter.println();
-						}
-					}
-				}
-				resultFilePrinter.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
+		// 	if (optionValue == JOptionPane.NO_OPTION) {
+		// 		// create a visualization class object and pass the network
+		// 		try {
+		// 			/*LIU:GrnVisulizeNetwork visualization = */new GrnVisulizeNetwork(network, numberOfGenes);
+		// 		} catch (Exception e) {
+		// 			// TODO Auto-generated catch block
+		// 			e.printStackTrace();
+		// 		}
+		// 	}
+		// } 
+		// else
+		// {
+		// 	try 
+		// 	{
+		// 		File resultFile = new File("LASSO_DELAY.tsv");
+		// 		PrintStream resultFilePrinter = new PrintStream(resultFile);
+		// 		if(geneNames != null) {
+		// 			for(int m=0; m<numberOfGenes; m++)
+		// 			{
+		// 				for(int n=0; n<numberOfGenes; n++) 
+		// 				{   
+		// 					if(network[m][n] == 1) 
+		// 						resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 1);
+		// 					else
+		//     				   	resultFilePrinter.print(geneNames.get(m) + "\t" + geneNames.get(n) + "\t" + 0);
+		// 					
+		// 					resultFilePrinter.println();
+		// 				}
+		// 			}
+		// 		} else {
+		// 			for(int m=0; m<numberOfGenes; m++)
+		// 			{
+		// 				for(int n=0; n<numberOfGenes; n++) 
+		// 				{   
+		// 					if(network[m][n] == 1) 
+		// 						resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+		// 					else
+		//     				   	resultFilePrinter.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+		// 					
+		// 					resultFilePrinter.println();
+		// 				}
+		// 			}
+		// 		}
+		// 		resultFilePrinter.close();
+		// 	} catch (FileNotFoundException e) {
+		// 		e.printStackTrace();
+		// 	}
+		// }
 	}
 	
 	//TEST

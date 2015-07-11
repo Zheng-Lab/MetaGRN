@@ -362,8 +362,9 @@ public class Options extends OptionsWindow
 	 */
 	public static void generateDREAM3GoldStandard(NetworkElement item) throws Exception
 	{
-		Simulation rd = new Simulation(new Frame(), item);
-		rd.setVisible(true);
+		// liuxingliang
+		// Simulation rd = new Simulation(new Frame(), item);
+		// rd.setVisible(true);
 	}
 	
 	// ----------------------------------------------------------------------------

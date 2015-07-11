@@ -2,14 +2,17 @@ package birc.grni.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
-import birc.grni.en.ProgressBarAdaptorEN;
 import birc.grni.util.CommonUtil;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class GrnEnsemble extends GrnEnsembleDisplay{
 	private ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
@@ -26,99 +29,101 @@ public class GrnEnsemble extends GrnEnsembleDisplay{
 			public void actionPerformed(ActionEvent e) {
 				
 				startButton.setEnabled(false);
-				InputData originalData = null;
 				String inputFilePath = dataFilePathField.getText();
 				try {
-					originalData = CommonUtil.readInput(inputFilePath, withheaderCheckBox.isSelected()/*withHeader*/, rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header")/*geneNameAreColumnHeader*/);
+					FileReader inputFileReader = new FileReader(inputFilePath);
+					InputData originalData = CommonUtil.readInput(inputFileReader, withheaderCheckBox.isSelected()/*withHeader*/, rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header")/*geneNameAreColumnHeader*/);
+					inputDataMatrix = originalData.getData();
+					System.out.println("generateNetworkButton: inputdataMatrix size: "+inputDataMatrix.get(0).size());
+				
+					if(dbnAlgorithmCheckBox.isSelected())
+					{
+						GrnDbn.runByMeta = true;
+						GrnDbn grnDbn = new GrnDbn(new JFrame());
+						grnDbn.getDataFilePathDbn().setText(inputFilePath);
+						grnDbn.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnDbn.columnHeaderRadioButton.setSelected(true);
+						else
+							grnDbn.rowHeaderRadioButton.setSelected(true);
+						//grnDbn.
+						grnDbn.frame_dbn.setVisible(true);
+					}
+				
+					if(rfAlgorithmCheckBox.isSelected())
+					{
+						GrnRf.runByMeta = true;
+						GrnRf grnRf = new GrnRf(new JFrame());
+						grnRf.getDataFilePathField().setText(inputFilePath);
+						grnRf.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnRf.columnHeaderRadioButton.setSelected(true);
+						else
+							grnRf.rowHeaderRadioButton.setSelected(true);
+						grnRf.frameRf.setVisible(true);
+					}
+				
+					if(enAlgorithmCheckBox.isSelected())
+					{
+						GrnElasticNet.runByMeta = true;
+						GrnElasticNet grnElasticNet = new GrnElasticNet(new JFrame());
+						grnElasticNet.getDataFilePathField().setText(inputFilePath);
+						grnElasticNet.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnElasticNet.columnHeaderRadioButton.setSelected(true);
+						else
+							grnElasticNet.rowHeaderRadioButton.setSelected(true);
+						grnElasticNet.frameElasticNet.setVisible(true);
+					}
+				
+					if(lassoAlgorithmCheckBox.isSelected())
+					{
+						GrnLasso.runByMeta = true;
+						GrnLasso grnLasso = new GrnLasso(new JFrame());
+						grnLasso.getDataFilePathField().setText(inputFilePath);
+						grnLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnLasso.columnHeaderRadioButton.setSelected(true);
+						else
+							grnLasso.rowHeaderRadioButton.setSelected(true);
+						grnLasso.frameLasso.setVisible(true);
+					}
+				
+					if(lassoDelayAlgorithmCheckBox.isSelected())
+					{
+						GrnTimeDelayLasso.runByMeta = true;
+						GrnTimeDelayLasso grnTimeDelayLasso = new GrnTimeDelayLasso(new JFrame());
+						grnTimeDelayLasso.getInputFilePathTextField().setText(inputFilePath);
+						grnTimeDelayLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnTimeDelayLasso.columnHeaderRadioButton.setSelected(true);
+						else
+							grnTimeDelayLasso.rowHeaderRadioButton.setSelected(true);
+						grnTimeDelayLasso.frame_lassoDelay.setVisible(true);
+					}
+				
+					if(ridgeAlgorithmCheckBox.isSelected())
+					{
+						GrnRidge.runByMeta = true;
+						GrnRidge grnRidge = new GrnRidge(new JFrame());
+						grnRidge.getInputFilePathField().setText(inputFilePath);
+						grnRidge.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+							grnRidge.columnHeaderRadioButton.setSelected(true);
+						else
+							grnRidge.rowHeaderRadioButton.setSelected(true);
+						grnRidge.frame_ridge.setVisible(true);
+					}
 					
+				} catch(FileNotFoundException fnfex) {
+					JOptionPane.showMessageDialog(null, fnfex.getMessage(), "FileNotFound", JOptionPane.ERROR_MESSAGE);
+				} catch(BadInputFormatException badInputFormatEx) {
+					JOptionPane.showMessageDialog(null, badInputFormatEx.getMessage(), "BadInputFormat", JOptionPane.ERROR_MESSAGE);
 				} catch(IOException ioex) {
-					ioex.printStackTrace();
+					JOptionPane.showMessageDialog(null, ioex.getMessage(), "IOException", JOptionPane.ERROR_MESSAGE);
+				} finally {
+					startButton.setEnabled(true);
 				}
-				inputDataMatrix = originalData.getData();
-				System.out.println("generateNetworkButton: inputdataMatrix size: "+inputDataMatrix.get(0).size());
-				
-				if(dbnAlgorithmCheckBox.isSelected())
-				{
-					GrnDbn.runByMeta = true;
-					GrnDbn grnDbn = new GrnDbn(new JFrame());
-					grnDbn.getDataFilePathDbn().setText(inputFilePath);
-					grnDbn.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-					if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-						grnDbn.columnHeaderRadioButton.setSelected(true);
-					else
-						grnDbn.rowHeaderRadioButton.setSelected(true);
-					//grnDbn.
-					grnDbn.frame_dbn.setVisible(true);
-				}
-				
-				if(rfAlgorithmCheckBox.isSelected())
-				{
-					GrnRf.runByMeta = true;
-					GrnRf grnRf = new GrnRf(new JFrame());
-					grnRf.getDataFilePathField().setText(inputFilePath);
-					grnRf.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-					if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-						grnRf.columnHeaderRadioButton.setSelected(true);
-					else
-						grnRf.rowHeaderRadioButton.setSelected(true);
-					grnRf.frameRf.setVisible(true);
-				}
-				
-				if(enAlgorithmCheckBox.isSelected())
-				{
-					GrnElasticNet.runByMeta = true;
-					GrnElasticNet grnElasticNet = new GrnElasticNet(new JFrame());
-					grnElasticNet.getDataFilePathField().setText(inputFilePath);
-					grnElasticNet.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-					if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-						grnElasticNet.columnHeaderRadioButton.setSelected(true);
-					else
-						grnElasticNet.rowHeaderRadioButton.setSelected(true);
-					grnElasticNet.frameElasticNet.setVisible(true);
-				}
-				
-				if(lassoAlgorithmCheckBox.isSelected())
-				{
-					GrnLasso.runByMeta = true;
-					GrnLasso grnLasso = new GrnLasso(new JFrame());
-					grnLasso.getDataFilePathField().setText(inputFilePath);
-					grnLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-					if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-						grnLasso.columnHeaderRadioButton.setSelected(true);
-					else
-						grnLasso.rowHeaderRadioButton.setSelected(true);
-					grnLasso.frameLasso.setVisible(true);
-				}
-				
-				if(lassoDelayAlgorithmCheckBox.isSelected())
-				{
-					GrnTimeDelayLasso.runByMeta = true;
-					GrnTimeDelayLasso grnTimeDelayLasso = new GrnTimeDelayLasso(new JFrame());
-					grnTimeDelayLasso.getInputFilePathTextField().setText(inputFilePath);
-					grnTimeDelayLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-					if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-						grnTimeDelayLasso.columnHeaderRadioButton.setSelected(true);
-					else
-						grnTimeDelayLasso.rowHeaderRadioButton.setSelected(true);
-					grnTimeDelayLasso.frame_lassoDelay.setVisible(true);
-				}
-				
-				if(ridgeAlgorithmCheckBox.isSelected())
-				{
-					GrnRidge.runByMeta = true;
-					GrnRidge grnRidge = new GrnRidge(new JFrame());
-					grnRidge.getInputFilePathField().setText(inputFilePath);
-					grnRidge.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-					if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-						grnRidge.columnHeaderRadioButton.setSelected(true);
-					else
-						grnRidge.rowHeaderRadioButton.setSelected(true);
-					grnRidge.frame_ridge.setVisible(true);
-				}
-				
-				
-				
-				
 			}
 		});
 		

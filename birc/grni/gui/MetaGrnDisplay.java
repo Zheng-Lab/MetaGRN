@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -37,6 +39,7 @@ import javax.swing.SwingWorker;
 import birc.grni.metagrn.MySimulation;
 import birc.grni.util.CommonUtil;
 import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 import ch.epfl.lis.gnwgui.DynamicalModelElement;
 import ch.epfl.lis.gnwgui.GnwGuiSettings;
 import ch.epfl.lis.gnwgui.NetworkElement;
@@ -98,13 +101,13 @@ public class MetaGrnDisplay extends JPanel {
 	/* whether store intermediate results (generated networks) of Meta-GRN*/
 	private JCheckBox storeNetworkCheckBox;
 	
-	/* only generate synthetic data directly from existing network, not generate networks from original data*/
-	private JCheckBox generateDataOnlyCheckBox;
+	// /* only generate synthetic data directly from existing network, not generate networks from original data*/
+	// private JCheckBox generateDataOnlyCheckBox;
 	
-	/* format of input networks, only matrix and TSV format are accepted currently*/
-	private ButtonGroup networkFormatButtonGroup;
-	private JLabel networkFormatLabel;
-	private JPanel networkFormatButtonPanel;
+	// /* format of input networks, only matrix and TSV format are accepted currently*/
+	// private ButtonGroup networkFormatButtonGroup;
+	// private JLabel networkFormatLabel;
+	// private JPanel networkFormatButtonPanel;
 	
 	private ArrayList<ArrayList<Double>> inputDataMatrix = new ArrayList<ArrayList<Double>>();
 	//ZMX
@@ -121,45 +124,45 @@ public class MetaGrnDisplay extends JPanel {
 		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints(); 
 		
-		this.generateDataOnlyCheckBox = new JCheckBox("Synthesize Data Only"); 
-		this.generateDataOnlyCheckBox.setBackground(Color.WHITE);
+		// this.generateDataOnlyCheckBox = new JCheckBox("Synthesize Data Only"); 
+		// this.generateDataOnlyCheckBox.setBackground(Color.WHITE);
 		
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.insets = new Insets(0,15,0,10);
-		this.add(this.generateDataOnlyCheckBox, gridBagConstraints);
+		// gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		// gridBagConstraints.weightx = 1;
+		// gridBagConstraints.gridx = 0;
+		// gridBagConstraints.gridy = 0;
+		// gridBagConstraints.gridwidth = 3;
+		// gridBagConstraints.insets = new Insets(0,15,0,10);
+		// this.add(this.generateDataOnlyCheckBox, gridBagConstraints);
 		
-		gridBagConstraints = new GridBagConstraints();					/* restore default*/
+		// gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
-		/* format of input networks*/
-		this.networkFormatLabel = new JLabel();
-		this.networkFormatLabel.setText("Network Format");
+		// /* format of input networks*/
+		// this.networkFormatLabel = new JLabel();
+		// this.networkFormatLabel.setText("Network Format");
 		
-		this.networkFormatButtonGroup = new ButtonGroup();
-		this.networkFormatButtonPanel = new JPanel();
-		this.networkFormatButtonPanel.setBackground(Color.WHITE);
-		addRadioButton("Matrix", this.networkFormatButtonGroup, this.networkFormatButtonPanel, true, false);
-		addRadioButton("TSV", this.networkFormatButtonGroup, this.networkFormatButtonPanel, false, false);
+		// this.networkFormatButtonGroup = new ButtonGroup();
+		// this.networkFormatButtonPanel = new JPanel();
+		// this.networkFormatButtonPanel.setBackground(Color.WHITE);
+		// addRadioButton("Matrix", this.networkFormatButtonGroup, this.networkFormatButtonPanel, true, false);
+		// addRadioButton("TSV", this.networkFormatButtonGroup, this.networkFormatButtonPanel, false, false);
 		
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.insets = new Insets(0,0,0,10);
-		this.add(this.networkFormatLabel, gridBagConstraints);
+		// gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		// gridBagConstraints.weightx = 1;
+		// gridBagConstraints.gridx = 3;
+		// gridBagConstraints.gridy = 0;
+		// gridBagConstraints.gridwidth = 1;
+		// gridBagConstraints.insets = new Insets(0,0,0,10);
+		// this.add(this.networkFormatLabel, gridBagConstraints);
 		
-		gridBagConstraints = new GridBagConstraints();					/* restore default*/
+		// gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.gridx = 4;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 3;
-		this.add(this.networkFormatButtonPanel, gridBagConstraints);
+		// gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		// gridBagConstraints.weightx = 1;
+		// gridBagConstraints.gridx = 4;
+		// gridBagConstraints.gridy = 0;
+		// gridBagConstraints.gridwidth = 3;
+		// this.add(this.networkFormatButtonPanel, gridBagConstraints);
 		
 		gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
@@ -511,7 +514,7 @@ public class MetaGrnDisplay extends JPanel {
 		
 		this.generateNetworkButton = new JButton("Generate Networks");
 		this.generateNetworkButton.setEnabled(true);
-		this.metaGrnButton = new JButton("Meta-GRN");
+		this.metaGrnButton = new JButton("Rank Networks");
 		this.metaGrnButton.setEnabled(false); /* only after generating networks, we can use Meta-GRN*/
 		this.bottomButtonPanel = new JPanel();
 		this.bottomButtonPanel.setBackground(Color.WHITE);
@@ -532,131 +535,138 @@ public class MetaGrnDisplay extends JPanel {
 		gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
 		
-		/** 
-		 * Actions
-		 * */
+		// /** 
+		//  * Actions
+		//  * */
 		
-		this.generateDataOnlyCheckBox.addActionListener(
-			new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if(generateDataOnlyCheckBox.isSelected())
-					{
-						generateNetworkButton.setEnabled(false);
-						metaGrnButton.setEnabled(true);
-						Component[] components = networkFormatButtonPanel.getComponents();
-						for(Component component : components)
-							component.setEnabled(true);
-					}
-					else
-					{
-						generateNetworkButton.setEnabled(true);
-						metaGrnButton.setEnabled(false);
-						Component[] components = networkFormatButtonPanel.getComponents();
-						for(Component component : components)
-							component.setEnabled(false);
-					}
-				}
-			}
-		);
+		// this.generateDataOnlyCheckBox.addActionListener(
+		// 	new ActionListener() {
+		// 		public void actionPerformed(ActionEvent e) {
+		// 			if(generateDataOnlyCheckBox.isSelected())
+		// 			{
+		// 				generateNetworkButton.setEnabled(false);
+		// 				metaGrnButton.setEnabled(true);
+		// 				Component[] components = networkFormatButtonPanel.getComponents();
+		// 				for(Component component : components)
+		// 					component.setEnabled(true);
+		// 			}
+		// 			else
+		// 			{
+		// 				generateNetworkButton.setEnabled(true);
+		// 				metaGrnButton.setEnabled(false);
+		// 				Component[] components = networkFormatButtonPanel.getComponents();
+		// 				for(Component component : components)
+		// 					component.setEnabled(false);
+		// 			}
+		// 		}
+		// 	}
+		// );
 		
 		this.generateNetworkButton.addActionListener(
 			new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					
+					generateNetworkButton.setEnabled(false);
 					String inputFilePath = inputFileTextField.getText();
 					InputData originalData = null;
 					try {
-						originalData = CommonUtil.readInput(inputFilePath, withheaderCheckBox.isSelected()/*withHeader*/, rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header")/*geneNameAreColumnHeader*/);
+						FileReader inputFileReader = new FileReader(inputFilePath);
+						originalData = CommonUtil.readInput(inputFileReader, withheaderCheckBox.isSelected()/*withHeader*/, rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header")/*geneNameAreColumnHeader*/);
+						inputDataMatrix = originalData.getData();
+						System.out.println("generateNetworkButton: inputdataMatrix size: "+inputDataMatrix.get(0).size());
 						
+						if(dbnAlgorithmCheckBox.isSelected())
+						{
+							GrnDbn.runByMeta = true;
+							GrnDbn grnDbn = new GrnDbn(new JFrame());
+							grnDbn.getDataFilePathDbn().setText(inputFilePath);
+							grnDbn.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+							if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+								grnDbn.columnHeaderRadioButton.setSelected(true);
+							else
+								grnDbn.rowHeaderRadioButton.setSelected(true);
+							//grnDbn.
+							grnDbn.frame_dbn.setVisible(true);
+						}
+						
+						if(rfAlgorithmCheckBox.isSelected())
+						{
+							GrnRf.runByMeta = true;
+							GrnRf grnRf = new GrnRf(new JFrame());
+							grnRf.getDataFilePathField().setText(inputFilePath);
+							grnRf.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+							if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+								grnRf.columnHeaderRadioButton.setSelected(true);
+							else
+								grnRf.rowHeaderRadioButton.setSelected(true);
+							grnRf.frameRf.setVisible(true);
+						}
+						
+						if(enAlgorithmCheckBox.isSelected())
+						{
+							GrnElasticNet.runByMeta = true;
+							GrnElasticNet grnElasticNet = new GrnElasticNet(new JFrame());
+							grnElasticNet.getDataFilePathField().setText(inputFilePath);
+							grnElasticNet.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+							if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+								grnElasticNet.columnHeaderRadioButton.setSelected(true);
+							else
+								grnElasticNet.rowHeaderRadioButton.setSelected(true);
+							grnElasticNet.frameElasticNet.setVisible(true);
+						}
+						
+						if(lassoAlgorithmCheckBox.isSelected())
+						{
+							GrnLasso.runByMeta = true;
+							GrnLasso grnLasso = new GrnLasso(new JFrame());
+							grnLasso.getDataFilePathField().setText(inputFilePath);
+							grnLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+							if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+								grnLasso.columnHeaderRadioButton.setSelected(true);
+							else
+								grnLasso.rowHeaderRadioButton.setSelected(true);
+							grnLasso.frameLasso.setVisible(true);
+						}
+						
+						if(lassoDelayAlgorithmCheckBox.isSelected())
+						{
+							GrnTimeDelayLasso.runByMeta = true;
+							GrnTimeDelayLasso grnTimeDelayLasso = new GrnTimeDelayLasso(new JFrame());
+							grnTimeDelayLasso.getInputFilePathTextField().setText(inputFilePath);
+							grnTimeDelayLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+							if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+								grnTimeDelayLasso.columnHeaderRadioButton.setSelected(true);
+							else
+								grnTimeDelayLasso.rowHeaderRadioButton.setSelected(true);
+							grnTimeDelayLasso.frame_lassoDelay.setVisible(true);
+						}
+						
+						if(ridgeAlgorithmCheckBox.isSelected())
+						{
+							GrnRidge.runByMeta = true;
+							GrnRidge grnRidge = new GrnRidge(new JFrame());
+							grnRidge.getInputFilePathField().setText(inputFilePath);
+							grnRidge.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
+							if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
+								grnRidge.columnHeaderRadioButton.setSelected(true);
+							else
+								grnRidge.rowHeaderRadioButton.setSelected(true);
+							grnRidge.frame_ridge.setVisible(true);
+						}
+						
+						/* only after generating networks, we can use Meta-GRN*/
+						//TODO: not reasonable, need change
+						metaGrnButton.setEnabled(true);
+						
+					} catch(FileNotFoundException fnfex) {
+						JOptionPane.showMessageDialog(null, fnfex.getMessage(), "FileNotFound", JOptionPane.ERROR_MESSAGE);
+					} catch(BadInputFormatException badInputFormatEx) {
+						JOptionPane.showMessageDialog(null, badInputFormatEx.getMessage(), "BadInputFormat", JOptionPane.ERROR_MESSAGE);
 					} catch(IOException ioex) {
-						ioex.printStackTrace();
+						JOptionPane.showMessageDialog(null, ioex.getMessage(), "IOException", JOptionPane.ERROR_MESSAGE);
+					} finally {
+						generateNetworkButton.setEnabled(true);
 					}
-					inputDataMatrix = originalData.getData();
-					System.out.println("generateNetworkButton: inputdataMatrix size: "+inputDataMatrix.get(0).size());
-					
-					if(dbnAlgorithmCheckBox.isSelected())
-					{
-						GrnDbn.runByMeta = true;
-						GrnDbn grnDbn = new GrnDbn(new JFrame());
-						grnDbn.getDataFilePathDbn().setText(inputFilePath);
-						grnDbn.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-							grnDbn.columnHeaderRadioButton.setSelected(true);
-						else
-							grnDbn.rowHeaderRadioButton.setSelected(true);
-						//grnDbn.
-						grnDbn.frame_dbn.setVisible(true);
-					}
-					
-					if(rfAlgorithmCheckBox.isSelected())
-					{
-						GrnRf.runByMeta = true;
-						GrnRf grnRf = new GrnRf(new JFrame());
-						grnRf.getDataFilePathField().setText(inputFilePath);
-						grnRf.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-							grnRf.columnHeaderRadioButton.setSelected(true);
-						else
-							grnRf.rowHeaderRadioButton.setSelected(true);
-						grnRf.frameRf.setVisible(true);
-					}
-					
-					if(enAlgorithmCheckBox.isSelected())
-					{
-						GrnElasticNet.runByMeta = true;
-						GrnElasticNet grnElasticNet = new GrnElasticNet(new JFrame());
-						grnElasticNet.getDataFilePathField().setText(inputFilePath);
-						grnElasticNet.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-							grnElasticNet.columnHeaderRadioButton.setSelected(true);
-						else
-							grnElasticNet.rowHeaderRadioButton.setSelected(true);
-						grnElasticNet.frameElasticNet.setVisible(true);
-					}
-					
-					if(lassoAlgorithmCheckBox.isSelected())
-					{
-						GrnLasso.runByMeta = true;
-						GrnLasso grnLasso = new GrnLasso(new JFrame());
-						grnLasso.getDataFilePathField().setText(inputFilePath);
-						grnLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-							grnLasso.columnHeaderRadioButton.setSelected(true);
-						else
-							grnLasso.rowHeaderRadioButton.setSelected(true);
-						grnLasso.frameLasso.setVisible(true);
-					}
-					
-					if(lassoDelayAlgorithmCheckBox.isSelected())
-					{
-						GrnTimeDelayLasso.runByMeta = true;
-						GrnTimeDelayLasso grnTimeDelayLasso = new GrnTimeDelayLasso(new JFrame());
-						grnTimeDelayLasso.getInputFilePathTextField().setText(inputFilePath);
-						grnTimeDelayLasso.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-							grnTimeDelayLasso.columnHeaderRadioButton.setSelected(true);
-						else
-							grnTimeDelayLasso.rowHeaderRadioButton.setSelected(true);
-						grnTimeDelayLasso.frame_lassoDelay.setVisible(true);
-					}
-					
-					if(ridgeAlgorithmCheckBox.isSelected())
-					{
-						GrnRidge.runByMeta = true;
-						GrnRidge grnRidge = new GrnRidge(new JFrame());
-						grnRidge.getInputFilePathField().setText(inputFilePath);
-						grnRidge.withheaderCheckBox.setSelected(withheaderCheckBox.isSelected());
-						if(rowColumnChooseButtonGroup.getSelection().getActionCommand().equals("column header"))
-							grnRidge.columnHeaderRadioButton.setSelected(true);
-						else
-							grnRidge.rowHeaderRadioButton.setSelected(true);
-						grnRidge.frame_ridge.setVisible(true);
-					}
-					
-					
-					/* only after generating networks, we can use Meta-GRN*/
-					//TODO: not reasonable, need change
-					metaGrnButton.setEnabled(true);
 				}
 			}
 		);
@@ -802,95 +812,97 @@ public class MetaGrnDisplay extends JPanel {
 		this.metaGrnButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						
+						String networkName = "";
 						try {			
-						if(generateDataOnlyCheckBox.isSelected())	/* synthesize data from network directly*/
-						{
-							if(networkFormatButtonGroup.getSelection().getActionCommand().equals("Matrix"))
-							{
-								/* transfer to tsv format first*/
-								//TODO: check with gene name or not
-								String inputNetworkFilePath = inputFileTextField.getText();
-								BufferedReader brInputNetworkFile = new BufferedReader(new FileReader(inputNetworkFilePath));
-								String line = "";
-								ArrayList<ArrayList<Integer>> networkMatrix = new ArrayList<ArrayList<Integer>>();
-								while((line = brInputNetworkFile.readLine()) != null) {
-									if(!line.equals(""))
-									{
-										ArrayList<Integer> oneLineOfNetworkMatrix = new ArrayList<Integer>();
-										Scanner sc = new Scanner(line);
-										while(sc.hasNext()) {
-											Integer ele = sc.nextInt();	/* network is 0-1 matrix*/
-											oneLineOfNetworkMatrix.add(ele);
-										}
-										networkMatrix.add(oneLineOfNetworkMatrix);
-									}
-								}
-								brInputNetworkFile.close();
-							
-								PrintStream psTsvFormatNetworkFile = new PrintStream("TSV");
-								File tsvInputNetworkFile = new File("TSV");
-								tsvInputNetworkFile.deleteOnExit();
-								int numberOfGenes = networkMatrix.size();
-								for(int m=0; m<numberOfGenes; m++)
-								{
-									for(int n=0; n<numberOfGenes; n++) 
-									{   
-										if(networkMatrix.get(m).get(n).intValue() == 1) 
-											psTsvFormatNetworkFile.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
-										else
-											psTsvFormatNetworkFile.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
-										
-										psTsvFormatNetworkFile.println();
-									}
-								}
-								psTsvFormatNetworkFile.close();
-								
-								/* load TSV format network file*/
-								StructureElement metaNetwork = loadStructureItem("NETWORK", new File("TSV").toURI().toURL(), ImodNetwork.TSV);
-								metaNetwork.getNetwork().removeAutoregulatoryInteractions();
-								
-								/* Create a new dynamic network from a static one and initialize its parameters.*/
-								DynamicalModelElement metaDynamicNetwork = new DynamicalModelElement(metaNetwork);
-								metaDynamicNetwork.getGeneNetwork().randomInitialization();
-								
-								if (metaNetwork.hasChildren())
-								{
-									for (IElement element : metaNetwork.getChildren())
-										metaDynamicNetwork.addChild(element);
-								}
-								
-								HashMap<String, NetworkElement> dynamicNeworks = new HashMap<String, NetworkElement>();
-								
-								dynamicNeworks.put("NETWORK", metaDynamicNetwork);
-								
-								generateDREAM3GoldStandard(dynamicNeworks, Integer.parseInt(numberOfSimulationSpinner.getValue().toString()), inputDataMatrix);
-							}
-							else if(networkFormatButtonGroup.getSelection().getActionCommand().equals("TSV"))
-							{
-								/* load directly*/
-								String inputNetworkFilePath = inputFileTextField.getText();
-								StructureElement metaNetwork = loadStructureItem("NETWORK", new File(inputNetworkFilePath).toURI().toURL(), ImodNetwork.TSV);
-								metaNetwork.getNetwork().removeAutoregulatoryInteractions();
-								
-								/* Create a new dynamic network from a static one and initialize its parameters.*/
-								DynamicalModelElement metaDynamicNetwork = new DynamicalModelElement(metaNetwork);
-								metaDynamicNetwork.getGeneNetwork().randomInitialization();
-								
-								if (metaNetwork.hasChildren())
-								{
-									for (IElement element : metaNetwork.getChildren())
-										metaDynamicNetwork.addChild(element);
-								}
-								
-								HashMap<String, NetworkElement> dynamicNeworks = new HashMap<String, NetworkElement>();
-								
-								dynamicNeworks.put("NETWORK", metaDynamicNetwork);
-								
-								generateDREAM3GoldStandard(dynamicNeworks, Integer.parseInt(numberOfSimulationSpinner.getValue().toString()), inputDataMatrix);
-							}
-						} 
-						else
-						{
+						// if(generateDataOnlyCheckBox.isSelected())	/* synthesize data from network directly*/
+						// {
+						// 	if(networkFormatButtonGroup.getSelection().getActionCommand().equals("Matrix"))
+						// 	{
+						// 		/* transfer to tsv format first*/
+						// 		//TODO: check with gene name or not
+						// 		String inputNetworkFilePath = inputFileTextField.getText();
+						// 		BufferedReader brInputNetworkFile = new BufferedReader(new FileReader(inputNetworkFilePath));
+						// 		String line = "";
+						// 		ArrayList<ArrayList<Integer>> networkMatrix = new ArrayList<ArrayList<Integer>>();
+						// 		while((line = brInputNetworkFile.readLine()) != null) {
+						// 			if(!line.equals(""))
+						// 			{
+						// 				ArrayList<Integer> oneLineOfNetworkMatrix = new ArrayList<Integer>();
+						// 				Scanner sc = new Scanner(line);
+						// 				while(sc.hasNext()) {
+						// 					Integer ele = sc.nextInt();	/* network is 0-1 matrix*/
+						// 					oneLineOfNetworkMatrix.add(ele);
+						// 				}
+						// 				networkMatrix.add(oneLineOfNetworkMatrix);
+						// 			}
+						// 		}
+						// 		brInputNetworkFile.close();
+						// 	
+						// 		PrintStream psTsvFormatNetworkFile = new PrintStream("TSV");
+						// 		File tsvInputNetworkFile = new File("TSV");
+						// 		tsvInputNetworkFile.deleteOnExit();
+						// 		int numberOfGenes = networkMatrix.size();
+						// 		for(int m=0; m<numberOfGenes; m++)
+						// 		{
+						// 			for(int n=0; n<numberOfGenes; n++) 
+						// 			{   
+						// 				if(networkMatrix.get(m).get(n).intValue() == 1) 
+						// 					psTsvFormatNetworkFile.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 1);
+						// 				else
+						// 					psTsvFormatNetworkFile.print("G" + (m+1) + "\t" + "G" + (n+1) + "\t" + 0);
+						// 				
+						// 				psTsvFormatNetworkFile.println();
+						// 			}
+						// 		}
+						// 		psTsvFormatNetworkFile.close();
+						// 		
+						// 		/* load TSV format network file*/
+						// 		StructureElement metaNetwork = loadStructureItem("NETWORK", new File("TSV").toURI().toURL(), ImodNetwork.TSV);
+						// 		metaNetwork.getNetwork().removeAutoregulatoryInteractions();
+						// 		
+						// 		/* Create a new dynamic network from a static one and initialize its parameters.*/
+						// 		DynamicalModelElement metaDynamicNetwork = new DynamicalModelElement(metaNetwork);
+						// 		metaDynamicNetwork.getGeneNetwork().randomInitialization();
+						// 		
+						// 		if (metaNetwork.hasChildren())
+						// 		{
+						// 			for (IElement element : metaNetwork.getChildren())
+						// 				metaDynamicNetwork.addChild(element);
+						// 		}
+						// 		
+						// 		HashMap<String, NetworkElement> dynamicNeworks = new HashMap<String, NetworkElement>();
+						// 		
+						// 		dynamicNeworks.put("NETWORK", metaDynamicNetwork);
+						// 		
+						// 		generateDREAM3GoldStandard(dynamicNeworks, Integer.parseInt(numberOfSimulationSpinner.getValue().toString()), inputDataMatrix);
+						// 	}
+						// 	else if(networkFormatButtonGroup.getSelection().getActionCommand().equals("TSV"))
+						// 	{
+						// 		/* load directly*/
+						// 		String inputNetworkFilePath = inputFileTextField.getText();
+						// 		StructureElement metaNetwork = loadStructureItem("NETWORK", new File(inputNetworkFilePath).toURI().toURL(), ImodNetwork.TSV);
+						// 		metaNetwork.getNetwork().removeAutoregulatoryInteractions();
+						// 		
+						// 		/* Create a new dynamic network from a static one and initialize its parameters.*/
+						// 		DynamicalModelElement metaDynamicNetwork = new DynamicalModelElement(metaNetwork);
+						// 		metaDynamicNetwork.getGeneNetwork().randomInitialization();
+						// 		
+						// 		if (metaNetwork.hasChildren())
+						// 		{
+						// 			for (IElement element : metaNetwork.getChildren())
+						// 				metaDynamicNetwork.addChild(element);
+						// 		}
+						// 		
+						// 		HashMap<String, NetworkElement> dynamicNeworks = new HashMap<String, NetworkElement>();
+						// 		
+						// 		dynamicNeworks.put("NETWORK", metaDynamicNetwork);
+						// 		
+						// 		generateDREAM3GoldStandard(dynamicNeworks, Integer.parseInt(numberOfSimulationSpinner.getValue().toString()), inputDataMatrix);
+						// 	}
+						// } 
+						// else
+						// {
 							DynamicalModelElement metaDynamicNetwork_RF = null;
 							DynamicalModelElement metaDynamicNetwork_EN = null;
 							DynamicalModelElement metaDynamicNetwork_LASSO = null;
@@ -903,7 +915,8 @@ public class MetaGrnDisplay extends JPanel {
 							
 							if(rfAlgorithmCheckBox.isSelected())
 							{
-								StructureElement metaNetwork_RF = loadStructureItem("RF", new File("RF.tsv").toURI().toURL(), ImodNetwork.TSV);
+								networkName = "RF";
+								StructureElement metaNetwork_RF = loadStructureItem(networkName, new File("RF.tsv").toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_RF.getNetwork().removeAutoregulatoryInteractions();
 								
 								/* Create a new dynamic network from a static one and initialize its parameters.*/
@@ -919,7 +932,8 @@ public class MetaGrnDisplay extends JPanel {
 							
 							if(enAlgorithmCheckBox.isSelected())
 							{
-								StructureElement metaNetwork_EN = loadStructureItem("EN", new File("EN.tsv").toURI().toURL(), ImodNetwork.TSV);
+								networkName = "EN";
+								StructureElement metaNetwork_EN = loadStructureItem(networkName, new File("EN.tsv").toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_EN.getNetwork().removeAutoregulatoryInteractions();
 								
 								metaDynamicNetwork_EN = new DynamicalModelElement(metaNetwork_EN);
@@ -934,7 +948,8 @@ public class MetaGrnDisplay extends JPanel {
 							
 							if(lassoAlgorithmCheckBox.isSelected())
 							{
-								StructureElement metaNetwork_LASSO = loadStructureItem("LASSO", new File("LASSO.tsv").toURI().toURL(), ImodNetwork.TSV);
+								networkName = "LASSO";
+								StructureElement metaNetwork_LASSO = loadStructureItem(networkName, new File("LASSO.tsv").toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_LASSO.getNetwork().removeAutoregulatoryInteractions();
 								
 								metaDynamicNetwork_LASSO = new DynamicalModelElement(metaNetwork_LASSO);
@@ -949,7 +964,8 @@ public class MetaGrnDisplay extends JPanel {
 
 							if(lassoDelayAlgorithmCheckBox.isSelected())
 							{
-								StructureElement metaNetwork_LASSO_DELAY = loadStructureItem("LASSO_DELAY", new File("LASSO_DELAY.tsv").toURI().toURL(), ImodNetwork.TSV);
+								networkName = "LASSO_DELAY";
+								StructureElement metaNetwork_LASSO_DELAY = loadStructureItem(networkName, new File("LASSO_DELAY.tsv").toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_LASSO_DELAY.getNetwork().removeAutoregulatoryInteractions();
 								
 								metaDynamicNetwork_LASSO_DELAY = new DynamicalModelElement(metaNetwork_LASSO_DELAY);
@@ -964,7 +980,8 @@ public class MetaGrnDisplay extends JPanel {
 							
 							if(dbnAlgorithmCheckBox.isSelected())
 							{
-								StructureElement metaNetwork_DBN = loadStructureItem("DBN", new File("DBN.tsv").toURI().toURL(), ImodNetwork.TSV);
+								networkName = "DBN";
+								StructureElement metaNetwork_DBN = loadStructureItem(networkName, new File("DBN.tsv").toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_DBN.getNetwork().removeAutoregulatoryInteractions();
 								
 								/* Create a new dynamic network from a static one and initialize its parameters.*/
@@ -980,7 +997,8 @@ public class MetaGrnDisplay extends JPanel {
 							
 							if(ridgeAlgorithmCheckBox.isSelected())
 							{
-								StructureElement metaNetwork_RIDGE = loadStructureItem("RIDGE", new File("RIDGE.tsv").toURI().toURL(), ImodNetwork.TSV);
+								networkName = "RIDGE";
+								StructureElement metaNetwork_RIDGE = loadStructureItem(networkName, new File("RIDGE.tsv").toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_RIDGE.getNetwork().removeAutoregulatoryInteractions();
 								
 								/* Create a new dynamic network from a static one and initialize its parameters.*/
@@ -998,9 +1016,11 @@ public class MetaGrnDisplay extends JPanel {
 							//ZMX original user network
 							if(originalUserNetworkCheckBox.isSelected())
 							{
+								// liuxingliang
+								networkName = "Original_USER_NETWORK";
 								/* load directly*/
 								String originalUserNetworkInputFilePath = originalUserNetworkInputFileTextField.getText();
-								StructureElement metaNetwork_USER_Original = loadStructureItem("Original_User_NETWORK", new File(originalUserNetworkInputFilePath).toURI().toURL(), ImodNetwork.TSV);
+								StructureElement metaNetwork_USER_Original = loadStructureItem(networkName, new File(originalUserNetworkInputFilePath).toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_USER_Original.getNetwork().removeAutoregulatoryInteractions();
 								
 								/* Create a new dynamic network from a static one and initialize its parameters.*/
@@ -1012,16 +1032,17 @@ public class MetaGrnDisplay extends JPanel {
 									for (IElement element : metaNetwork_USER_Original.getChildren())
 										metaDynamicNetwork_USER_Original.addChild(element);
 								}
-								
-								
 							}
 							
 							//ZMX modified user network
 							if(modifiedUserNetworkCheckBox.isSelected())
 							{
+								// liuxingliang
+								networkName = "Modified_USER_NETWORK";
+								
 								/* load directly*/
 								String modifiedUserNetworkInputFilePath = modifiedUserNetworkInputFileTextField.getText();
-								StructureElement metaNetwork_USER_modified = loadStructureItem("modified_User_NETWORK", new File(modifiedUserNetworkInputFilePath).toURI().toURL(), ImodNetwork.TSV);
+								StructureElement metaNetwork_USER_modified = loadStructureItem(networkName, new File(modifiedUserNetworkInputFilePath).toURI().toURL(), ImodNetwork.TSV);
 								metaNetwork_USER_modified.getNetwork().removeAutoregulatoryInteractions();
 								
 								/* Create a new dynamic network from a static one and initialize its parameters.*/
@@ -1033,7 +1054,6 @@ public class MetaGrnDisplay extends JPanel {
 									for (IElement element : metaNetwork_USER_modified.getChildren())
 										metaDynamicNetwork_USER_Modified.addChild(element);
 								}
-								
 								
 							}
 							
@@ -1049,14 +1069,18 @@ public class MetaGrnDisplay extends JPanel {
 							dynamicNeworks.put("Original_USER_NETWORK", metaDynamicNetwork_USER_Original);
 							dynamicNeworks.put("Modified_USER_NETWORK", metaDynamicNetwork_USER_Modified);
 							
-							System.out.println("MetaGRN Run Button inputdataMatrix size: "+inputDataMatrix.get(0).size());
 							generateDREAM3GoldStandard(dynamicNeworks, Integer.parseInt(numberOfSimulationSpinner.getValue().toString()), inputDataMatrix);
-						}
+					// 	}
 						
+					} catch (MalformedURLException malFormEx) {
+						JOptionPane.showMessageDialog(null, malFormEx.getMessage(), networkName + ":MalformedURLException", JOptionPane.ERROR_MESSAGE);
+					} catch (ParseException parseEx) {
+						JOptionPane.showMessageDialog(null, parseEx.getMessage(), networkName + ":BadNetworkFormat", JOptionPane.ERROR_MESSAGE);
+					} catch(FileNotFoundException fnfex) {
+						JOptionPane.showMessageDialog(null, fnfex.getMessage(), networkName + ":FileNotFound", JOptionPane.ERROR_MESSAGE);
 					} catch(Exception ex) {
-						ex.printStackTrace();
+						JOptionPane.showMessageDialog(null, ex.getMessage(), networkName + ":Exception", JOptionPane.ERROR_MESSAGE);
 					}
-					
 				}
 			}
 		);

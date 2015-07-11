@@ -1,21 +1,26 @@
 package birc.grni.dbn;
-import org.omegahat.Simulation.MCMC.*;
-import org.omegahat.Simulation.MCMC.Proposals.*;
-import org.omegahat.Simulation.MCMC.Examples.Binomial_HDBNmlf;
-import org.omegahat.Simulation.RandomGenerators.*;
-import org.omegahat.Probability.Distributions.*;
-
-import birc.grni.gui.GrnDbn;
-import birc.grni.gui.GrnDbnDisplay;
-import birc.grni.util.InputData;
-
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+
+import org.omegahat.Probability.Distributions.UnnormalizedDensity;
+import org.omegahat.Simulation.MCMC.CustomMetropolisHastingsSampler;
+import org.omegahat.Simulation.MCMC.SymmetricProposal;
+import org.omegahat.Simulation.MCMC.Examples.Binomial_HDBNmlf;
+import org.omegahat.Simulation.MCMC.Proposals.Binomial_HDBNprof;
+import org.omegahat.Simulation.RandomGenerators.CollingsPRNG;
+import org.omegahat.Simulation.RandomGenerators.CollingsPRNGAdministrator;
+import org.omegahat.Simulation.RandomGenerators.PRNG;
+
+import birc.grni.gui.GrnDbn;
+import birc.grni.gui.GrnDbnDisplay;
+import birc.grni.util.InputData;
+import birc.grni.util.exception.BadInputFormatException;
 
 public class ProgressBarAdaptorDBN extends SwingWorker<Void, Void> {
 	
@@ -38,7 +43,7 @@ public class ProgressBarAdaptorDBN extends SwingWorker<Void, Void> {
 	int [][] dbnInputData;
 	int beta = 0;
 	 
-	String inputFileData, resultFullPath;
+	String resultFullPath;
 	String priorFile;
 	private static Logger logger = Logger.getLogger(ProgressBarAdaptorDBN.class.getName());
 	
@@ -63,10 +68,9 @@ public class ProgressBarAdaptorDBN extends SwingWorker<Void, Void> {
 //		
 //	}
 	
-	public ProgressBarAdaptorDBN(String inputFile ,int iterations, boolean withHeader, boolean geneNameAreColumnHeader) {
+	public ProgressBarAdaptorDBN(FileReader inputFileReader ,int iterations, boolean withHeader, boolean geneNameAreColumnHeader) throws BadInputFormatException, IOException{
 		
-		inputFileData = inputFile;
-		DbnDiscretization dbnData = new DbnDiscretization(inputFile, withHeader, geneNameAreColumnHeader);
+		DbnDiscretization dbnData = new DbnDiscretization(inputFileReader, withHeader, geneNameAreColumnHeader);
 		dbnData.discretize();
 		dbnData.convertToDbn();
 		dbnInputData =dbnData.dbnData;
