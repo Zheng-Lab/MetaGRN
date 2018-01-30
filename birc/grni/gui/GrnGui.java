@@ -213,15 +213,16 @@ public class GrnGui {
 		
 		// ADD BY LIU
 		
-		// add meta-grn button
-		metaGrnButton = new JButton("Meta GRN");
+		// Edit by TTW
+		// changed meta-grn button to show ensemble method
+		metaGrnButton = new JButton("Ensemble Method");
 		mainButtonPanel.add(metaGrnButton);
 		metaGrnButton.setPreferredSize(new Dimension(70,50));
 		mainButtonGroup.add(metaGrnButton);
 		
 		// add meta-grn panel
 		metaGrnPanel = new JPanel();
-		metaGrnPanel.setName("Meta-GRN Panel");
+		metaGrnPanel.setName("Ensemble Method Panel");
 		metaGrnPanel.setBackground(Color.WHITE);
 		metaGrnPanel.setLayout(new BorderLayout());
 		mainPanel.add(metaGrnPanel, metaGrnPanel.getName());

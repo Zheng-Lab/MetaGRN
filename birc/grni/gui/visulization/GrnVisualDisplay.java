@@ -13,6 +13,7 @@ import ch.epfl.lis.imod.*;
 import ch.epfl.lis.networks.ios.*;
 
 
+
 public class GrnVisualDisplay extends JPanel {
 
 	/**
@@ -71,7 +72,7 @@ public class GrnVisualDisplay extends JPanel {
 				}
 		);
 		
-		generateNetworkButton = new JButton("generate network");
+		generateNetworkButton = new JButton("Generate Network");
 	
 		lowPanel.add(generateNetworkButton);
 		
@@ -95,7 +96,7 @@ public class GrnVisualDisplay extends JPanel {
 						}
 						
 						String networkName = "Network Name";	
-
+						
 						try {
 							element = IONetwork.loadItem(networkName, inputfileURL, ImodNetwork.TSV);
 							GrnGraphViewerWindow window = new GrnGraphViewerWindow(new JFrame(), element);	

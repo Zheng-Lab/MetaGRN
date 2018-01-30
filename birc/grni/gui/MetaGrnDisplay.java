@@ -116,7 +116,7 @@ public class MetaGrnDisplay extends JPanel {
 	public MetaGrnDisplay() {
 		
 		super();
-		this.setName("Meta Grn Panel");
+		this.setName("Ensemble Method Panel");			//edit to show Ensemble Method instead
 		this.setBackground(Color.WHITE);
 		
 		/* set layout of this panel*/
@@ -167,7 +167,7 @@ public class MetaGrnDisplay extends JPanel {
 		gridBagConstraints = new GridBagConstraints();					/* restore default*/
 		
 		inputFileLabel = new JLabel("Choose data file:  ");
-		inputFileTextField = new JTextField("upload the data file for Meta-GRN:   ");
+		inputFileTextField = new JTextField("upload the data file for Ensemble Method:   ");
 		inputFileButton = new JButton("Choose");
 		inputFileButton.addActionListener(
 				new ActionListener(){

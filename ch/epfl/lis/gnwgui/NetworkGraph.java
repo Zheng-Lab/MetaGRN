@@ -120,7 +120,7 @@ import edu.uci.ics.screencap.PNGDump;
  * @author Thomas Schaffter (firstname.name@gmail.com)
  *
  */
-public class NetworkGraph {
+public class NetworkGraph extends GraphViewerController {
 	
 	/** NetworkItem associated to this network representation */
 	private NetworkElement item_ = null;
@@ -458,11 +458,12 @@ public class NetworkGraph {
 	 */
 	@SuppressWarnings("serial")
 	 public void addDeleteAction(JComponent jp) {
-		KeyStroke k = KeyStroke.getKeyStroke("control D");
+		
+		KeyStroke k = KeyStroke.getKeyStroke("control D");		
         jp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(k, "deletenode");
-        
         jp.getActionMap().put("deletenode", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+            	
                 if (control_.interactionMode_.getSelectedIndex() == 3 && !(item_ instanceof DynamicalModelElement)){
                     
                     Set<Node> picked_nodes = pickedState_.getPicked();
@@ -508,6 +509,8 @@ public class NetworkGraph {
 
                             msg = msg.substring(0, msg.length() - 2);
                             msg += "] has/have been deleted successfully.";
+                            //TTW
+                            GraphViewerController.saveEditButton.setEnabled(true);
 
                             // update item_
                             if (item_ instanceof StructureElement) {
@@ -677,8 +680,8 @@ public class NetworkGraph {
                              
                              msg = msg.substring(0, msg.length() - 2);
                              msg += "] has/have been deleted successfully.";
-                             
-                             
+                             //TTW
+                             GraphViewerController.saveEditButton.setEnabled(true);
 
                              // update item_
                              if (item_ instanceof StructureElement) {
@@ -700,10 +703,7 @@ public class NetworkGraph {
                          JOptionPane.showMessageDialog(null, 
                                  "No edge has been selected to delete",
                                  "Edge Not Found", JOptionPane.INFORMATION_MESSAGE);
-                     }
-                     
-                     
-                    
+                     }                                         
                  }
              }
 	   });
@@ -808,6 +808,8 @@ public class NetworkGraph {
 
                                          msg += "The edge from " + edgeToCreate.getSource().getLabel() + " to " + 
                                                  edgeToCreate.getTarget().getLabel() + " has been created successfully.";
+                                         //TTW
+                                         GraphViewerController.saveEditButton.setEnabled(true);
 
                                          // update item_
                                          if (item_ instanceof StructureElement) {

@@ -448,9 +448,10 @@ public class CommonUtil {
         return sortedArray;
     }
     
-    public static InputData readInput(FileReader inputFileReader, boolean withHeader, boolean genesAreColumnHeader) throws BadInputFormatException, IOException{
+    public static InputData readInput(FileReader inputFileReader, boolean withHeader, boolean genesAreColumnHeader) 
+    		throws BadInputFormatException, IOException{
 
-    	Pattern inputLineNotHeaderFormatPattern = Pattern.compile("\\d+(\\.\\d+)?(\t\\d+(\\.\\d+)?)*");
+    	Pattern inputLineNotHeaderFormatPattern = Pattern.compile("(\\-)?\\d+(\\.\\d+)?(\t|\\s(\\-)?\\d+(\\.\\d+)?)*");
     	Matcher inputLineNotHeaderFormatMatcher = null;
     	Pattern inputLineHeaderFormatPattern = Pattern.compile("\t\\S+(\t\\S+)*");
     	Matcher inputLineHeaderFormatMatcher = null;

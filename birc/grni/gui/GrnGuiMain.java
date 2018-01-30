@@ -45,9 +45,9 @@ public class GrnGuiMain extends GrnGui {
 		} catch (Exception e) {
 			
 		}
-		
-		GrnGuiMain grnGuiMain = new GrnGuiMain();
-		
+		logger.log(Level.INFO, "End of main method");
+		GrnGuiMain grnGuiMain = new GrnGuiMain(); //enter grnGUI Constructor
+
 		grnGuiMain.initialize();
 		
 		//CHANGE BY LIU
@@ -86,8 +86,8 @@ public class GrnGuiMain extends GrnGui {
 			public void actionPerformed(ActionEvent e) {
 				//inferenceAlgoPanel.refreshAllModels();
 				mainLayout.show(mainPanel, metaGrnPanel.getName());
-				header.setTitle("Meta-GRN");
-//				header.setInfo("Use meta-algorithm to choose best algoirthm for the data ");
+				header.setTitle("Ensemble Method");		//renamed from Meta GRN to Ensemble Method (Edit by TTW)
+				header.setInfo("Use meta-algorithm to choose best algorithm for the data ");
 			}
 		});
 		
