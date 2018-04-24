@@ -23,15 +23,6 @@ ant -f build.xml
 
 You will find a `dist/` folder generated under `ant/` folder, the runnable jar `MetaGRN.jar` is inside.
 
-## Test dataset
-Folder `Data_forTest`.
-
-## User manual
-Please check `docs/manual.pdf`.
-
-## Old version
-Folder `old_versions`.
-
 ## NOTES to Windows users
 It is a known issue that JRE cannot handle long path or path with white spaces very well. If you encounter a problem when run MetaGRN.jar, please move it to a path shorter and without white spaces.
 
